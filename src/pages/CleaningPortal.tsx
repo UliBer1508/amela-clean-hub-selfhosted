@@ -28,9 +28,6 @@ interface Booking {
     status: string;
     assigned_staff_id: string;
     provider_id: string;
-    cleaning_staff: Array<{
-      name: string;
-    }>;
     service_providers?: {
       name: string;
     };
@@ -66,7 +63,7 @@ const CleaningPortal = () => {
             name,
             address
           ),
-          service_tasks (
+          service_tasks!inner (
             id,
             service_type,
             scheduled_date,
@@ -74,9 +71,6 @@ const CleaningPortal = () => {
             status,
             assigned_staff_id,
             provider_id,
-            cleaning_staff (
-              name
-            ),
             service_providers (
               name
             )
@@ -356,7 +350,7 @@ const CleaningPortal = () => {
                         {task.assigned_staff_id && (
                           <div className="mt-2 p-2 bg-green-50 dark:bg-green-950/20 rounded-md border border-green-200 dark:border-green-800">
                             <span className="text-sm text-green-800 dark:text-green-200 font-medium">
-                              ✓ Zugewiesen an: {task.cleaning_staff?.[0]?.name || 'Amela'}
+                              ✓ Zugewiesen an: {task.service_providers?.name || 'Amela'}
                             </span>
                           </div>
                         )}
