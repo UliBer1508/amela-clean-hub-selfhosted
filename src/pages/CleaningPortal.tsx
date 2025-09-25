@@ -52,6 +52,7 @@ const CleaningPortal = () => {
   const [editingTask, setEditingTask] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>('09:00');
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
@@ -297,20 +298,130 @@ const CleaningPortal = () => {
               <Users className="w-4 h-4 mr-2" />
               Putzkräfte
             </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="my-2"
+              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+            >
+              <Bell className="w-4 h-4 mr-2" />
+              Benachrichtigungen
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-foreground mb-2">
-            Alle Buchungen mit Reinigungsaufträgen
-          </h2>
-          <p className="text-muted-foreground">
-            Verwalten Sie alle Reinigungsaufträge für Ihre Gäste
-          </p>
-        </div>
+        {showNotificationSettings ? (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-foreground">
+                Benachrichtigungseinstellungen
+              </h2>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowNotificationSettings(false)}
+              >
+                Zurück zu Reinigungen
+              </Button>
+            </div>
+            <NotificationSettings />
+          </div>
+        ) : (
+          <div>
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-foreground mb-2">
+                Alle Buchungen mit Reinigungsaufträgen
+              </h2>
+              <p className="text-muted-foreground">
+                Verwalten Sie alle Reinigungsaufträge für Ihre Gäste
+              </p>
+            </div>
+
+            {/* Search and Filter */}
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Search className="w-5 h-5 text-primary" />
+                    <span className="font-medium text-foreground">Suche & Filter</span>
+                    <Badge variant="secondary" className="ml-2">0 aktiv</Badge>
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Suche nach Gast, Haus oder Adresse..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Filter className="w-4 h-4 text-primary" />
+                    <span className="font-medium text-foreground">Filter</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Alle Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Alle Status</SelectItem>
+                        <SelectItem value="scheduled">Geplant</SelectItem>
+                        <SelectItem value="completed">Abgeschlossen</SelectItem>
+                        <SelectItem value="cancelled">Storniert</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={staffFilter} onValueChange={setStaffFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Alle Putzkräfte" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Alle Putzkräfte</SelectItem>
+                        <SelectItem value="amela">Amela</SelectItem>
+                        <SelectItem value="tatort">Tatort Reiniger</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={timeFilter} onValueChange={setTimeFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Alle Zeiten" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Alle Zeiten</SelectItem>
+                        <SelectItem value="today">Heute</SelectItem>
+                        <SelectItem value="week">Diese Woche</SelectItem>
+                        <SelectItem value="month">Dieser Monat</SelectItem>
+                        <SelectItem value="3months">Letzten 3 Monate</SelectItem>
+                        <SelectItem value="6months">Letzten 6 Monate</SelectItem>
+                        <SelectItem value="12months">Letzten 12 Monate</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2 border-t border-border">
+                    <span className="text-sm text-muted-foreground">
+                      {filteredBookings.length} von {totalCleaningTasks} Aufträgen
+                    </span>
+                    <Button variant="outline" size="sm">
+                      Filter zurücksetzen
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
 
         {/* Search and Filter */}
         <Card className="mb-6">
@@ -618,16 +729,6 @@ const CleaningPortal = () => {
           </Card>
         )}
       </main>
-
-      {/* Benachrichtigungseinstellungen Dialog */}
-      <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Benachrichtigungseinstellungen</DialogTitle>
-          </DialogHeader>
-          <NotificationSettings />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

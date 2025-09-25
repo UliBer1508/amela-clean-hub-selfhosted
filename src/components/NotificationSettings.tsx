@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Bell, Mail, Volume2, Smartphone, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Settings, Bell, Mail, Volume2, Smartphone, Save } from 'lucide-react';
 
 interface NotificationPreferences {
   id: string;
@@ -24,10 +24,10 @@ interface NotificationPreferences {
 }
 
 const NotificationSettings = () => {
-  const { toast } = useToast();
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchPreferences();
@@ -47,7 +47,7 @@ const NotificationSettings = () => {
       console.error('Error fetching preferences:', error);
       toast({
         title: "Fehler",
-        description: "Einstellungen konnten nicht geladen werden",
+        description: "Benachrichtigungseinstellungen konnten nicht geladen werden.",
         variant: "destructive",
       });
     } finally {
@@ -55,54 +55,47 @@ const NotificationSettings = () => {
     }
   };
 
-  const updatePreferences = async () => {
+  const updatePreferences = async (updatedPrefs: Partial<NotificationPreferences>) => {
     if (!preferences) return;
 
-    setSaving(true);
+    const newPreferences = { ...preferences, ...updatedPrefs };
+    setPreferences(newPreferences);
+
     try {
+      setSaving(true);
       const { error } = await supabase
         .from('notification_preferences')
-        .update({
-          toast_notifications: preferences.toast_notifications,
-          email_notifications: preferences.email_notifications,
-          push_notifications: preferences.push_notifications,
-          sound_notifications: preferences.sound_notifications,
-          notify_new_tasks: preferences.notify_new_tasks,
-          notify_task_changes: preferences.notify_task_changes,
-          notify_status_updates: preferences.notify_status_updates,
-          notify_urgent_tasks: preferences.notify_urgent_tasks,
-          email_address: preferences.email_address,
-        })
+        .update(updatedPrefs)
         .eq('id', preferences.id);
 
       if (error) throw error;
 
       toast({
         title: "Gespeichert",
-        description: "Benachrichtigungseinstellungen wurden aktualisiert",
+        description: "Benachrichtigungseinstellungen wurden aktualisiert.",
       });
     } catch (error) {
       console.error('Error updating preferences:', error);
       toast({
         title: "Fehler",
-        description: "Einstellungen konnten nicht gespeichert werden",
+        description: "Einstellungen konnten nicht gespeichert werden.",
         variant: "destructive",
       });
+      // Revert changes on error
+      setPreferences(preferences);
     } finally {
       setSaving(false);
     }
   };
 
-  const updatePreference = (key: keyof NotificationPreferences, value: boolean | string) => {
-    if (!preferences) return;
-    setPreferences({ ...preferences, [key]: value });
-  };
-
   if (loading) {
     return (
       <Card>
-        <CardContent className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <CardContent className="p-6">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-2 text-muted-foreground">Lade Einstellungen...</p>
+          </div>
         </CardContent>
       </Card>
     );
@@ -111,88 +104,102 @@ const NotificationSettings = () => {
   if (!preferences) {
     return (
       <Card>
-        <CardContent className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">Keine Einstellungen gefunden</p>
+        <CardContent className="p-6">
+          <p className="text-center text-muted-foreground">
+            Benachrichtigungseinstellungen konnten nicht geladen werden.
+          </p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <Settings className="w-5 h-5" />
+          <Bell className="w-5 h-5" />
           <span>Benachrichtigungseinstellungen für {preferences.user_name}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Benachrichtigungsarten */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium flex items-center space-x-2">
-            <Bell className="w-4 h-4" />
-            <span>Benachrichtigungsarten</span>
-          </h3>
+          <h3 className="text-lg font-medium">Benachrichtigungsarten</h3>
           
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label className="text-sm font-medium">Popup-Benachrichtigungen</Label>
-                <p className="text-xs text-muted-foreground">
-                  Sofortige Popups im Browser für neue Updates
-                </p>
+              <div className="flex items-center space-x-3">
+                <Bell className="w-4 h-4 text-blue-600" />
+                <div>
+                  <Label className="font-medium">Popup-Benachrichtigungen</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Sofortige Benachrichtigungen im Browser
+                  </p>
+                </div>
               </div>
               <Switch
                 checked={preferences.toast_notifications}
-                onCheckedChange={(checked) => updatePreference('toast_notifications', checked)}
+                onCheckedChange={(checked) => 
+                  updatePreferences({ toast_notifications: checked })
+                }
+                disabled={saving}
               />
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label className="text-sm font-medium flex items-center space-x-2">
-                  <Mail className="w-4 h-4" />
-                  <span>E-Mail-Benachrichtigungen</span>
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  E-Mails für wichtige Änderungen
-                </p>
+              <div className="flex items-center space-x-3">
+                <Mail className="w-4 h-4 text-green-600" />
+                <div>
+                  <Label className="font-medium">E-Mail-Benachrichtigungen</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Benachrichtigungen per E-Mail erhalten
+                  </p>
+                </div>
               </div>
               <Switch
                 checked={preferences.email_notifications}
-                onCheckedChange={(checked) => updatePreference('email_notifications', checked)}
+                onCheckedChange={(checked) => 
+                  updatePreferences({ email_notifications: checked })
+                }
+                disabled={saving}
               />
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label className="text-sm font-medium flex items-center space-x-2">
-                  <Smartphone className="w-4 h-4" />
-                  <span>Push-Benachrichtigungen</span>
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  Browser-Push-Nachrichten auch wenn die Seite nicht geöffnet ist
-                </p>
+              <div className="flex items-center space-x-3">
+                <Smartphone className="w-4 h-4 text-purple-600" />
+                <div>
+                  <Label className="font-medium">Push-Benachrichtigungen</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Browser-Push-Benachrichtigungen
+                  </p>
+                </div>
               </div>
               <Switch
                 checked={preferences.push_notifications}
-                onCheckedChange={(checked) => updatePreference('push_notifications', checked)}
+                onCheckedChange={(checked) => 
+                  updatePreferences({ push_notifications: checked })
+                }
+                disabled={saving}
               />
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label className="text-sm font-medium flex items-center space-x-2">
-                  <Volume2 className="w-4 h-4" />
-                  <span>Sound-Benachrichtigungen</span>
-                </Label>
-                <p className="text-xs text-muted-foreground">
-                  Töne bei neuen Benachrichtigungen abspielen
-                </p>
+              <div className="flex items-center space-x-3">
+                <Volume2 className="w-4 h-4 text-orange-600" />
+                <div>
+                  <Label className="font-medium">Soundbenachrichtigungen</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Ton bei neuen Benachrichtigungen
+                  </p>
+                </div>
               </div>
               <Switch
                 checked={preferences.sound_notifications}
-                onCheckedChange={(checked) => updatePreference('sound_notifications', checked)}
+                onCheckedChange={(checked) => 
+                  updatePreferences({ sound_notifications: checked })
+                }
+                disabled={saving}
               />
             </div>
           </div>
@@ -200,93 +207,119 @@ const NotificationSettings = () => {
 
         <Separator />
 
-        {/* Was benachrichtigen */}
+        {/* Was soll benachrichtigt werden */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">Wann benachrichtigen</h3>
+          <h3 className="text-lg font-medium">Benachrichtigen bei</h3>
           
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label className="text-sm font-medium">Neue Reinigungsaufträge</Label>
-                <p className="text-xs text-muted-foreground">
-                  Bei neuen Buchungen mit Reinigungsaufträgen
-                </p>
+              <div className="flex items-center space-x-3">
+                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <div>
+                  <Label className="font-medium">Neue Reinigungsaufträge</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Wenn ein neuer Auftrag erstellt wird
+                  </p>
+                </div>
               </div>
               <Switch
                 checked={preferences.notify_new_tasks}
-                onCheckedChange={(checked) => updatePreference('notify_new_tasks', checked)}
+                onCheckedChange={(checked) => 
+                  updatePreferences({ notify_new_tasks: checked })
+                }
+                disabled={saving}
               />
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label className="text-sm font-medium">Auftragsänderungen</Label>
-                <p className="text-xs text-muted-foreground">
-                  Bei Änderungen an Datum, Zeit oder Details
-                </p>
+              <div className="flex items-center space-x-3">
+                <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                <div>
+                  <Label className="font-medium">Auftragsänderungen</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Datum, Zeit oder Details wurden geändert
+                  </p>
+                </div>
               </div>
               <Switch
                 checked={preferences.notify_task_changes}
-                onCheckedChange={(checked) => updatePreference('notify_task_changes', checked)}
+                onCheckedChange={(checked) => 
+                  updatePreferences({ notify_task_changes: checked })
+                }
+                disabled={saving}
               />
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label className="text-sm font-medium">Status-Updates</Label>
-                <p className="text-xs text-muted-foreground">
-                  Bei Änderungen des Reinigungsstatus
-                </p>
+              <div className="flex items-center space-x-3">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div>
+                  <Label className="font-medium">Statusänderungen</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Wenn ein Auftrag abgeschlossen oder storniert wird
+                  </p>
+                </div>
               </div>
               <Switch
                 checked={preferences.notify_status_updates}
-                onCheckedChange={(checked) => updatePreference('notify_status_updates', checked)}
+                onCheckedChange={(checked) => 
+                  updatePreferences({ notify_status_updates: checked })
+                }
+                disabled={saving}
               />
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <Label className="text-sm font-medium">Dringende Aufträge</Label>
-                <p className="text-xs text-muted-foreground">
-                  Spezielle Benachrichtigungen für dringende Reinigungen
-                </p>
+              <div className="flex items-center space-x-3">
+                <AlertTriangle className="w-4 h-4 text-red-600" />
+                <div>
+                  <Label className="font-medium">Dringende Aufträge</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Aufträge die heute oder morgen stattfinden
+                  </p>
+                </div>
               </div>
               <Switch
                 checked={preferences.notify_urgent_tasks}
-                onCheckedChange={(checked) => updatePreference('notify_urgent_tasks', checked)}
+                onCheckedChange={(checked) => 
+                  updatePreferences({ notify_urgent_tasks: checked })
+                }
+                disabled={saving}
               />
             </div>
           </div>
         </div>
 
-        {/* E-Mail-Adresse */}
+        {/* E-Mail Einstellungen */}
         {preferences.email_notifications && (
           <>
             <Separator />
-            <div className="space-y-2">
-              <Label htmlFor="email">E-Mail-Adresse</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="amela@reinigungsservice.at"
-                value={preferences.email_address || ''}
-                onChange={(e) => updatePreference('email_address', e.target.value)}
-              />
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">E-Mail Einstellungen</h3>
+              <div className="space-y-2">
+                <Label htmlFor="email">E-Mail Adresse</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={preferences.email_address || ''}
+                  onChange={(e) => 
+                    updatePreferences({ email_address: e.target.value })
+                  }
+                  placeholder="ihre.email@beispiel.at"
+                  disabled={saving}
+                />
+              </div>
             </div>
           </>
         )}
 
-        <Separator />
-
-        {/* Speichern Button */}
-        <div className="flex justify-end">
+        <div className="flex justify-center pt-4">
           <Button 
-            onClick={updatePreferences} 
+            variant="outline" 
+            onClick={fetchPreferences}
             disabled={saving}
-            className="flex items-center space-x-2"
           >
-            <Save className="w-4 h-4" />
-            <span>{saving ? 'Speichern...' : 'Einstellungen speichern'}</span>
+            {saving ? 'Wird gespeichert...' : 'Einstellungen zurücksetzen'}
           </Button>
         </div>
       </CardContent>
