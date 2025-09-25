@@ -129,35 +129,6 @@ const CleaningPortal = () => {
     }
   };
 
-  const isWithinTimeFilter = (date: string) => {
-    if (timeFilter === 'all') return true;
-    
-    const taskDate = new Date(date);
-    const now = new Date();
-    
-    switch (timeFilter) {
-      case 'today':
-        return taskDate.toDateString() === now.toDateString();
-      case 'week':
-        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        return taskDate >= weekAgo && taskDate <= now;
-      case 'month':
-        const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-        return taskDate >= monthAgo && taskDate <= now;
-      case '3months':
-        const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
-        return taskDate >= threeMonthsAgo && taskDate <= now;
-      case '6months':
-        const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate());
-        return taskDate >= sixMonthsAgo && taskDate <= now;
-      case '12months':
-        const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 12, now.getDate());
-        return taskDate >= twelveMonthsAgo && taskDate <= now;
-      default:
-        return true;
-    }
-  };
-
   const filteredBookings = bookings.filter(booking => {
     const matchesSearch = 
       booking.guest_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -167,10 +138,7 @@ const CleaningPortal = () => {
     const matchesStatus = statusFilter === 'all' || 
       booking.service_tasks?.some(task => task.status === statusFilter);
     
-    const matchesTime = timeFilter === 'all' || 
-      booking.service_tasks?.some(task => isWithinTimeFilter(task.scheduled_date));
-    
-    return matchesSearch && matchesStatus && matchesTime;
+    return matchesSearch && matchesStatus;
   });
 
   const formatDate = (dateString: string) => {
@@ -323,9 +291,6 @@ const CleaningPortal = () => {
                     <SelectItem value="today">Heute</SelectItem>
                     <SelectItem value="week">Diese Woche</SelectItem>
                     <SelectItem value="month">Dieser Monat</SelectItem>
-                    <SelectItem value="3months">Letzten 3 Monate</SelectItem>
-                    <SelectItem value="6months">Letzten 6 Monate</SelectItem>
-                    <SelectItem value="12months">Letzten 12 Monate</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
