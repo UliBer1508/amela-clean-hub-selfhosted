@@ -8,12 +8,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { 
   Search, Filter, UserPlus, Users, Star, Calendar, MapPin, 
-  Phone, Mail, Euro, Edit2, Trash2, UserCheck, UserX, ArrowLeft
+  Phone, Mail, Euro, Edit2, Trash2, UserCheck, UserX, ArrowLeft, Home, Bell
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCleaningStaff } from '@/hooks/useCleaningStaff';
+import { useBookings } from '@/hooks/useBookings';
 import StaffForm from '@/components/StaffForm';
 import { CleaningStaff, StaffFilter, StaffSortBy } from '@/types/staff';
 import { APP_CONFIG } from '@/constants/app';
@@ -28,6 +29,8 @@ const PutzkraeftePage = () => {
 
   const debouncedSearchTerm = useDebounce(searchTerm, APP_CONFIG.SEARCH_DEBOUNCE_MS);
   const { toast } = useToast();
+  
+  const { bookings, totalCleaningTasks } = useBookings();
   
   const {
     staff,
@@ -170,23 +173,67 @@ const PutzkraeftePage = () => {
 
   if (showForm) {
     return (
-      <div className="min-h-screen bg-background py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-6">
-            <Link 
-              to="/" 
-              className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4 story-link"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Zurück zu Reinigungen
-            </Link>
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="bg-card border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                  <Home className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
+                  <p className="text-sm text-muted-foreground">Professioneller Reinigungsservice für Ferienhäuser</p>
+                </div>
+              </div>
+              <Button 
+                onClick={handleCancelForm}
+                variant="outline"
+                className="hover-scale"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Zurück zur Liste
+              </Button>
+            </div>
           </div>
+        </header>
+
+        {/* Navigation */}
+        <div className="bg-card border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex space-x-6">
+              <Link to="/">
+                <Button variant="ghost" size="sm" className="my-2 hover-scale">
+                  <Home className="w-4 h-4 mr-2" />
+                  Reinigungen ({totalCleaningTasks})
+                </Button>
+              </Link>
+              <Link to="/calendar">
+                <Button variant="ghost" size="sm" className="my-2 hover-scale">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Kalender
+                </Button>
+              </Link>
+              <Button variant="default" size="sm" className="my-2">
+                <Users className="w-4 h-4 mr-2" />
+                Putzkräfte
+              </Button>
+              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+                <Bell className="w-4 h-4 mr-2" />
+                Benachrichtigungen
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <StaffForm
             staff={editingStaff || undefined}
             onSubmit={editingStaff ? handleUpdateStaff : handleCreateStaff}
             onCancel={handleCancelForm}
           />
-        </div>
+        </main>
       </div>
     );
   }
@@ -198,19 +245,12 @@ const PutzkraeftePage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <Link 
-                to="/" 
-                className="inline-flex items-center text-muted-foreground hover:text-foreground story-link"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Zurück
-              </Link>
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-primary-foreground" />
+                <Home className="w-6 h-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">Putzkräfte-Verwaltung</h1>
-                <p className="text-sm text-muted-foreground">Verwalten Sie Ihre Reinigungsmitarbeiter</p>
+                <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
+                <p className="text-sm text-muted-foreground">Professioneller Reinigungsservice für Ferienhäuser</p>
               </div>
             </div>
             <Button 
@@ -223,6 +263,34 @@ const PutzkraeftePage = () => {
           </div>
         </div>
       </header>
+
+      {/* Navigation */}
+      <div className="bg-card border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex space-x-6">
+            <Link to="/">
+              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+                <Home className="w-4 h-4 mr-2" />
+                Reinigungen ({totalCleaningTasks})
+              </Button>
+            </Link>
+            <Link to="/calendar">
+              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+                <Calendar className="w-4 h-4 mr-2" />
+                Kalender
+              </Button>
+            </Link>
+            <Button variant="default" size="sm" className="my-2">
+              <Users className="w-4 h-4 mr-2" />
+              Putzkräfte
+            </Button>
+            <Button variant="ghost" size="sm" className="my-2 hover-scale">
+              <Bell className="w-4 h-4 mr-2" />
+              Benachrichtigungen
+            </Button>
+          </div>
+        </div>
+      </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="animate-fade-in">
