@@ -11,7 +11,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { Search, Filter, Calendar, Users, Home, MapPin, Clock, User, CalendarIcon } from 'lucide-react';
+import { Search, Filter, Calendar, Users, Home, MapPin, Clock, User, CalendarIcon, Settings } from 'lucide-react';
+import NotificationSettings from '@/components/NotificationSettings';
 
 interface Booking {
   id: string;
@@ -51,6 +52,7 @@ const CleaningPortal = () => {
   const [editingTask, setEditingTask] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>('09:00');
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     console.log('CleaningPortal: Component mounted, fetching data...');
@@ -265,6 +267,15 @@ const CleaningPortal = () => {
             </div>
             <Button variant="outline" size="sm">
               Reinigungsservice
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setShowSettings(true)}
+              className="flex items-center space-x-2"
+            >
+              <Settings className="w-4 h-4" />
+              <span>Einstellungen</span>
             </Button>
           </div>
         </div>
@@ -607,6 +618,16 @@ const CleaningPortal = () => {
           </Card>
         )}
       </main>
+
+      {/* Benachrichtigungseinstellungen Dialog */}
+      <Dialog open={showSettings} onOpenChange={setShowSettings}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Benachrichtigungseinstellungen</DialogTitle>
+          </DialogHeader>
+          <NotificationSettings />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
