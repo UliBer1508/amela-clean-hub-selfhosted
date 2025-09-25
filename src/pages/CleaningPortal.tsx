@@ -113,8 +113,7 @@ const CleaningPortal = () => {
             )
           )
         `)
-        .eq('service_tasks.service_type', 'cleaning')
-        .order('check_in', { ascending: false });
+        .eq('service_tasks.service_type', 'cleaning');
 
       if (error) throw error;
       
@@ -122,6 +121,14 @@ const CleaningPortal = () => {
       const bookingsWithCleaning = data?.filter(booking => 
         booking.service_tasks && booking.service_tasks.length > 0
       ) || [];
+      
+      // Sort by earliest cleaning date first
+      bookingsWithCleaning.sort((a, b) => {
+        const aDate = a.service_tasks?.[0]?.scheduled_date;
+        const bDate = b.service_tasks?.[0]?.scheduled_date;
+        if (!aDate || !bDate) return 0;
+        return new Date(aDate).getTime() - new Date(bDate).getTime();
+      });
       
       setBookings(bookingsWithCleaning);
       console.log('CleaningPortal: Successfully loaded', bookingsWithCleaning.length, 'bookings');
