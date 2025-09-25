@@ -4,7 +4,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from 'date-fns';
-import { de } from 'date-fns/locale';
 
 interface CalendarEvent {
   id: string;
@@ -156,7 +155,7 @@ const CalendarView = () => {
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
                 <span className="text-lg font-medium min-w-[200px] text-center">
-                  {format(currentMonth, 'MMMM yyyy', { locale: de })}
+                  {format(currentMonth, 'MMMM yyyy')}
                 </span>
                 <Button
                   variant="outline"
@@ -259,7 +258,7 @@ const CalendarView = () => {
             <Card>
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold mb-4">
-                  Termine für {format(selectedDate, 'd. MMMM', { locale: de })}
+                  Termine für {format(selectedDate, 'd. MMMM')}
                 </h3>
                 {selectedDateEvents.length === 0 ? (
                   <p className="text-muted-foreground text-sm">
