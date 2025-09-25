@@ -224,25 +224,26 @@ const Calendar = () => {
                           {format(day, 'd')}
                         </div>
                         
-                        {/* Events */}
-                        <div className="space-y-1">
-                          {dayEvents.slice(0, 3).map((event, eventIndex) => (
-                            <div
-                              key={event.id}
-                              className={`text-xs px-1 py-0.5 rounded text-white ${getEventColor(event.type)}`}
-                            >
-                              {event.type === 'checkin' && '🟢'}
-                              {event.type === 'checkout' && '🔴'}
-                              {event.type === 'cleaning' && '🔵'}
-                              {event.type === 'occupied' && '🟠'}
-                            </div>
-                          ))}
-                          {dayEvents.length > 3 && (
-                            <div className="text-xs text-muted-foreground">
-                              +{dayEvents.length - 3} mehr
-                            </div>
-                          )}
-                        </div>
+                         {/* Events */}
+                         <div className="space-y-1">
+                           {dayEvents.slice(0, 2).map((event, eventIndex) => (
+                             <div
+                               key={event.id}
+                               className={`text-xs px-1 py-0.5 rounded text-white ${getEventColor(event.type)} truncate`}
+                               title={event.title}
+                             >
+                               {event.type === 'checkin' && '✓ Check-in'}
+                               {event.type === 'checkout' && '✗ Check-out'}
+                               {event.type === 'cleaning' && '🧽 Reinigung'}
+                               {event.type === 'occupied' && '🏠 Belegt'}
+                             </div>
+                           ))}
+                           {dayEvents.length > 2 && (
+                             <div className="text-xs text-muted-foreground">
+                               +{dayEvents.length - 2} mehr
+                             </div>
+                           )}
+                         </div>
                       </div>
                     );
                   })}
