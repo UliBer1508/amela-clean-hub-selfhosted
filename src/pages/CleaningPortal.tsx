@@ -135,7 +135,8 @@ const CleaningPortal = () => {
       booking.houses?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.houses?.address?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = statusFilter === 'all' || booking.status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || 
+      booking.service_tasks?.some(task => task.status === statusFilter);
     
     return matchesSearch && matchesStatus;
   });
