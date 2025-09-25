@@ -16,14 +16,15 @@ import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useBookings } from '@/hooks/useBookings';
 import NotificationSettings from '@/components/NotificationSettings';
-import { StatusFilter, TimeFilter, TaskEditingState } from '@/types/booking';
-import { APP_CONFIG, STATUS_FILTERS, TIME_FILTERS } from '@/constants/app';
+import { StatusFilter, TimeFilter, TaskEditingState, StaffFilter } from '@/types/booking';
+import { APP_CONFIG, STATUS_FILTERS, TIME_FILTERS, STAFF_FILTERS } from '@/constants/app';
 import { formatDateTime } from '@/utils/date';
 import { validateTime, sanitizeSearchTerm } from '@/utils/validation';
 
 const CleaningPortal = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('scheduled');
+  const [staffFilter, setStaffFilter] = useState<StaffFilter>('amela');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
   const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -103,21 +104,23 @@ const CleaningPortal = () => {
   const handleResetFilters = useCallback(() => {
     setSearchTerm('');
     setStatusFilter('scheduled');
+    setStaffFilter('amela');
     setTimeFilter('all');
   }, []);
 
   const currentFilteredBookings = useMemo(() => 
-    filteredBookings(debouncedSearchTerm, statusFilter, timeFilter), 
-    [filteredBookings, debouncedSearchTerm, statusFilter, timeFilter]
+    filteredBookings(debouncedSearchTerm, statusFilter, staffFilter, timeFilter), 
+    [filteredBookings, debouncedSearchTerm, statusFilter, staffFilter, timeFilter]
   );
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (debouncedSearchTerm.trim()) count++;
-    if (statusFilter !== 'all') count++;
+    if (statusFilter !== 'scheduled') count++;
+    if (staffFilter !== 'amela') count++;
     if (timeFilter !== 'all') count++;
     return count;
-  }, [debouncedSearchTerm, statusFilter, timeFilter]);
+  }, [debouncedSearchTerm, statusFilter, staffFilter, timeFilter]);
 
   if (loading) {
     return (
@@ -255,38 +258,49 @@ const CleaningPortal = () => {
                     <span className="font-medium text-foreground">Filter</span>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Alle Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(STATUS_FILTERS).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>{label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                  <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Alle Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(STATUS_FILTERS).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                    <Select value={timeFilter} onValueChange={(value: TimeFilter) => setTimeFilter(value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Alle Zeiten" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(TIME_FILTERS).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>{label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <Select value={staffFilter} onValueChange={(value: StaffFilter) => setStaffFilter(value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Alle Putzkräfte" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(STAFF_FILTERS).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                    <Button 
-                      variant="outline" 
-                      onClick={handleResetFilters}
-                      disabled={activeFilterCount === 0}
-                      className="hover-scale"
-                    >
-                      Filter zurücksetzen
-                    </Button>
-                  </div>
+                  <Select value={timeFilter} onValueChange={(value: TimeFilter) => setTimeFilter(value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Alle Zeiten" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(TIME_FILTERS).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Button 
+                    variant="outline" 
+                    onClick={handleResetFilters}
+                    disabled={activeFilterCount === 0}
+                    className="hover-scale"
+                  >
+                    Filter zurücksetzen
+                  </Button>
+                </div>
 
                   <div className="flex justify-between items-center pt-2 border-t border-border">
                     <span className="text-sm text-muted-foreground">

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Booking, StatusFilter, TimeFilter } from '@/types/booking';
+import { Booking, StatusFilter, TimeFilter, StaffFilter } from '@/types/booking';
 import { APP_CONFIG } from '@/constants/app';
 import { isWithinTimeRange } from '@/utils/date';
 import { sanitizeSearchTerm } from '@/utils/validation';
@@ -127,6 +127,7 @@ export const useBookings = () => {
   const filteredBookings = useCallback((
     searchTerm: string,
     statusFilter: StatusFilter,
+    staffFilter: StaffFilter,
     timeFilter: TimeFilter
   ): Booking[] => {
     const sanitizedSearch = sanitizeSearchTerm(searchTerm.toLowerCase());
@@ -140,10 +141,20 @@ export const useBookings = () => {
       const matchesStatus = statusFilter === 'all' || 
         booking.service_tasks?.some(task => task.status === statusFilter);
       
+      const matchesStaff = staffFilter === 'all' || 
+        booking.service_tasks?.some(task => {
+          if (!task.service_providers?.name) return false;
+          const providerName = task.service_providers.name.toLowerCase();
+          return (
+            (staffFilter === 'amela' && providerName.includes('amela')) ||
+            (staffFilter === 'tatort' && providerName.includes('tatort'))
+          );
+        });
+      
       const matchesTime = timeFilter === 'all' || 
         booking.service_tasks?.some(task => isWithinTimeRange(task.scheduled_date, timeFilter));
       
-      return matchesSearch && matchesStatus && matchesTime;
+      return matchesSearch && matchesStatus && matchesStaff && matchesTime;
     });
   }, [bookings]);
 
