@@ -123,15 +123,7 @@ const CleaningPortal = () => {
     }
   }, [editingTask, selectedDate, selectedTime, updateTaskDateTime, toast]);
 
-  const handleResetFilters = useCallback(() => {
-    setSearchTerm('');
-    setStatusFilter('scheduled');
-    setStaffFilter('amela');
-    setTimeFilter('all');
-    setHouseFilter('all');
-  }, []);
-
-  const currentFilteredBookings = useMemo(() => 
+  const currentFilteredBookings = useMemo(() =>
     filteredBookings(debouncedSearchTerm, statusFilter, staffFilter, timeFilter, houseFilter), 
     [filteredBookings, debouncedSearchTerm, statusFilter, staffFilter, timeFilter, houseFilter]
   );
@@ -142,8 +134,9 @@ const CleaningPortal = () => {
     if (statusFilter !== 'scheduled') count++;
     if (staffFilter !== 'amela') count++;
     if (timeFilter !== 'all') count++;
+    if (houseFilter !== 'all') count++;
     return count;
-  }, [debouncedSearchTerm, statusFilter, staffFilter, timeFilter]);
+  }, [debouncedSearchTerm, statusFilter, staffFilter, timeFilter, houseFilter]);
 
   if (loading) {
     return (
@@ -283,7 +276,7 @@ const CleaningPortal = () => {
                     <span className="font-medium text-foreground">Filter</span>
                   </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                   <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Alle Status" />
@@ -328,15 +321,6 @@ const CleaningPortal = () => {
                       ))}
                     </SelectContent>
                   </Select>
-
-                  <Button 
-                    variant="outline" 
-                    onClick={handleResetFilters}
-                    disabled={activeFilterCount === 0}
-                    className="hover-scale"
-                  >
-                    Filter zurücksetzen
-                  </Button>
                 </div>
 
                   <div className="flex justify-between items-center pt-2 border-t border-border">
