@@ -40,3 +40,4 @@ export interface TaskEditingState {
 export type StatusFilter = 'all' | 'scheduled' | 'completed' | 'cancelled' | 'in_progress' | 'delayed';
 export type TimeFilter = 'all' | 'today' | 'week' | 'month' | '3months' | '6months' | '12months';
 export type StaffFilter = 'all' | 'amela' | 'tatort';
+export type HouseFilter = 'all' | string; // 'all' or house ID

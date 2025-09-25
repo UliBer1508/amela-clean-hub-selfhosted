@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Booking, StatusFilter, TimeFilter, StaffFilter } from '@/types/booking';
+import { Booking, StatusFilter, TimeFilter, StaffFilter, HouseFilter } from '@/types/booking';
 import { APP_CONFIG } from '@/constants/app';
 import { isWithinTimeRange } from '@/utils/date';
 import { sanitizeSearchTerm } from '@/utils/validation';
@@ -128,7 +128,8 @@ export const useBookings = () => {
     searchTerm: string,
     statusFilter: StatusFilter,
     staffFilter: StaffFilter,
-    timeFilter: TimeFilter
+    timeFilter: TimeFilter,
+    houseFilter: HouseFilter
   ): Booking[] => {
     const sanitizedSearch = sanitizeSearchTerm(searchTerm.toLowerCase());
     
@@ -154,7 +155,9 @@ export const useBookings = () => {
       const matchesTime = timeFilter === 'all' || 
         booking.service_tasks?.some(task => isWithinTimeRange(task.scheduled_date, timeFilter));
       
-      return matchesSearch && matchesStatus && matchesStaff && matchesTime;
+      const matchesHouse = houseFilter === 'all' || booking.house_id === houseFilter;
+      
+      return matchesSearch && matchesStatus && matchesStaff && matchesTime && matchesHouse;
     });
   }, [bookings]);
 

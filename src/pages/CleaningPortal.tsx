@@ -15,8 +15,9 @@ import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useBookings } from '@/hooks/useBookings';
+import { useHouses } from '@/hooks/useHouses';
 import NotificationSettings from '@/components/NotificationSettings';
-import { StatusFilter, TimeFilter, TaskEditingState, StaffFilter } from '@/types/booking';
+import { StatusFilter, TimeFilter, TaskEditingState, StaffFilter, HouseFilter } from '@/types/booking';
 import { APP_CONFIG, STATUS_FILTERS, TIME_FILTERS, STAFF_FILTERS } from '@/constants/app';
 import { formatDateTime } from '@/utils/date';
 import { validateTime, sanitizeSearchTerm } from '@/utils/validation';
@@ -26,6 +27,7 @@ const CleaningPortal = () => {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('scheduled');
   const [staffFilter, setStaffFilter] = useState<StaffFilter>('amela');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
+  const [houseFilter, setHouseFilter] = useState<HouseFilter>('all');
   const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>(APP_CONFIG.DEFAULT_TIME);
@@ -33,6 +35,7 @@ const CleaningPortal = () => {
 
   const debouncedSearchTerm = useDebounce(searchTerm, APP_CONFIG.SEARCH_DEBOUNCE_MS);
   const { toast } = useToast();
+  const { houses } = useHouses();
   
   const {
     bookings,
@@ -106,11 +109,12 @@ const CleaningPortal = () => {
     setStatusFilter('scheduled');
     setStaffFilter('amela');
     setTimeFilter('all');
+    setHouseFilter('all');
   }, []);
 
   const currentFilteredBookings = useMemo(() => 
-    filteredBookings(debouncedSearchTerm, statusFilter, staffFilter, timeFilter), 
-    [filteredBookings, debouncedSearchTerm, statusFilter, staffFilter, timeFilter]
+    filteredBookings(debouncedSearchTerm, statusFilter, staffFilter, timeFilter, houseFilter), 
+    [filteredBookings, debouncedSearchTerm, statusFilter, staffFilter, timeFilter, houseFilter]
   );
 
   const activeFilterCount = useMemo(() => {
@@ -258,7 +262,7 @@ const CleaningPortal = () => {
                     <span className="font-medium text-foreground">Filter</span>
                   </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
                   <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Alle Status" />
@@ -277,6 +281,18 @@ const CleaningPortal = () => {
                     <SelectContent>
                       {Object.entries(STAFF_FILTERS).map(([key, label]) => (
                         <SelectItem key={key} value={key}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={houseFilter} onValueChange={(value: HouseFilter) => setHouseFilter(value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Alle Häuser" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Alle Häuser</SelectItem>
+                      {houses.map((house) => (
+                        <SelectItem key={house.id} value={house.id}>{house.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
