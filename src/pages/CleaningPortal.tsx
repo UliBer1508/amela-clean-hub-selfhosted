@@ -5,7 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Filter, Calendar, Users, Home, MapPin, Clock, User } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Label } from '@/components/ui/label';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { Search, Filter, Calendar, Users, Home, MapPin, Clock, User, CalendarIcon } from 'lucide-react';
 
 interface Booking {
   id: string;
@@ -41,10 +47,39 @@ const CleaningPortal = () => {
   const [staffFilter, setStaffFilter] = useState('all');
   const [timeFilter, setTimeFilter] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [editingTask, setEditingTask] = useState<any>(null);
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedTime, setSelectedTime] = useState<string>('09:00');
 
   useEffect(() => {
     fetchBookingsWithCleaningTasks();
   }, []);
+
+  const updateTaskDateTime = async (taskId: string, newDate: Date, newTime: string) => {
+    try {
+      const { error } = await supabase
+        .from('service_tasks')
+        .update({
+          scheduled_date: format(newDate, 'yyyy-MM-dd'),
+          scheduled_time: newTime
+        })
+        .eq('id', taskId);
+
+      if (error) throw error;
+      
+      // Refresh bookings
+      await fetchBookingsWithCleaningTasks();
+      setEditingTask(null);
+    } catch (error) {
+      console.error('Error updating task:', error);
+    }
+  };
+
+  const handleEditDateTime = (task: any) => {
+    setEditingTask(task);
+    setSelectedDate(new Date(task.scheduled_date));
+    setSelectedTime(task.scheduled_time || '09:00');
+  };
 
   const fetchBookingsWithCleaningTasks = async () => {
     try {
@@ -361,10 +396,84 @@ const CleaningPortal = () => {
 
                 <div className="border-t border-border p-4 bg-muted/50">
                   <div className="flex justify-center space-x-4">
-                    <Button variant="outline" size="sm">
-                      <Clock className="w-4 h-4 mr-2" />
-                      Datum/Uhrzeit bearbeiten
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEditDateTime(booking.service_tasks?.[0])}
+                        >
+                          <Clock className="w-4 h-4 mr-2" />
+                          Datum/Uhrzeit bearbeiten
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Reinigungstermin bearbeiten</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label>Datum auswählen</Label>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !selectedDate && "text-muted-foreground"
+                                  )}
+                                >
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Datum wählen"}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <CalendarComponent
+                                  mode="single"
+                                  selected={selectedDate}
+                                  onSelect={setSelectedDate}
+                                  initialFocus
+                                  className={cn("p-3 pointer-events-auto")}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                          
+                          <div>
+                            <Label>Uhrzeit</Label>
+                            <Select value={selectedTime} onValueChange={setSelectedTime}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="08:00">08:00 Uhr</SelectItem>
+                                <SelectItem value="09:00">09:00 Uhr</SelectItem>
+                                <SelectItem value="10:00">10:00 Uhr</SelectItem>
+                                <SelectItem value="11:00">11:00 Uhr</SelectItem>
+                                <SelectItem value="12:00">12:00 Uhr</SelectItem>
+                                <SelectItem value="13:00">13:00 Uhr</SelectItem>
+                                <SelectItem value="14:00">14:00 Uhr</SelectItem>
+                                <SelectItem value="15:00">15:00 Uhr</SelectItem>
+                                <SelectItem value="16:00">16:00 Uhr</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div className="flex space-x-2">
+                            <Button 
+                              onClick={() => {
+                                if (editingTask && selectedDate) {
+                                  updateTaskDateTime(editingTask.id, selectedDate, selectedTime);
+                                }
+                              }}
+                              className="flex-1"
+                            >
+                              Speichern
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                     <Button variant="outline" size="sm">
                       <Users className="w-4 h-4 mr-2" />
                       Reinigungsnotizen anzeigen
