@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Search, Filter, Calendar, Users, Home, MapPin, Clock, User, CalendarIcon, Bell } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useBookings } from '@/hooks/useBookings';
@@ -178,10 +179,12 @@ const CleaningPortal = () => {
               <Calendar className="w-4 h-4 mr-2" />
               Kalender
             </Button>
-            <Button variant="ghost" size="sm" className="my-2 hover-scale">
-              <Users className="w-4 h-4 mr-2" />
-              Putzkräfte
-            </Button>
+            <Link to="/putzkraefte">
+              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+                <Users className="w-4 h-4 mr-2" />
+                Putzkräfte
+              </Button>
+            </Link>
             <Button 
               variant="ghost" 
               size="sm" 
