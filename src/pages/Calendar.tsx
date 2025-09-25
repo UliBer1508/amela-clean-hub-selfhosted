@@ -1,15 +1,15 @@
 import React, { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Home, Calendar as CalendarIcon, Users, Bell } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Link } from 'react-router-dom';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import { formatGermanDate } from '@/utils/date';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { de } from 'date-fns/locale';
-import Navigation from '@/components/Navigation';
 
 type ViewType = 'month' | 'week';
 
@@ -20,7 +20,7 @@ const Calendar = () => {
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
-  const { bookings, loading } = useBookings();
+  const { bookings, loading, totalCleaningTasks } = useBookings();
   const { houses } = useHouses();
 
   // Get calendar days for the current month
@@ -133,9 +133,56 @@ const Calendar = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      <div className="pt-24 p-6">{/* pt-24 to account for fixed navigation */}
-      <div className="mx-auto max-w-7xl">
+      {/* Header */}
+      <header className="bg-card border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                <Home className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
+                <p className="text-sm text-muted-foreground">Professioneller Reinigungsservice für Ferienhäuser</p>
+              </div>
+            </div>
+            <Button variant="outline" size="sm" className="hover-scale">
+              Reinigungsservice
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Navigation */}
+      <div className="bg-card border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex space-x-6">
+            <Link to="/">
+              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+                <Home className="w-4 h-4 mr-2" />
+                Reinigungen ({totalCleaningTasks})
+              </Button>
+            </Link>
+            <Button variant="default" size="sm" className="my-2">
+              <CalendarIcon className="w-4 h-4 mr-2" />
+              Kalender
+            </Button>
+            <Link to="/putzkraefte">
+              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+                <Users className="w-4 h-4 mr-2" />
+                Putzkräfte
+              </Button>
+            </Link>
+            <Button variant="ghost" size="sm" className="my-2 hover-scale">
+              <Bell className="w-4 h-4 mr-2" />
+              Benachrichtigungen
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -224,26 +271,26 @@ const Calendar = () => {
                           {format(day, 'd')}
                         </div>
                         
-                         {/* Events */}
-                         <div className="space-y-1">
-                           {dayEvents.slice(0, 2).map((event, eventIndex) => (
-                             <div
-                               key={event.id}
-                               className={`text-xs px-1 py-0.5 rounded text-white ${getEventColor(event.type)} truncate`}
-                               title={event.title}
-                             >
-                               {event.type === 'checkin' && '✓ Check-in'}
-                               {event.type === 'checkout' && '✗ Check-out'}
-                               {event.type === 'cleaning' && '🧽 Reinigung'}
-                               {event.type === 'occupied' && '🏠 Belegt'}
-                             </div>
-                           ))}
-                           {dayEvents.length > 2 && (
-                             <div className="text-xs text-muted-foreground">
-                               +{dayEvents.length - 2} mehr
-                             </div>
-                           )}
-                         </div>
+                        {/* Events */}
+                        <div className="space-y-1">
+                          {dayEvents.slice(0, 2).map((event, eventIndex) => (
+                            <div
+                              key={event.id}
+                              className={`text-xs px-1 py-0.5 rounded text-white ${getEventColor(event.type)} truncate`}
+                              title={event.title}
+                            >
+                              {event.type === 'checkin' && '✓ Check-in'}
+                              {event.type === 'checkout' && '✗ Check-out'}
+                              {event.type === 'cleaning' && '🧽 Reinigung'}
+                              {event.type === 'occupied' && '🏠 Belegt'}
+                            </div>
+                          ))}
+                          {dayEvents.length > 2 && (
+                            <div className="text-xs text-muted-foreground">
+                              +{dayEvents.length - 2} mehr
+                            </div>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -322,8 +369,7 @@ const Calendar = () => {
             </Card>
           </div>
         </div>
-      </div>
-      </div>
+      </main>
     </div>
   );
 };
