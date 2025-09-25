@@ -241,7 +241,7 @@ const CleaningPortal = () => {
               <Home className="w-4 h-4 mr-2" />
               Reinigungen ({totalCleaningTasks})    
             </Button>
-            <Button variant="ghost" size="sm" className="my-2" onClick={() => window.location.href = '/calendar'}>
+            <Button variant="ghost" size="sm" className="my-2">
               <Calendar className="w-4 h-4 mr-2" />
               Kalender
             </Button>
