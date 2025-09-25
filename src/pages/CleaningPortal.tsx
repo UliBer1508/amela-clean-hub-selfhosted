@@ -431,11 +431,11 @@ const CleaningPortal = () => {
                           <span className="text-sm font-medium">Reinigung:</span>
                           <div className="ml-auto">
                             <Select 
-                              value={task.status} 
+                              value={task.status || 'scheduled'} 
                               onValueChange={(value) => updateTaskStatus(task.id, value as 'scheduled' | 'completed' | 'cancelled')}
                             >
                               <SelectTrigger className="h-8 w-[120px]">
-                                <SelectValue />
+                                <SelectValue placeholder="Geplant" />
                               </SelectTrigger>
                               <SelectContent className="bg-card border-border">
                                 <SelectItem value="scheduled">
