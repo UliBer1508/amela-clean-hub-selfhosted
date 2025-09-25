@@ -204,6 +204,10 @@ const CleaningPortal = () => {
     total + (booking.service_tasks?.length || 0), 0
   );
 
+  console.log('CleaningPortal: Rendering with', bookings.length, 'bookings, loading:', loading);
+  console.log('CleaningPortal: Filtered bookings:', filteredBookings.length);
+  console.log('CleaningPortal: About to render main content');
+
   if (loading) {
     console.log('CleaningPortal: Still loading...');
     return (
