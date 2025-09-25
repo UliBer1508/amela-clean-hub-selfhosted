@@ -9,6 +9,7 @@ import { useHouses } from '@/hooks/useHouses';
 import { formatGermanDate } from '@/utils/date';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { de } from 'date-fns/locale';
+import Navigation from '@/components/Navigation';
 
 type ViewType = 'month' | 'week';
 
@@ -131,7 +132,9 @@ const Calendar = () => {
   const weekDays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <div className="pt-20 p-6">{/* pt-20 to account for fixed navigation */}
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
@@ -318,6 +321,7 @@ const Calendar = () => {
             </Card>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

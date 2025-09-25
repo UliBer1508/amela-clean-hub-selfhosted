@@ -201,10 +201,12 @@ const CleaningPortal = () => {
               <Home className="w-4 h-4 mr-2" />
               Reinigungen ({totalCleaningTasks})    
             </Button>
-            <Button variant="ghost" size="sm" className="my-2 hover-scale">
-              <Calendar className="w-4 h-4 mr-2" />
-              Kalender
-            </Button>
+            <Link to="/calendar">
+              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+                <Calendar className="w-4 h-4 mr-2" />
+                Kalender
+              </Button>
+            </Link>
             <Link to="/putzkraefte">
               <Button variant="ghost" size="sm" className="my-2 hover-scale">
                 <Users className="w-4 h-4 mr-2" />
