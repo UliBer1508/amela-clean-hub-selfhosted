@@ -134,7 +134,7 @@ const Calendar = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <div className="pt-20 p-6">{/* pt-20 to account for fixed navigation */}
+      <div className="pt-24 p-6">{/* pt-24 to account for fixed navigation */}
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">

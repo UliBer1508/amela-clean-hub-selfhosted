@@ -21,34 +21,24 @@ const Navigation = () => {
         
         <div className="hidden md:flex items-center space-x-8">
           <Link 
+            to="/" 
+            className="text-foreground hover:text-primary transition-colors story-link"
+          >
+            Reinigungen
+          </Link>
+          <Link 
             to="/calendar" 
             className="text-foreground hover:text-primary transition-colors story-link"
           >
             Kalender
           </Link>
-          <button 
-            onClick={() => scrollToSection('services')}
+          <Link 
+            to="/putzkraefte" 
             className="text-foreground hover:text-primary transition-colors story-link"
           >
-            Dienstleistungen
-          </button>
-          <button 
-            onClick={() => scrollToSection('about')}
-            className="text-foreground hover:text-primary transition-colors story-link"
-          >
-            Über uns
-          </button>
-          <button 
-            onClick={() => scrollToSection('contact')}
-            className="text-foreground hover:text-primary transition-colors story-link"
-          >
-            Kontakt
-          </button>
+            Putzkräfte
+          </Link>
         </div>
-        
-        <Button variant="default" className="hidden md:block hover-scale">
-          Angebot anfordern
-        </Button>
       </div>
     </nav>
   );
