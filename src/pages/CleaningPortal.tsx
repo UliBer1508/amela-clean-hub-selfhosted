@@ -22,7 +22,7 @@ import { validateTime, sanitizeSearchTerm } from '@/utils/validation';
 
 const CleaningPortal = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('scheduled');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
   const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -101,7 +101,7 @@ const CleaningPortal = () => {
 
   const handleResetFilters = useCallback(() => {
     setSearchTerm('');
-    setStatusFilter('all');
+    setStatusFilter('scheduled');
     setTimeFilter('all');
   }, []);
 
