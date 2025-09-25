@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Bell, Mail, Volume2, Smartphone, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { validateEmail } from '@/utils/validation';
 
 interface NotificationPreferences {
   id: string;
@@ -33,21 +34,47 @@ const NotificationSettings = () => {
     fetchPreferences();
   }, []);
 
-  const fetchPreferences = async () => {
+  const fetchPreferences = async (userName = 'Amela') => {
     try {
       const { data, error } = await supabase
         .from('notification_preferences')
         .select('*')
-        .eq('user_name', 'Amela')
-        .single();
+        .eq('user_name', userName)
+        .maybeSingle();
 
       if (error) throw error;
-      setPreferences(data);
+      
+      if (!data) {
+        // Create default preferences if none exist
+        const defaultPrefs = {
+          user_name: userName,
+          toast_notifications: true,
+          email_notifications: false,
+          push_notifications: true,
+          sound_notifications: true,
+          notify_new_tasks: true,
+          notify_task_changes: true,
+          notify_status_updates: true,
+          notify_urgent_tasks: true,
+          email_address: null
+        };
+        
+        const { data: newData, error: createError } = await supabase
+          .from('notification_preferences')
+          .insert(defaultPrefs)
+          .select()
+          .single();
+          
+        if (createError) throw createError;
+        setPreferences(newData);
+      } else {
+        setPreferences(data);
+      }
     } catch (error) {
-      console.error('Error fetching preferences:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unbekannter Fehler';
       toast({
         title: "Fehler",
-        description: "Benachrichtigungseinstellungen konnten nicht geladen werden.",
+        description: `Benachrichtigungseinstellungen konnten nicht geladen werden: ${errorMessage}`,
         variant: "destructive",
       });
     } finally {
@@ -316,7 +343,7 @@ const NotificationSettings = () => {
         <div className="flex justify-center pt-4">
           <Button 
             variant="outline" 
-            onClick={fetchPreferences}
+            onClick={() => fetchPreferences()}
             disabled={saving}
           >
             {saving ? 'Wird gespeichert...' : 'Einstellungen zurücksetzen'}

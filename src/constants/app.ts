@@ -1,0 +1,38 @@
+export const APP_CONFIG = {
+  ITEMS_PER_PAGE: 50,
+  SEARCH_DEBOUNCE_MS: 300,
+  DEFAULT_TIME: '09:00',
+  LOADING_TIMEOUT: 30000,
+} as const;
+
+export const TIME_FILTERS = {
+  all: 'Alle Zeiten',
+  today: 'Heute',
+  week: 'Diese Woche', 
+  month: 'Dieser Monat',
+  '3months': 'Letzten 3 Monate',
+  '6months': 'Letzten 6 Monate',
+  '12months': 'Letzten 12 Monate',
+} as const;
+
+export const STATUS_FILTERS = {
+  all: 'Alle Status',
+  scheduled: 'Geplant',
+  completed: 'Abgeschlossen',
+  cancelled: 'Storniert',
+  in_progress: 'In Bearbeitung',
+  delayed: 'Verzögert',
+} as const;
+
+export const STAFF_FILTERS = {
+  all: 'Alle Putzkräfte',
+  amela: 'Amela',
+  tatort: 'Tatort Reiniger',
+} as const;
+
+export const NOTIFICATION_TYPES = {
+  TASK_CREATED: 'task_created',
+  TASK_UPDATED: 'task_updated', 
+  TASK_COMPLETED: 'task_completed',
+  TASK_CANCELLED: 'task_cancelled',
+} as const;
