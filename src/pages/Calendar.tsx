@@ -10,7 +10,7 @@ import { useHouses } from '@/hooks/useHouses';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import NotificationSettings from '@/components/NotificationSettings';
 import { formatGermanDate } from '@/utils/date';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, addWeeks, subWeeks } from 'date-fns';
 import { de } from 'date-fns/locale';
 
 type ViewType = 'month' | 'week';
@@ -26,15 +26,22 @@ const Calendar = () => {
   const { bookings, loading, totalCleaningTasks } = useBookings();
   const { houses } = useHouses();
 
-  // Get calendar days for the current month
+  // Get calendar days for the current month/week
   const calendarDays = useMemo(() => {
-    const monthStart = startOfMonth(currentDate);
-    const monthEnd = endOfMonth(currentDate);
-    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 }); // Monday
-    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
-
-    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
-  }, [currentDate]);
+    if (viewType === 'week') {
+      // Week view: show 7 days of current week
+      const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 }); // Monday
+      const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
+      return eachDayOfInterval({ start: weekStart, end: weekEnd });
+    } else {
+      // Month view: show full month calendar
+      const monthStart = startOfMonth(currentDate);
+      const monthEnd = endOfMonth(currentDate);
+      const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 }); // Monday
+      const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+      return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+    }
+  }, [currentDate, viewType]);
 
   // Filter bookings and tasks for current month
   const monthEvents = useMemo(() => {
@@ -124,6 +131,22 @@ const Calendar = () => {
     setSelectedDate(today);
   };
 
+  const previousPeriod = () => {
+    if (viewType === 'week') {
+      setCurrentDate(prev => subWeeks(prev, 1));
+    } else {
+      setCurrentDate(prev => subMonths(prev, 1));
+    }
+  };
+
+  const nextPeriod = () => {
+    if (viewType === 'week') {
+      setCurrentDate(prev => addWeeks(prev, 1));
+    } else {
+      setCurrentDate(prev => addMonths(prev, 1));
+    }
+  };
+
   const previousMonth = () => {
     setCurrentDate(prev => subMonths(prev, 1));
   };
@@ -210,22 +233,25 @@ const Calendar = () => {
           <>
             {/* Header */}
             <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold">
-              {format(currentDate, 'MMMM yyyy', { locale: de })}
-            </h1>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" onClick={previousMonth}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="sm" onClick={goToToday}>
-                Heute
-              </Button>
-              <Button variant="outline" size="sm" onClick={nextMonth}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+            <div className="flex items-center space-x-4">
+              <h1 className="text-2xl font-bold">
+                {viewType === 'week' 
+                  ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
+                  : format(currentDate, 'MMMM yyyy', { locale: de })
+                }
+              </h1>
+              <div className="flex items-center space-x-2">
+                <Button variant="outline" size="sm" onClick={previousPeriod}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="sm" onClick={goToToday}>
+                  Heute
+                </Button>
+                <Button variant="outline" size="sm" onClick={nextPeriod}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          </div>
           
           <div className="flex items-center space-x-2">
             <Button
@@ -252,20 +278,23 @@ const Calendar = () => {
               <CardContent className="p-6">
                 <div className="mb-4 flex items-center justify-between">
                   <h2 className="text-xl font-semibold">
-                    {format(currentDate, 'MMMM yyyy', { locale: de })}
+                    {viewType === 'week' 
+                      ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
+                      : format(currentDate, 'MMMM yyyy', { locale: de })
+                    }
                   </h2>
                   <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm" onClick={previousMonth}>
+                    <Button variant="ghost" size="sm" onClick={previousPeriod}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={nextMonth}>
+                    <Button variant="ghost" size="sm" onClick={nextPeriod}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
 
                 {/* Calendar Grid */}
-                <div className="grid grid-cols-7 gap-1">
+                <div className={`grid gap-1 ${viewType === 'week' ? 'grid-cols-7' : 'grid-cols-7'}`}>
                   {/* Week days header */}
                   {weekDays.map(day => (
                     <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
@@ -276,7 +305,7 @@ const Calendar = () => {
                   {/* Calendar days */}
                   {calendarDays.map((day, index) => {
                     const dayEvents = getDayEvents(day);
-                    const isCurrentMonth = isSameMonth(day, currentDate);
+                    const isCurrentMonth = viewType === 'week' ? true : isSameMonth(day, currentDate);
                     const isTodayDate = isToday(day);
                     const isSelected = selectedDate && isSameDay(day, selectedDate);
 
@@ -284,7 +313,7 @@ const Calendar = () => {
                       <div
                         key={index}
                         className={`
-                          min-h-[100px] p-2 border border-border cursor-pointer transition-colors
+                          ${viewType === 'week' ? 'min-h-[120px]' : 'min-h-[100px]'} p-2 border border-border cursor-pointer transition-colors
                           ${!isCurrentMonth ? 'bg-muted/50 text-muted-foreground' : ''}
                           ${isTodayDate ? 'bg-primary/10' : ''}
                           ${isSelected ? 'bg-primary text-primary-foreground' : ''}
@@ -293,12 +322,15 @@ const Calendar = () => {
                         onClick={() => setSelectedDate(day)}
                       >
                         <div className="text-sm font-medium mb-1">
-                          {format(day, 'd')}
+                          {viewType === 'week' 
+                            ? format(day, 'd. MMM', { locale: de })
+                            : format(day, 'd')
+                          }
                         </div>
                         
                         {/* Events */}
                         <div className="space-y-1">
-                          {dayEvents.slice(0, 2).map((event, eventIndex) => (
+                          {dayEvents.slice(0, viewType === 'week' ? 4 : 2).map((event, eventIndex) => (
                             <div
                               key={event.id}
                               className={`text-xs px-1 py-0.5 rounded text-white ${getEventColor(event.type)} truncate`}
@@ -310,9 +342,9 @@ const Calendar = () => {
                               {event.type === 'occupied' && '🏠 Belegt'}
                             </div>
                           ))}
-                          {dayEvents.length > 2 && (
+                          {dayEvents.length > (viewType === 'week' ? 4 : 2) && (
                             <div className="text-xs text-muted-foreground">
-                              +{dayEvents.length - 2} mehr
+                              +{dayEvents.length - (viewType === 'week' ? 4 : 2)} mehr
                             </div>
                           )}
                         </div>
