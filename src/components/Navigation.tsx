@@ -20,6 +20,12 @@ const Navigation = () => {
         </Link>
         
         <div className="hidden md:flex items-center space-x-8">
+          <Link 
+            to="/calendar" 
+            className="text-foreground hover:text-primary transition-colors story-link"
+          >
+            Kalender
+          </Link>
           <button 
             onClick={() => scrollToSection('services')}
             className="text-foreground hover:text-primary transition-colors story-link"
