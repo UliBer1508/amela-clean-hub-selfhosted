@@ -57,6 +57,18 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        "service-card": "hsl(var(--service-card))",
+        "service-card-hover": "hsl(var(--service-card-hover))",
+      },
+      backgroundImage: {
+        "hero-gradient": "var(--hero-gradient)",
+      },
+      boxShadow: {
+        "soft": "var(--shadow-soft)",
+        "medium": "var(--shadow-medium)",
+      },
+      transitionProperty: {
+        "smooth": "var(--transition-smooth)",
       },
       borderRadius: {
         lg: "var(--radius)",
