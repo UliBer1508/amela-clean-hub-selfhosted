@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
+import { useCleaningStaff } from '@/hooks/useCleaningStaff';
 import NotificationSettings from '@/components/NotificationSettings';
 import { StatusFilter, TimeFilter, TaskEditingState, StaffFilter, HouseFilter } from '@/types/booking';
 import { APP_CONFIG, STATUS_FILTERS, TIME_FILTERS, STAFF_FILTERS } from '@/constants/app';
@@ -36,6 +37,7 @@ const CleaningPortal = () => {
   const debouncedSearchTerm = useDebounce(searchTerm, APP_CONFIG.SEARCH_DEBOUNCE_MS);
   const { toast } = useToast();
   const { houses } = useHouses();
+  const { staff } = useCleaningStaff();
   
   const {
     bookings,
@@ -44,6 +46,7 @@ const CleaningPortal = () => {
     totalCleaningTasks,
     updateTaskStatus,
     updateTaskDateTime,
+    updateTaskStaff,
     filteredBookings,
     refetch
   } = useBookings();
@@ -67,6 +70,22 @@ const CleaningPortal = () => {
       });
     }
   }, [updateTaskStatus, toast]);
+
+  const handleStaffUpdate = useCallback(async (taskId: string, staffId: string | null) => {
+    const result = await updateTaskStaff(taskId, staffId);
+    if (result.success) {
+      toast({
+        title: "Putzkraft zugewiesen",
+        description: "Die Putzkraft wurde erfolgreich zugewiesen.",
+      });
+    } else {
+      toast({
+        title: "Fehler",
+        description: result.error || "Fehler beim Zuweisen der Putzkraft",
+        variant: "destructive",
+      });
+    }
+  }, [updateTaskStaff, toast]);
 
   const handleEditDateTime = useCallback((task: TaskEditingState) => {
     setEditingTask(task);
@@ -422,6 +441,25 @@ const CleaningPortal = () => {
                                     <SelectItem value="completed">Abgeschlossen</SelectItem>
                                     <SelectItem value="delayed">Verzögert</SelectItem>
                                     <SelectItem value="cancelled">Storniert</SelectItem>
+                                  </SelectContent>
+                                </Select>
+
+                                <Select
+                                  value={task.assigned_staff_id || 'unassigned'}
+                                  onValueChange={(value: string) => 
+                                    handleStaffUpdate(task.id, value === 'unassigned' ? null : value)
+                                  }
+                                >
+                                  <SelectTrigger className="w-auto">
+                                    <SelectValue placeholder="Putzkraft" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="unassigned">Nicht zugewiesen</SelectItem>
+                                    {staff.filter(s => s.is_active).map((staffMember) => (
+                                      <SelectItem key={staffMember.id} value={staffMember.id}>
+                                        {staffMember.name}
+                                      </SelectItem>
+                                    ))}
                                   </SelectContent>
                                 </Select>
 

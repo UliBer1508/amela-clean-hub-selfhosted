@@ -124,6 +124,28 @@ export const useBookings = () => {
     }
   }, [fetchBookings]);
 
+  const updateTaskStaff = useCallback(async (
+    taskId: string, 
+    staffId: string | null
+  ) => {
+    try {
+      const { error } = await supabase
+        .from('service_tasks')
+        .update({
+          assigned_staff_id: staffId
+        })
+        .eq('id', taskId);
+
+      if (error) throw error;
+      
+      await fetchBookings();
+      return { success: true };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Fehler beim Zuweisen der Putzkraft';
+      return { success: false, error: errorMessage };
+    }
+  }, [fetchBookings]);
+
   const filteredBookings = useCallback((
     searchTerm: string,
     statusFilter: StatusFilter,
@@ -174,6 +196,7 @@ export const useBookings = () => {
     totalCleaningTasks,
     updateTaskStatus,
     updateTaskDateTime,
+    updateTaskStaff,
     filteredBookings,
     refetch: fetchBookings
   };
