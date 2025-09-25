@@ -17,6 +17,7 @@ import { useCleaningStaff } from '@/hooks/useCleaningStaff';
 import { useBookings } from '@/hooks/useBookings';
 import StaffForm from '@/components/StaffForm';
 import PWAInstallButton from '@/components/PWAInstallButton';
+import NotificationSettings from '@/components/NotificationSettings';
 import { CleaningStaff, StaffFilter, StaffSortBy } from '@/types/staff';
 import { APP_CONFIG } from '@/constants/app';
 import { sanitizeSearchTerm } from '@/utils/validation';
@@ -27,6 +28,7 @@ const PutzkraeftePage = () => {
   const [sortBy, setSortBy] = useState<StaffSortBy>('name');
   const [showForm, setShowForm] = useState(false);
   const [editingStaff, setEditingStaff] = useState<CleaningStaff | null>(null);
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
 
   const debouncedSearchTerm = useDebounce(searchTerm, APP_CONFIG.SEARCH_DEBOUNCE_MS);
   const { toast } = useToast();
@@ -220,7 +222,12 @@ const PutzkraeftePage = () => {
                 <Users className="w-4 h-4 mr-2" />
                 Putzkräfte
               </Button>
-              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="my-2 hover-scale"
+                onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+              >
                 <Bell className="w-4 h-4 mr-2" />
                 Benachrichtigungen
               </Button>
@@ -288,7 +295,12 @@ const PutzkraeftePage = () => {
               <Users className="w-4 h-4 mr-2" />
               Putzkräfte
             </Button>
-            <Button variant="ghost" size="sm" className="my-2 hover-scale">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="my-2 hover-scale"
+              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+            >
               <Bell className="w-4 h-4 mr-2" />
               Benachrichtigungen
             </Button>
@@ -297,7 +309,22 @@ const PutzkraeftePage = () => {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="animate-fade-in">
+        {showNotificationSettings ? (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold">Benachrichtigungseinstellungen</h1>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowNotificationSettings(false)}
+                className="hover-scale"
+              >
+                Zurück zu Putzkräfte
+              </Button>
+            </div>
+            <NotificationSettings />
+          </div>
+        ) : (
+          <div className="animate-fade-in">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <Card>
@@ -557,6 +584,7 @@ const PutzkraeftePage = () => {
             )}
           </div>
         </div>
+        )}
       </main>
     </div>
   );

@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import PWAInstallButton from '@/components/PWAInstallButton';
+import NotificationSettings from '@/components/NotificationSettings';
 import { formatGermanDate } from '@/utils/date';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -20,6 +21,7 @@ const Calendar = () => {
   const [viewType, setViewType] = useState<ViewType>('month');
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
 
   const { bookings, loading, totalCleaningTasks } = useBookings();
   const { houses } = useHouses();
@@ -175,7 +177,12 @@ const Calendar = () => {
                 Putzkräfte
               </Button>
             </Link>
-            <Button variant="ghost" size="sm" className="my-2 hover-scale">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="my-2 hover-scale"
+              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+            >
               <Bell className="w-4 h-4 mr-2" />
               Benachrichtigungen
             </Button>
@@ -185,8 +192,24 @@ const Calendar = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
+        {showNotificationSettings ? (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold">Benachrichtigungseinstellungen</h1>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowNotificationSettings(false)}
+                className="hover-scale"
+              >
+                Zurück zum Kalender
+              </Button>
+            </div>
+            <NotificationSettings />
+          </div>
+        ) : (
+          <>
+            {/* Header */}
+            <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold">
               {format(currentDate, 'MMMM yyyy', { locale: de })}
@@ -371,6 +394,8 @@ const Calendar = () => {
             </Card>
           </div>
         </div>
+        </>
+        )}
       </main>
     </div>
   );
