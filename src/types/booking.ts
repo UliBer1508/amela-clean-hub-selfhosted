@@ -7,6 +7,7 @@ export interface ServiceTask {
   assigned_staff_id: string;
   provider_id: string;
   completed_at?: string;
+  notes?: string;
   service_providers?: {
     name: string;
   };

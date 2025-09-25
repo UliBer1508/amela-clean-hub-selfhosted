@@ -39,6 +39,7 @@ export const useBookings = () => {
             assigned_staff_id,
             provider_id,
             completed_at,
+            notes,
             service_providers (
               name
             )
