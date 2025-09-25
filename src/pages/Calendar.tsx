@@ -23,7 +23,7 @@ const Calendar = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
 
-  const { bookings, loading, totalCleaningTasks } = useBookings();
+  const { allBookings, loading, totalCleaningTasks } = useBookings();
   const { houses } = useHouses();
 
   // Get calendar days for the current month/week
@@ -45,7 +45,7 @@ const Calendar = () => {
 
   // Filter bookings and tasks for current month
   const monthEvents = useMemo(() => {
-    if (!bookings) return [];
+    if (!allBookings) return [];
 
     const events: Array<{
       id: string;
@@ -58,7 +58,7 @@ const Calendar = () => {
       bookingId?: string;
     }> = [];
 
-    bookings.forEach(booking => {
+    allBookings.forEach(booking => {
       const checkinDate = new Date(booking.check_in);
       const checkoutDate = new Date(booking.check_out);
       
@@ -84,6 +84,23 @@ const Calendar = () => {
         bookingId: booking.id
       });
 
+      // Add occupied days (between check-in and check-out)
+      const currentDate = new Date(checkinDate);
+      currentDate.setDate(currentDate.getDate() + 1); // Start from day after check-in
+      
+      while (currentDate < checkoutDate) {
+        events.push({
+          id: `occupied-${booking.id}-${currentDate.toISOString().split('T')[0]}`,
+          date: new Date(currentDate),
+          type: 'occupied',
+          title: `Belegt: ${booking.guest_name}`,
+          house: booking.houses?.name || 'Unbekannt',
+          guestName: booking.guest_name,
+          bookingId: booking.id
+        });
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
       // Add cleaning tasks
       booking.service_tasks?.forEach(task => {
         if (task.service_type === 'cleaning') {
@@ -101,8 +118,8 @@ const Calendar = () => {
       });
     });
 
-    return events;
-  }, [bookings]);
+     return events;
+  }, [allBookings]);
 
   // Get events for selected date
   const selectedDateEvents = useMemo(() => {

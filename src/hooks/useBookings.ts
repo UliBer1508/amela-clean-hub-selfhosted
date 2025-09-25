@@ -7,6 +7,7 @@ import { sanitizeSearchTerm } from '@/utils/validation';
 
 export const useBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [allBookings, setAllBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,7 +16,8 @@ export const useBookings = () => {
       setLoading(true);
       setError(null);
       
-      const { data, error: fetchError } = await supabase
+      // Fetch bookings with cleaning tasks (for main cleaning portal)
+      const { data: cleaningData, error: cleaningError } = await supabase
         .from('bookings')
         .select(`
           id,
@@ -48,10 +50,45 @@ export const useBookings = () => {
         .eq('service_tasks.service_type', 'cleaning')
         .limit(APP_CONFIG.ITEMS_PER_PAGE);
 
-      if (fetchError) throw fetchError;
+      // Fetch all bookings (for calendar view)
+      const { data: allData, error: allError } = await supabase
+        .from('bookings')
+        .select(`
+          id,
+          guest_name,
+          guest_email,
+          check_in,
+          check_out,
+          number_of_guests,
+          status,
+          house_id,
+          houses (
+            name,
+            address
+          ),
+          service_tasks (
+            id,
+            service_type,
+            scheduled_date,
+            scheduled_time,
+            status,
+            assigned_staff_id,
+            provider_id,
+            completed_at,
+            notes,
+            service_providers (
+              name
+            )
+          )
+        `)
+        .order('check_in', { ascending: true });
+
+      if (cleaningError) throw cleaningError;
+      if (allError) throw allError;
       
       // Cast the data to match our Booking interface
-      const bookingsData = data as unknown as Booking[];
+      const bookingsData = cleaningData as unknown as Booking[];
+      const allBookingsData = allData as unknown as Booking[];
       
       const bookingsWithCleaning = bookingsData?.filter(booking => 
         booking.service_tasks && booking.service_tasks.length > 0
@@ -66,6 +103,7 @@ export const useBookings = () => {
       });
       
       setBookings(bookingsWithCleaning);
+      setAllBookings(allBookingsData || []);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Fehler beim Laden der Buchungen';
       setError(errorMessage);
@@ -192,6 +230,7 @@ export const useBookings = () => {
 
   return {
     bookings,
+    allBookings, // All bookings for calendar view
     loading,
     error,
     totalCleaningTasks,
