@@ -419,11 +419,32 @@ const CleaningPortal = () => {
                                 <span>{formatDateTime(task.scheduled_date, task.scheduled_time)}</span>
                               </div>
 
-                              {task.service_providers?.name && (
-                                <div className="text-sm text-muted-foreground">
-                                  Zugewiesen an: {task.service_providers.name}
-                                </div>
-                              )}
+                              <div className="flex items-center space-x-2 text-sm">
+                                <span className="text-muted-foreground">Zugewiesen an:</span>
+                                <Select
+                                  value={task.assigned_staff_id || 'unassigned'}
+                                  onValueChange={(value: string) => 
+                                    handleStaffUpdate(task.id, value === 'unassigned' ? null : value)
+                                  }
+                                >
+                                  <SelectTrigger className="w-auto">
+                                    <SelectValue>
+                                      {task.assigned_staff_id 
+                                        ? staff.find(s => s.id === task.assigned_staff_id)?.name || 'Nicht zugewiesen'
+                                        : 'Nicht zugewiesen'
+                                      }
+                                    </SelectValue>
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="unassigned">Nicht zugewiesen</SelectItem>
+                                    {staff.filter(s => s.is_active).map((staffMember) => (
+                                      <SelectItem key={staffMember.id} value={staffMember.id}>
+                                        {staffMember.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
 
                               <div className="flex flex-wrap gap-2 pt-2">
                                 <Select
@@ -441,25 +462,6 @@ const CleaningPortal = () => {
                                     <SelectItem value="completed">Abgeschlossen</SelectItem>
                                     <SelectItem value="delayed">Verzögert</SelectItem>
                                     <SelectItem value="cancelled">Storniert</SelectItem>
-                                  </SelectContent>
-                                </Select>
-
-                                <Select
-                                  value={task.assigned_staff_id || 'unassigned'}
-                                  onValueChange={(value: string) => 
-                                    handleStaffUpdate(task.id, value === 'unassigned' ? null : value)
-                                  }
-                                >
-                                  <SelectTrigger className="w-auto">
-                                    <SelectValue placeholder="Putzkraft" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="unassigned">Nicht zugewiesen</SelectItem>
-                                    {staff.filter(s => s.is_active).map((staffMember) => (
-                                      <SelectItem key={staffMember.id} value={staffMember.id}>
-                                        {staffMember.name}
-                                      </SelectItem>
-                                    ))}
                                   </SelectContent>
                                 </Select>
 
