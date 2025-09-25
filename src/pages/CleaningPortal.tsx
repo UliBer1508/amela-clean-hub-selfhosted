@@ -205,6 +205,7 @@ const CleaningPortal = () => {
   );
 
   if (loading) {
+    console.log('CleaningPortal: Still loading...');
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
