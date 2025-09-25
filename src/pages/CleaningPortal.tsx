@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Search, Filter, Calendar, Users, Home, MapPin, Clock, User, CalendarIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface Booking {
   id: string;
@@ -241,9 +242,11 @@ const CleaningPortal = () => {
               <Home className="w-4 h-4 mr-2" />
               Reinigungen ({totalCleaningTasks})    
             </Button>
-            <Button variant="ghost" size="sm" className="my-2" onClick={() => window.location.href = '/calendar'}>
-              <Calendar className="w-4 h-4 mr-2" />
-              Kalender
+            <Button variant="ghost" size="sm" className="my-2" asChild>
+              <Link to="/calendar">
+                <Calendar className="w-4 h-4 mr-2" />
+                Kalender
+              </Link>
             </Button>
             <Button variant="ghost" size="sm" className="my-2">
               <Users className="w-4 h-4 mr-2" />
