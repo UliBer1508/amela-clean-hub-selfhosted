@@ -34,6 +34,7 @@ interface Booking {
     status: string;
     assigned_staff_id: string;
     provider_id: string;
+    completed_at?: string;
     service_providers?: {
       name: string;
     };
@@ -55,6 +56,25 @@ const CleaningPortal = () => {
     console.log('CleaningPortal: Component mounted, fetching data...');
     fetchBookingsWithCleaningTasks();
   }, []);
+
+  const updateTaskStatus = async (taskId: string, newStatus: 'scheduled' | 'completed' | 'cancelled') => {
+    try {
+      const { error } = await supabase
+        .from('service_tasks')
+        .update({
+          status: newStatus,
+          completed_at: newStatus === 'completed' ? new Date().toISOString() : null
+        })
+        .eq('id', taskId);
+
+      if (error) throw error;
+      
+      // Refresh bookings
+      await fetchBookingsWithCleaningTasks();
+    } catch (error) {
+      console.error('Error updating task status:', error);
+    }
+  };
 
   const updateTaskDateTime = async (taskId: string, newDate: Date, newTime: string) => {
     try {
@@ -108,6 +128,7 @@ const CleaningPortal = () => {
             status,
             assigned_staff_id,
             provider_id,
+            completed_at,
             service_providers (
               name
             )
@@ -408,6 +429,36 @@ const CleaningPortal = () => {
                         <div className="flex items-center space-x-2">
                           <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
                           <span className="text-sm font-medium">Reinigung:</span>
+                          <div className="ml-auto">
+                            <Select 
+                              value={task.status} 
+                              onValueChange={(value) => updateTaskStatus(task.id, value as 'scheduled' | 'completed' | 'cancelled')}
+                            >
+                              <SelectTrigger className="h-8 w-[120px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="bg-card border-border">
+                                <SelectItem value="scheduled">
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                    <span>Geplant</span>
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="completed">
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span>Abgeschlossen</span>
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="cancelled">
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                    <span>Storniert</span>
+                                  </div>
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Home className="w-4 h-4 text-blue-600" />
@@ -418,6 +469,11 @@ const CleaningPortal = () => {
                           <span className="text-sm">
                             Geplant: {formatDateTime(task.scheduled_date, task.scheduled_time)}
                           </span>
+                          {task.status === 'completed' && task.completed_at && (
+                            <div className="ml-2 px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200 text-xs rounded">
+                              ✓ Abgeschlossen
+                            </div>
+                          )}
                         </div>
                         <div className="flex items-center space-x-2">
                           <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
