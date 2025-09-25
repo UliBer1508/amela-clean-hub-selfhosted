@@ -18,6 +18,7 @@ import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import { useCleaningStaff } from '@/hooks/useCleaningStaff';
 import NotificationSettings from '@/components/NotificationSettings';
+import PWAInstallButton from '@/components/PWAInstallButton';
 import { StatusFilter, TimeFilter, TaskEditingState, StaffFilter, HouseFilter } from '@/types/booking';
 import { APP_CONFIG, STATUS_FILTERS, TIME_FILTERS, STAFF_FILTERS } from '@/constants/app';
 import { formatDateTime } from '@/utils/date';
@@ -182,6 +183,7 @@ const CleaningPortal = () => {
             <Button variant="outline" size="sm" className="hover-scale">
               Reinigungsservice
             </Button>
+            <PWAInstallButton />
           </div>
         </div>
       </header>

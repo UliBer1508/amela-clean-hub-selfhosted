@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Link } from 'react-router-dom';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
+import PWAInstallButton from '@/components/PWAInstallButton';
 import { formatGermanDate } from '@/utils/date';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -149,6 +150,7 @@ const Calendar = () => {
             <Button variant="outline" size="sm" className="hover-scale">
               Reinigungsservice
             </Button>
+            <PWAInstallButton />
           </div>
         </div>
       </header>

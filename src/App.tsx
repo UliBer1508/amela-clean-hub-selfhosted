@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import PutzkraeftePage from "./pages/PutzkraeftePage";
 import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
+import PWAUpdateNotification from "./components/PWAUpdateNotification";
 
 const queryClient = new QueryClient();
 
@@ -15,6 +16,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <Toaster />
     <Sonner />
+    <PWAUpdateNotification />
     <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />

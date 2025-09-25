@@ -16,6 +16,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useCleaningStaff } from '@/hooks/useCleaningStaff';
 import { useBookings } from '@/hooks/useBookings';
 import StaffForm from '@/components/StaffForm';
+import PWAInstallButton from '@/components/PWAInstallButton';
 import { CleaningStaff, StaffFilter, StaffSortBy } from '@/types/staff';
 import { APP_CONFIG } from '@/constants/app';
 import { sanitizeSearchTerm } from '@/utils/validation';
@@ -253,13 +254,16 @@ const PutzkraeftePage = () => {
                 <p className="text-sm text-muted-foreground">Professioneller Reinigungsservice für Ferienhäuser</p>
               </div>
             </div>
-            <Button 
-              onClick={() => setShowForm(true)}
-              className="hover-scale"
-            >
-              <UserPlus className="w-4 h-4 mr-2" />
-              Neue Putzkraft
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button 
+                onClick={() => setShowForm(true)}
+                className="hover-scale"
+              >
+                <UserPlus className="w-4 h-4 mr-2" />
+                Neue Putzkraft
+              </Button>
+              <PWAInstallButton />
+            </div>
           </div>
         </div>
       </header>
