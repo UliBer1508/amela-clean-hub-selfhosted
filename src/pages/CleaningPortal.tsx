@@ -52,6 +52,7 @@ const CleaningPortal = () => {
   const [selectedTime, setSelectedTime] = useState<string>('09:00');
 
   useEffect(() => {
+    console.log('CleaningPortal: Component mounted, fetching data...');
     fetchBookingsWithCleaningTasks();
   }, []);
 
@@ -82,6 +83,7 @@ const CleaningPortal = () => {
   };
 
   const fetchBookingsWithCleaningTasks = async () => {
+    console.log('CleaningPortal: Starting to fetch bookings...');
     try {
       const { data, error } = await supabase
         .from('bookings')
@@ -122,9 +124,11 @@ const CleaningPortal = () => {
       ) || [];
       
       setBookings(bookingsWithCleaning);
+      console.log('CleaningPortal: Successfully loaded', bookingsWithCleaning.length, 'bookings');
     } catch (error) {
-      console.error('Error fetching bookings:', error);
+      console.error('CleaningPortal: Error fetching bookings:', error);
     } finally {
+      console.log('CleaningPortal: Loading finished, setting loading to false');
       setLoading(false);
     }
   };
