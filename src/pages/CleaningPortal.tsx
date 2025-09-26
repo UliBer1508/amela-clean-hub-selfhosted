@@ -303,7 +303,13 @@ const CleaningPortal = () => {
                 <p className="text-sm text-muted-foreground">Professioneller Reinigungsservice für Ferienhäuser</p>
               </div>
             </div>
-            <PWAInstallButton />
+            <div className="flex items-center space-x-3">
+              <BookingCardSettings 
+                config={cardConfig}
+                onConfigChange={updateCardConfig}
+              />
+              <PWAInstallButton />
+            </div>
           </div>
         </div>
       </header>
@@ -458,14 +464,10 @@ const CleaningPortal = () => {
                   </Select>
                 </div>
 
-                <div className="flex justify-between items-center pt-2 border-t border-border">
+                <div className="flex justify-center items-center pt-2 border-t border-border">
                   <span className="text-sm text-muted-foreground">
                     {currentFilteredBookings.length} von {totalCleaningTasks} Aufträgen
                   </span>
-                  <BookingCardSettings 
-                    config={cardConfig}
-                    onConfigChange={updateCardConfig}
-                  />
                 </div>
               </div>
             </CardContent>
