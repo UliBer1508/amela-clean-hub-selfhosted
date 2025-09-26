@@ -205,7 +205,8 @@ const PutzkraeftePage = () => {
         {/* Navigation */}
         <div className="bg-card border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex space-x-6">
+            {/* Desktop Navigation */}
+            <div className="hidden sm:flex space-x-6">
               <Link to="/">
                 <Button variant="ghost" size="sm" className="my-2 hover-scale">
                   <Home className="w-4 h-4 mr-2" />
@@ -226,6 +227,35 @@ const PutzkraeftePage = () => {
                 variant="ghost" 
                 size="sm" 
                 className="my-2 hover-scale"
+                onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+              >
+                <Bell className="w-4 h-4 mr-2" />
+                Benachrichtigungen
+              </Button>
+            </div>
+            
+            {/* Mobile Navigation - 2x2 Grid */}
+            <div className="sm:hidden grid grid-cols-2 gap-2 py-2">
+              <Link to="/">
+                <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
+                  <Home className="w-4 h-4 mr-2" />
+                  Reinigungen ({totalCleaningTasks})
+                </Button>
+              </Link>
+              <Link to="/calendar">
+                <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Kalender
+                </Button>
+              </Link>
+              <Button variant="default" size="sm" className="w-full justify-start">
+                <Users className="w-4 h-4 mr-2" />
+                Putzkräfte
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-full justify-start hover-scale"
                 onClick={() => setShowNotificationSettings(!showNotificationSettings)}
               >
                 <Bell className="w-4 h-4 mr-2" />
@@ -278,7 +308,8 @@ const PutzkraeftePage = () => {
       {/* Navigation */}
       <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-6">
+          {/* Desktop Navigation */}
+          <div className="hidden sm:flex space-x-6">
             <Link to="/">
               <Button variant="ghost" size="sm" className="my-2 hover-scale">
                 <Home className="w-4 h-4 mr-2" />
@@ -299,6 +330,35 @@ const PutzkraeftePage = () => {
               variant="ghost" 
               size="sm" 
               className="my-2 hover-scale"
+              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+            >
+              <Bell className="w-4 h-4 mr-2" />
+              Benachrichtigungen
+            </Button>
+          </div>
+          
+          {/* Mobile Navigation - 2x2 Grid */}
+          <div className="sm:hidden grid grid-cols-2 gap-2 py-2">
+            <Link to="/">
+              <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
+                <Home className="w-4 h-4 mr-2" />
+                Reinigungen ({totalCleaningTasks})
+              </Button>
+            </Link>
+            <Link to="/calendar">
+              <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
+                <Calendar className="w-4 h-4 mr-2" />
+                Kalender
+              </Button>
+            </Link>
+            <Button variant="default" size="sm" className="w-full justify-start">
+              <Users className="w-4 h-4 mr-2" />
+              Putzkräfte
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="w-full justify-start hover-scale"
               onClick={() => setShowNotificationSettings(!showNotificationSettings)}
             >
               <Bell className="w-4 h-4 mr-2" />
