@@ -194,9 +194,9 @@ const CleaningPortal = () => {
           <div className="grid grid-cols-2 sm:flex sm:space-x-6 gap-2 sm:gap-0 py-2">
             <Button variant="default" size="sm" className="justify-center">
               <Home className="w-4 h-4 mr-2" />
-              <span className="hidden xs:inline">Reinigungen</span>
-              <span className="xs:hidden">({totalCleaningTasks})</span>
-              <span className="hidden xs:inline"> ({totalCleaningTasks})</span>    
+              <span className="hidden sm:inline">Reinigungen</span>
+              <span className="sm:hidden">({totalCleaningTasks})</span>
+              <span className="hidden sm:inline"> ({totalCleaningTasks})</span>    
             </Button>
             
             <Link to="/calendar" className="w-full sm:w-auto">
@@ -220,8 +220,8 @@ const CleaningPortal = () => {
               onClick={() => setShowNotificationSettings(!showNotificationSettings)}
             >
               <Bell className="w-4 h-4 mr-2" />
-              <span className="hidden xs:inline">Benachrichtigungen</span>
-              <span className="xs:inline sm:hidden">Alerts</span>
+              <span className="hidden sm:inline">Benachrichtigungen</span>
+              <span className="sm:hidden">Alerts</span>
             </Button>
           </div>
         </div>
