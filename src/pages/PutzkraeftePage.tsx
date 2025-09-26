@@ -291,16 +291,7 @@ const PutzkraeftePage = () => {
                 <p className="text-sm text-muted-foreground">Professioneller Reinigungsservice für Ferienhäuser</p>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Button 
-                onClick={() => setShowForm(true)}
-                className="hover-scale"
-              >
-                <UserPlus className="w-4 h-4 mr-2" />
-                Neue Putzkraft
-              </Button>
-              <PWAInstallButton />
-            </div>
+            <PWAInstallButton />
           </div>
         </div>
       </header>
@@ -434,6 +425,21 @@ const PutzkraeftePage = () => {
                 </div>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Section Header with Action Button */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">Putzkräfte verwalten</h2>
+              <p className="text-sm text-muted-foreground">Verwalten Sie Ihr Reinigungsteam</p>
+            </div>
+            <Button 
+              onClick={() => setShowForm(true)}
+              className="hover-scale"
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              Neue Putzkraft
+            </Button>
           </div>
 
           {/* Search and Filter */}
