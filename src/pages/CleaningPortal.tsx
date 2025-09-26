@@ -1,167 +1,289 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Label } from '@/components/ui/label';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { Search, Filter, Calendar, Users, Home, MapPin, Clock, User, CalendarIcon, Bell, ChevronDown } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useCallback } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useToast } from '@/hooks/use-toast';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import { useCleaningStaff } from '@/hooks/useCleaningStaff';
-import NotificationSettings from '@/components/NotificationSettings';
-import PWAInstallButton from '@/components/PWAInstallButton';
-import { StatusFilter, TimeFilter, TaskEditingState, StaffFilter, HouseFilter } from '@/types/booking';
-import { APP_CONFIG, STATUS_FILTERS, TIME_FILTERS, STAFF_FILTERS } from '@/constants/app';
+import { supabase } from '@/integrations/supabase/client';
 import { formatDateTime } from '@/utils/date';
-import { validateTime, sanitizeSearchTerm } from '@/utils/validation';
+import PWAInstallButton from '@/components/PWAInstallButton';
+import NotificationSettings from '@/components/NotificationSettings';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import BookingCardSettings, { useBookingCardConfig } from "@/components/BookingCardSettings";
+import ConfigurableBookingCard from "@/components/ConfigurableBookingCard";
+import {
+  Home,
+  Search,
+  Filter,
+  Bell,
+  Calendar,
+  Users,
+  ArrowLeft,
+  UserPlus
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+type StatusFilter = 'all' | 'scheduled' | 'in_progress' | 'completed' | 'delayed' | 'cancelled';
+type StaffFilter = 'all' | 'assigned' | 'unassigned';
+type HouseFilter = 'all' | string;
+type TimeFilter = 'all' | 'today' | 'tomorrow' | 'this_week' | 'overdue';
+
+interface TaskEditingState {
+  id: string;
+  scheduled_date: string;
+  scheduled_time: string | null;
+  status: string;
+}
+
+const STATUS_FILTERS = {
+  all: 'Alle Status',
+  scheduled: 'Geplant',
+  in_progress: 'In Bearbeitung',
+  completed: 'Abgeschlossen', 
+  delayed: 'Verzögert',
+  cancelled: 'Storniert'
+};
+
+const STAFF_FILTERS = {
+  all: 'Alle Putzkräfte',
+  assigned: 'Zugewiesen',
+  unassigned: 'Nicht zugewiesen'
+};
+
+const TIME_FILTERS = {
+  all: 'Alle Zeiten',
+  today: 'Heute',
+  tomorrow: 'Morgen', 
+  this_week: 'Diese Woche',
+  overdue: 'Überfällig'
+};
 
 const CleaningPortal = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('scheduled');
-  const [staffFilter, setStaffFilter] = useState<StaffFilter>('amela');
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
-  const [houseFilter, setHouseFilter] = useState<HouseFilter>('all');
-  const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date>();
-  const [selectedTime, setSelectedTime] = useState<string>(APP_CONFIG.DEFAULT_TIME);
-  const [showFilters, setShowFilters] = useState(false);
-  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
-
-  const debouncedSearchTerm = useDebounce(searchTerm, APP_CONFIG.SEARCH_DEBOUNCE_MS);
   const { toast } = useToast();
-  const { houses } = useHouses();
-  const { staff } = useCleaningStaff();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [staffFilter, setStaffFilter] = useState<StaffFilter>('all');
+  const [houseFilter, setHouseFilter] = useState<HouseFilter>('all');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedTime, setSelectedTime] = useState('');
+  const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   
-  const {
-    bookings,
-    loading,
-    error,
-    totalCleaningTasks,
-    updateTaskStatus,
-    updateTaskDateTime,
-    updateTaskStaff,
-    filteredBookings,
-    refetch
+  // Booking card configuration
+  const { config: cardConfig, updateConfig: updateCardConfig } = useBookingCardConfig();
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  const { 
+    bookings = [], 
+    loading: bookingsLoading, 
+    error: bookingsError,
+    refetch: refetchBookings 
   } = useBookings();
 
-  const handleStatusUpdate = useCallback(async (
-    taskId: string, 
-    newStatus: 'scheduled' | 'completed' | 'cancelled' | 'in_progress' | 'delayed'
-  ) => {
-    const result = await updateTaskStatus(taskId, newStatus);
-    
-    if (result.success) {
+  const { 
+    houses = [], 
+    loading: housesLoading 
+  } = useHouses();
+
+  const { 
+    staff = [], 
+    loading: staffLoading 
+  } = useCleaningStaff();
+
+  const bookingsWithTasks = bookings.filter(booking => 
+    booking.service_tasks && booking.service_tasks.length > 0
+  );
+
+  const totalCleaningTasks = bookingsWithTasks.reduce((total, booking) => 
+    total + (booking.service_tasks?.length || 0), 0
+  );
+
+  const filteredBookings = bookingsWithTasks.filter(booking => {
+    const matchesSearch = debouncedSearchTerm === '' || 
+      booking.guest_name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      booking.houses?.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      booking.houses?.address.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
+
+    const matchesHouse = houseFilter === 'all' || booking.house_id === houseFilter;
+
+    const hasMatchingTask = booking.service_tasks?.some(task => {
+      const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
+      
+      const matchesStaff = staffFilter === 'all' || 
+        (staffFilter === 'assigned' && task.assigned_staff_id) ||
+        (staffFilter === 'unassigned' && !task.assigned_staff_id);
+
+      let matchesTime = true;
+      if (timeFilter !== 'all') {
+        const taskDate = new Date(task.scheduled_date);
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        
+        switch (timeFilter) {
+          case 'today':
+            matchesTime = taskDate.toDateString() === today.toDateString();
+            break;
+          case 'tomorrow':
+            matchesTime = taskDate.toDateString() === tomorrow.toDateString();
+            break;
+          case 'this_week':
+            const weekFromNow = new Date(today);
+            weekFromNow.setDate(today.getDate() + 7);
+            matchesTime = taskDate >= today && taskDate <= weekFromNow;
+            break;
+          case 'overdue':
+            matchesTime = taskDate < today && task.status !== 'completed';
+            break;
+        }
+      }
+
+      return matchesStatus && matchesStaff && matchesTime;
+    });
+
+    return matchesSearch && matchesHouse && hasMatchingTask;
+  });
+
+  const currentFilteredBookings = filteredBookings;
+
+  const handleStatusUpdate = useCallback(async (taskId: string, newStatus: 'scheduled' | 'completed' | 'cancelled' | 'in_progress' | 'delayed') => {
+    try {
+      const { error } = await supabase
+        .from('service_tasks')
+        .update({ 
+          status: newStatus,
+          completed_at: newStatus === 'completed' ? new Date().toISOString() : null
+        })
+        .eq('id', taskId);
+
+      if (error) throw error;
+
       toast({
         title: "Status aktualisiert",
-        description: `Aufgabe wurde erfolgreich auf "${STATUS_FILTERS[newStatus]}" gesetzt.`,
+        description: `Der Status wurde erfolgreich auf "${STATUS_FILTERS[newStatus as StatusFilter]}" geändert.`,
       });
-    } else {
+
+      refetchBookings();
+    } catch (error) {
+      console.error('Error updating task status:', error);
       toast({
         title: "Fehler",
-        description: result.error || "Status konnte nicht aktualisiert werden.",
+        description: "Status konnte nicht aktualisiert werden.",
         variant: "destructive",
       });
     }
-  }, [updateTaskStatus, toast]);
+  }, [toast, refetchBookings]);
 
   const handleStaffUpdate = useCallback(async (taskId: string, staffId: string | null) => {
-    const result = await updateTaskStaff(taskId, staffId);
-    if (result.success) {
+    try {
+      const { error } = await supabase
+        .from('service_tasks')
+        .update({ 
+          assigned_staff_id: staffId,
+        })
+        .eq('id', taskId);
+
+      if (error) throw error;
+
+      const staffName = staffId ? staff.find(s => s.id === staffId)?.name || 'Unbekannt' : 'Nicht zugewiesen';
+      
       toast({
-        title: "Putzkraft zugewiesen",
-        description: "Die Putzkraft wurde erfolgreich zugewiesen.",
+        title: "Zuweisung aktualisiert",
+        description: `Die Aufgabe wurde ${staffName} zugewiesen.`,
       });
-    } else {
+
+      refetchBookings();
+    } catch (error) {
+      console.error('Error updating staff assignment:', error);
       toast({
         title: "Fehler",
-        description: result.error || "Fehler beim Zuweisen der Putzkraft",
+        description: "Zuweisung konnte nicht aktualisiert werden.",
         variant: "destructive",
       });
     }
-  }, [updateTaskStaff, toast]);
+  }, [toast, refetchBookings, staff]);
 
-  const handleEditDateTime = useCallback((task: TaskEditingState) => {
+  const handleEditDateTime = (task: TaskEditingState) => {
     setEditingTask(task);
     setSelectedDate(new Date(task.scheduled_date));
-    setSelectedTime(task.scheduled_time || APP_CONFIG.DEFAULT_TIME);
-  }, []);
+    setSelectedTime(task.scheduled_time || '');
+  };
 
   const handleDateTimeUpdate = useCallback(async () => {
     if (!editingTask || !selectedDate) return;
 
-    const timeValidation = validateTime(selectedTime);
-    if (!timeValidation.isValid) {
-      toast({
-        title: "Ungültige Zeit",
-        description: timeValidation.error,
-        variant: "destructive",
-      });
-      return;
-    }
+    try {
+      const dateString = selectedDate.toISOString().split('T')[0];
+      
+      const { error } = await supabase
+        .from('service_tasks')
+        .update({ 
+          scheduled_date: dateString,
+          scheduled_time: selectedTime || null
+        })
+        .eq('id', editingTask.id);
 
-    const result = await updateTaskDateTime(editingTask.id, selectedDate, selectedTime);
-    
-    if (result.success) {
+      if (error) throw error;
+
       toast({
         title: "Termin aktualisiert",
-        description: "Der Reinigungstermin wurde erfolgreich geändert.",
+        description: `Der Termin wurde erfolgreich aktualisiert.`,
       });
+
+      refetchBookings();
       setEditingTask(null);
-    } else {
+      setSelectedDate(undefined);
+      setSelectedTime('');
+    } catch (error) {
+      console.error('Error updating task datetime:', error);
       toast({
         title: "Fehler",
-        description: result.error || "Termin konnte nicht aktualisiert werden.",
+        description: "Termin konnte nicht aktualisiert werden.",
         variant: "destructive",
       });
     }
-  }, [editingTask, selectedDate, selectedTime, updateTaskDateTime, toast]);
+  }, [editingTask, selectedDate, selectedTime, toast, refetchBookings]);
 
-  const currentFilteredBookings = useMemo(() =>
-    filteredBookings(debouncedSearchTerm, statusFilter, staffFilter, timeFilter, houseFilter), 
-    [filteredBookings, debouncedSearchTerm, statusFilter, staffFilter, timeFilter, houseFilter]
-  );
+  const handleDateTimeUpdateFromCard = useCallback((taskId: string, date: string, time: string) => {
+    const task = bookingsWithTasks
+      .flatMap(b => b.service_tasks || [])
+      .find(t => t.id === taskId);
+    
+    if (task) {
+      setEditingTask({
+        id: taskId,
+        scheduled_date: date,
+        scheduled_time: time,
+        status: task.status
+      });
+      setSelectedDate(new Date(date));
+      setSelectedTime(time);
+      handleDateTimeUpdate();
+    }
+  }, [bookingsWithTasks, handleDateTimeUpdate]);
 
-  const activeFilterCount = useMemo(() => {
-    let count = 0;
-    if (debouncedSearchTerm.trim()) count++;
-    if (statusFilter !== 'scheduled') count++;
-    if (staffFilter !== 'amela') count++;
-    if (timeFilter !== 'all') count++;
-    if (houseFilter !== 'all') count++;
-    return count;
-  }, [debouncedSearchTerm, statusFilter, staffFilter, timeFilter, houseFilter]);
-
-  if (loading) {
+  if (bookingsLoading || housesLoading || staffLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center animate-fade-in">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-          <p className="mt-4 text-muted-foreground">Lade Reinigungsaufträge...</p>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Lade Reinigungsportal...</p>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (bookingsError) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="max-w-md mx-auto">
-          <CardContent className="p-6 text-center">
-            <p className="text-destructive mb-4">{error}</p>
-            <Button onClick={refetch} variant="outline">
-              Erneut versuchen
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="text-center">
+          <p className="text-red-500">Fehler beim Laden der Buchungen: {bookingsError}</p>
+        </div>
       </div>
     );
   }
@@ -189,385 +311,192 @@ const CleaningPortal = () => {
       {/* Navigation */}
       <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 sm:flex sm:space-x-6 gap-2 sm:gap-0 py-2">
-            <Button variant="default" size="sm" className="justify-center">
-              <Home className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Reinigungen</span>
-              <span className="sm:hidden">({totalCleaningTasks})</span>
-              <span className="hidden sm:inline"> ({totalCleaningTasks})</span>    
-            </Button>
-            
-            <Link to="/calendar" className="w-full sm:w-auto">
-              <Button variant="ghost" size="sm" className="w-full justify-center hover-scale">
+          {/* Desktop Navigation */}
+          <div className="hidden sm:flex space-x-6">
+            <Link to="/">
+              <Button variant="default" size="sm" className="my-2 hover-scale">
+                <Home className="w-4 h-4 mr-2" />
+                Reinigungen ({totalCleaningTasks})
+              </Button>
+            </Link>
+            <Link to="/calendar">
+              <Button variant="ghost" size="sm" className="my-2 hover-scale">
                 <Calendar className="w-4 h-4 mr-2" />
                 Kalender
               </Button>
             </Link>
-            
-            <Link to="/putzkraefte" className="w-full sm:w-auto">
-              <Button variant="ghost" size="sm" className="w-full justify-center hover-scale">
+            <Link to="/putzkraefte">
+              <Button variant="ghost" size="sm" className="my-2 hover-scale">
                 <Users className="w-4 h-4 mr-2" />
                 Putzkräfte
               </Button>
             </Link>
-            
             <Button 
               variant="ghost" 
               size="sm" 
-              className="w-full sm:w-auto justify-center hover-scale"
+              className="my-2 hover-scale"
               onClick={() => setShowNotificationSettings(!showNotificationSettings)}
             >
               <Bell className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Benachrichtigungen</span>
-              <span className="sm:hidden">Alerts</span>
+              Benachrichtigungen
+            </Button>
+          </div>
+          
+          {/* Mobile Navigation - 2x2 Grid */}
+          <div className="sm:hidden grid grid-cols-2 gap-2 py-2">
+            <Link to="/">
+              <Button variant="default" size="sm" className="w-full justify-start hover-scale">
+                <Home className="w-4 h-4 mr-2" />
+                Reinigungen ({totalCleaningTasks})
+              </Button>
+            </Link>
+            <Link to="/calendar">
+              <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
+                <Calendar className="w-4 h-4 mr-2" />
+                Kalender
+              </Button>
+            </Link>
+            <Link to="/putzkraefte">
+              <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
+                <Users className="w-4 h-4 mr-2" />
+                Putzkräfte
+              </Button>
+            </Link>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="w-full justify-start hover-scale"
+              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+            >
+              <Bell className="w-4 h-4 mr-2" />
+              Benachrichtigungen
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {showNotificationSettings ? (
-          <div className="space-y-6 animate-fade-in">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-foreground">
-                Benachrichtigungseinstellungen
-              </h2>
-              <Button 
-                variant="outline" 
-                onClick={() => setShowNotificationSettings(false)}
-                className="hover-scale"
-              >
-                Zurück zu Reinigungen
-              </Button>
-            </div>
+      {/* Notification Settings */}
+      {showNotificationSettings && (
+        <div className="bg-card border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <NotificationSettings />
           </div>
-        ) : (
-          <div className="animate-fade-in">
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-2">
-                Alle Buchungen mit Reinigungsaufträgen
-              </h2>
-              <p className="text-muted-foreground">
-                Verwalten Sie alle Reinigungsaufträge für Ihre Gäste
-              </p>
-            </div>
+        </div>
+      )}
 
-            {/* Search and Filter */}
-            <Card className="mb-6">
-              <CardContent className="p-4">
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-between"
-                  onClick={() => setShowFilters(!showFilters)}
-                >
-                  <div className="flex items-center space-x-2">
-                    <Search className="w-4 h-4" />
-                    <span>Suche & Filter</span>
-                    <Badge variant="secondary">{activeFilterCount} aktiv</Badge>
-                  </div>
-                  <ChevronDown className={cn(
-                    "w-4 h-4 transition-transform",
-                    showFilters && "rotate-180"
-                  )} />
-                </Button>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
+          {/* Search and Filters */}
+          <Card className="shadow-sm border border-border">
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Search className="w-4 h-4 text-primary" />
+                  <span className="font-medium text-foreground">Suche</span>
+                </div>
                 
-                {showFilters && (
-                  <div className="mt-4 space-y-4 animate-accordion-down">
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <div className="flex-1">
-                        <Input
-                          placeholder="Suche nach Gast, Haus oder Adresse..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(sanitizeSearchTerm(e.target.value))}
-                          className="w-full"
-                        />
-                      </div>
-                    </div>
+                <div className="relative">
+                  <Input
+                    placeholder="Nach Gast, Haus oder Adresse suchen..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                  <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-3" />
+                </div>
 
-                    <div className="flex items-center space-x-2">
-                      <Filter className="w-4 h-4 text-primary" />
-                      <span className="font-medium text-foreground">Filter</span>
-                    </div>
+                <div className="flex items-center space-x-2">
+                  <Filter className="w-4 h-4 text-primary" />
+                  <span className="font-medium text-foreground">Filter</span>
+                </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                      <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Alle Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.entries(STATUS_FILTERS).map(([key, label]) => (
-                            <SelectItem key={key} value={key}>{label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Alle Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(STATUS_FILTERS).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                      <Select value={staffFilter} onValueChange={(value: StaffFilter) => setStaffFilter(value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Alle Putzkräfte" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.entries(STAFF_FILTERS).map(([key, label]) => (
-                            <SelectItem key={key} value={key}>{label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                  <Select value={staffFilter} onValueChange={(value: StaffFilter) => setStaffFilter(value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Alle Putzkräfte" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(STAFF_FILTERS).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                      <Select value={houseFilter} onValueChange={(value: HouseFilter) => setHouseFilter(value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Alle Häuser" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Alle Häuser</SelectItem>
-                          {houses.map((house) => (
-                            <SelectItem key={house.id} value={house.id}>{house.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                  <Select value={houseFilter} onValueChange={(value: HouseFilter) => setHouseFilter(value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Alle Häuser" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Alle Häuser</SelectItem>
+                      {houses.map((house) => (
+                        <SelectItem key={house.id} value={house.id}>{house.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                      <Select value={timeFilter} onValueChange={(value: TimeFilter) => setTimeFilter(value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Alle Zeiten" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.entries(TIME_FILTERS).map(([key, label]) => (
-                            <SelectItem key={key} value={key}>{label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <Select value={timeFilter} onValueChange={(value: TimeFilter) => setTimeFilter(value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Alle Zeiten" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(TIME_FILTERS).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>{label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                    <div className="flex justify-between items-center pt-2 border-t border-border">
-                      <span className="text-sm text-muted-foreground">
-                        {currentFilteredBookings.length} von {totalCleaningTasks} Aufträgen
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                <div className="flex justify-between items-center pt-2 border-t border-border">
+                  <span className="text-sm text-muted-foreground">
+                    {currentFilteredBookings.length} von {totalCleaningTasks} Aufträgen
+                  </span>
+                  <BookingCardSettings 
+                    config={cardConfig}
+                    onConfigChange={updateCardConfig}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Booking Cards */}
-            <div className="space-y-4">
-              {currentFilteredBookings.length === 0 ? (
-                <Card>
-                  <CardContent className="p-8 text-center">
-                    <p className="text-muted-foreground">
-                      Keine Reinigungsaufträge gefunden. Versuchen Sie andere Filter.
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : (
-                currentFilteredBookings.map((booking) => (
-                  <Card key={booking.id} className="overflow-hidden hover-scale">
-                    <CardContent className="p-0">
-                      <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-4 border-b border-border">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <Home className="w-5 h-5 text-amber-600" />
-                            <span className="font-semibold text-foreground">
-                              Unterkunft: {booking.houses?.name}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2 mt-1">
-                          <MapPin className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">
-                            Adresse: {booking.houses?.address}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Guest Information */}
-                        <div className="space-y-3">
-                          <div className="flex items-center space-x-2">
-                            <User className="w-4 h-4 text-green-600" />
-                            <span className="text-sm font-medium">Gast: {booking.guest_name}</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Users className="w-4 h-4 text-green-600" />
-                            <span className="text-sm font-medium">Gäste: {booking.number_of_guests} Personen</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Calendar className="w-4 h-4 text-purple-600" />
-                            <span className="text-sm">Check-in: {formatDateTime(booking.check_in)}</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Calendar className="w-4 h-4 text-purple-600" />
-                            <span className="text-sm">Check-out: {formatDateTime(booking.check_out)}</span>
-                          </div>
-
-                          {/* Notes from cleaning tasks */}
-                          {booking.service_tasks?.some(task => task.notes) && (
-                            <div className="mt-3 p-2 bg-muted/30 rounded border-l-4 border-blue-500">
-                              <div className="flex items-start space-x-2">
-                                <div className="text-blue-600 mt-0.5">
-                                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                                  </svg>
-                                </div>
-                                <div className="flex-1">
-                                  <p className="text-xs font-medium text-muted-foreground mb-1">Notizen:</p>
-                                  {booking.service_tasks?.map(task => 
-                                    task.notes ? (
-                                      <p key={task.id} className="text-sm text-foreground whitespace-pre-wrap mb-1">
-                                        {task.notes}
-                                      </p>
-                                    ) : null
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Cleaning Tasks */}
-                        <div className="space-y-3">
-                          <h4 className="font-medium text-foreground">Reinigungsaufträge</h4>
-                          {booking.service_tasks?.map((task) => (
-                            <div key={task.id} className="bg-muted/50 rounded-lg p-3 space-y-2">
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm font-medium">Reinigung</span>
-                                <Badge variant={
-                                  task.status === 'completed' ? 'default' : 
-                                  task.status === 'cancelled' ? 'destructive' : 
-                                  'secondary'
-                                }>
-                                  {STATUS_FILTERS[task.status as StatusFilter]}
-                                </Badge>
-                              </div>
-
-                              <div className="flex items-center space-x-2 text-sm">
-                                <Clock className="w-4 h-4 text-blue-600" />
-                                <span>{formatDateTime(task.scheduled_date, task.scheduled_time)}</span>
-                              </div>
-
-                              <div className="flex items-center space-x-2 text-sm">
-                                <span className="text-muted-foreground">Zugewiesen an:</span>
-                                <Select
-                                  value={task.assigned_staff_id || 'unassigned'}
-                                  onValueChange={(value: string) => 
-                                    handleStaffUpdate(task.id, value === 'unassigned' ? null : value)
-                                  }
-                                >
-                                  <SelectTrigger className="w-auto">
-                                    <SelectValue>
-                                      {task.assigned_staff_id 
-                                        ? staff.find(s => s.id === task.assigned_staff_id)?.name || 'Nicht zugewiesen'
-                                        : 'Nicht zugewiesen'
-                                      }
-                                    </SelectValue>
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="unassigned">Nicht zugewiesen</SelectItem>
-                                    {staff.filter(s => s.is_active).map((staffMember) => (
-                                      <SelectItem key={staffMember.id} value={staffMember.id}>
-                                        {staffMember.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-
-                              <div className="flex flex-wrap gap-2 pt-2">
-                                <Select
-                                  value={task.status}
-                                  onValueChange={(value: 'scheduled' | 'completed' | 'cancelled' | 'in_progress' | 'delayed') => 
-                                    handleStatusUpdate(task.id, value)
-                                  }
-                                >
-                                  <SelectTrigger className="w-auto">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="scheduled">Geplant</SelectItem>
-                                    <SelectItem value="in_progress">In Bearbeitung</SelectItem>
-                                    <SelectItem value="completed">Abgeschlossen</SelectItem>
-                                    <SelectItem value="delayed">Verzögert</SelectItem>
-                                    <SelectItem value="cancelled">Storniert</SelectItem>
-                                  </SelectContent>
-                                </Select>
-
-                                <Dialog>
-                                  <DialogTrigger asChild>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => handleEditDateTime({
-                                        id: task.id,
-                                        scheduled_date: task.scheduled_date,
-                                        scheduled_time: task.scheduled_time,
-                                        status: task.status
-                                      })}
-                                    >
-                                      <CalendarIcon className="w-4 h-4 mr-1" />
-                                      Termin ändern
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent>
-                                    <DialogHeader>
-                                      <DialogTitle>Reinigungstermin ändern</DialogTitle>
-                                    </DialogHeader>
-                                    <div className="space-y-4">
-                                      <div>
-                                        <Label>Datum</Label>
-                                        <Popover>
-                                          <PopoverTrigger asChild>
-                                            <Button
-                                              variant="outline"
-                                              className={cn(
-                                                "w-full justify-start text-left font-normal",
-                                                !selectedDate && "text-muted-foreground"
-                                              )}
-                                            >
-                                              <CalendarIcon className="mr-2 h-4 w-4" />
-                                              {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Datum wählen"}
-                                            </Button>
-                                          </PopoverTrigger>
-                                          <PopoverContent className="w-auto p-0" align="start">
-                                            <CalendarComponent
-                                              mode="single"
-                                              selected={selectedDate}
-                                              onSelect={setSelectedDate}
-                                              disabled={(date) => date < new Date()}
-                                              initialFocus
-                                            />
-                                          </PopoverContent>
-                                        </Popover>
-                                      </div>
-                                      <div>
-                                        <Label htmlFor="time">Uhrzeit</Label>
-                                        <Input
-                                          id="time"
-                                          type="time"
-                                          value={selectedTime}
-                                          onChange={(e) => setSelectedTime(e.target.value)}
-                                        />
-                                      </div>
-                                      <Button 
-                                        onClick={handleDateTimeUpdate}
-                                        disabled={!selectedDate}
-                                        className="w-full hover-scale"
-                                      >
-                                        Termin aktualisieren
-                                      </Button>
-                                    </div>
-                                  </DialogContent>
-                                </Dialog>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
+          {/* Booking Cards */}
+          <div className="space-y-4">
+            {currentFilteredBookings.length === 0 ? (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <p className="text-muted-foreground">
+                    Keine Reinigungsaufträge gefunden. Versuchen Sie andere Filter.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              currentFilteredBookings.map((booking) => (
+                <ConfigurableBookingCard
+                  key={booking.id}
+                  booking={booking}
+                  config={cardConfig}
+                  staff={staff}
+                  onStatusUpdate={handleStatusUpdate}
+                  onStaffUpdate={handleStaffUpdate}
+                  onDateTimeUpdate={handleDateTimeUpdateFromCard}
+                  formatDateTime={formatDateTime}
+                />
+              ))
+            )}
           </div>
-        )}
+        </div>
       </main>
     </div>
   );

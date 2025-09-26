@@ -1,0 +1,364 @@
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { 
+  Home, 
+  MapPin, 
+  User, 
+  Users, 
+  Calendar, 
+  Clock, 
+  Mail, 
+  Phone, 
+  CreditCard,
+  Globe,
+  Calendar as CalendarIcon
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+
+import type { BookingCardConfig } from './BookingCardSettings';
+
+const STATUS_FILTERS = {
+  all: 'Alle Status',
+  scheduled: 'Geplant',
+  in_progress: 'In Bearbeitung',
+  completed: 'Abgeschlossen', 
+  delayed: 'Verzögert',
+  cancelled: 'Storniert'
+};
+
+interface ConfigurableBookingCardProps {
+  booking: any;
+  config: BookingCardConfig;
+  staff: any[];
+  onStatusUpdate: (taskId: string, status: string) => void;
+  onStaffUpdate: (taskId: string, staffId: string | null) => void;
+  onDateTimeUpdate: (taskId: string, date: string, time: string) => void;
+  formatDateTime: (date: string, time?: string) => string;
+}
+
+const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
+  booking,
+  config,
+  staff,
+  onStatusUpdate,
+  onStaffUpdate,
+  onDateTimeUpdate,
+  formatDateTime,
+}) => {
+  const [selectedDate, setSelectedDate] = React.useState<Date>();
+  const [selectedTime, setSelectedTime] = React.useState('');
+  const [editingTask, setEditingTask] = React.useState<any>(null);
+
+  const handleEditDateTime = (task: any) => {
+    setEditingTask(task);
+    setSelectedDate(new Date(task.scheduled_date));
+    setSelectedTime(task.scheduled_time || '');
+  };
+
+  const handleDateTimeUpdateInternal = () => {
+    if (editingTask && selectedDate) {
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      onDateTimeUpdate(editingTask.id, dateStr, selectedTime);
+      setEditingTask(null);
+    }
+  };
+
+  return (
+    <Card className="overflow-hidden hover-scale">
+      <CardContent className="p-0">
+        {/* House Information Header */}
+        {(config.showHouseName || config.showHouseAddress) && (
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-4 border-b border-border">
+            {config.showHouseName && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Home className="w-5 h-5 text-amber-600" />
+                  <span className="font-semibold text-foreground">
+                    Unterkunft: {booking.houses?.name}
+                  </span>
+                </div>
+              </div>
+            )}
+            {config.showHouseAddress && (
+              <div className="flex items-center space-x-2 mt-1">
+                <MapPin className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
+                  Adresse: {booking.houses?.address}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Guest Information */}
+          <div className="space-y-3">
+            {config.showGuestName && (
+              <div className="flex items-center space-x-2">
+                <User className="w-4 h-4 text-green-600" />
+                <span className="text-sm font-medium">Gast: {booking.guest_name}</span>
+              </div>
+            )}
+            
+            {config.showGuestCount && (
+              <div className="flex items-center space-x-2">
+                <Users className="w-4 h-4 text-green-600" />
+                <span className="text-sm font-medium">Gäste: {booking.number_of_guests} Personen</span>
+              </div>
+            )}
+
+            {config.showGuestEmail && booking.guest_email && (
+              <div className="flex items-center space-x-2">
+                <Mail className="w-4 h-4 text-blue-600" />
+                <span className="text-sm">E-Mail: {booking.guest_email}</span>
+              </div>
+            )}
+
+            {config.showGuestPhone && booking.guest_phone && (
+              <div className="flex items-center space-x-2">
+                <Phone className="w-4 h-4 text-blue-600" />
+                <span className="text-sm">Telefon: {booking.guest_phone}</span>
+              </div>
+            )}
+
+            {config.showNationality && booking.nationality && (
+              <div className="flex items-center space-x-2">
+                <Globe className="w-4 h-4 text-purple-600" />
+                <span className="text-sm">Nationalität: {booking.nationality}</span>
+              </div>
+            )}
+
+            {config.showCheckInDate && (
+              <div className="flex items-center space-x-2">
+                <Calendar className="w-4 h-4 text-purple-600" />
+                <span className="text-sm">Check-in: {formatDateTime(booking.check_in)}</span>
+              </div>
+            )}
+
+            {config.showCheckOutDate && (
+              <div className="flex items-center space-x-2">
+                <Calendar className="w-4 h-4 text-purple-600" />
+                <span className="text-sm">Check-out: {formatDateTime(booking.check_out)}</span>
+              </div>
+            )}
+
+            {config.showBookingAmount && booking.booking_amount && (
+              <div className="flex items-center space-x-2">
+                <CreditCard className="w-4 h-4 text-emerald-600" />
+                <span className="text-sm">Betrag: {booking.booking_amount} {booking.currency || 'EUR'}</span>
+              </div>
+            )}
+
+            {config.showBookingStatus && (
+              <div className="flex items-center space-x-2">
+                <Badge variant={booking.status === 'confirmed' ? 'default' : 'secondary'}>
+                  {booking.status === 'confirmed' ? 'Bestätigt' : booking.status}
+                </Badge>
+              </div>
+            )}
+
+            {config.showPlatform && booking.platform && (
+              <div className="flex items-center space-x-2">
+                <span className="text-sm">Plattform: {booking.platform}</span>
+              </div>
+            )}
+
+            {/* Booking Notes */}
+            {config.showBookingNotes && booking.notes && (
+              <div className="mt-3 p-2 bg-muted/30 rounded border-l-4 border-blue-500">
+                <div className="flex items-start space-x-2">
+                  <div className="text-blue-600 mt-0.5">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Buchungsnotizen:</p>
+                    <p className="text-sm text-foreground whitespace-pre-wrap">{booking.notes}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Task Notes */}
+            {config.showTaskNotes && booking.service_tasks?.some((task: any) => task.notes) && (
+              <div className="mt-3 p-2 bg-muted/30 rounded border-l-4 border-blue-500">
+                <div className="flex items-start space-x-2">
+                  <div className="text-blue-600 mt-0.5">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Aufgaben Notizen:</p>
+                    {booking.service_tasks?.map((task: any) => 
+                      task.notes ? (
+                        <p key={task.id} className="text-sm text-foreground whitespace-pre-wrap mb-1">
+                          {task.notes}
+                        </p>
+                      ) : null
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Cleaning Tasks */}
+          {config.showCleaningTasks && (
+            <div className="space-y-3">
+              <h4 className="font-medium text-foreground">Reinigungsaufträge</h4>
+              {booking.service_tasks?.map((task: any) => (
+                <div key={task.id} className="bg-muted/50 rounded-lg p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Reinigung</span>
+                    {config.showTaskStatus && (
+                      <Badge variant={
+                        task.status === 'completed' ? 'default' : 
+                        task.status === 'cancelled' ? 'destructive' : 
+                        'secondary'
+                      }>
+                        {STATUS_FILTERS[task.status as keyof typeof STATUS_FILTERS]}
+                      </Badge>
+                    )}
+                  </div>
+
+                  {config.showTaskDateTime && (
+                    <div className="flex items-center space-x-2 text-sm">
+                      <Clock className="w-4 h-4 text-blue-600" />
+                      <span>{formatDateTime(task.scheduled_date, task.scheduled_time)}</span>
+                    </div>
+                  )}
+
+                  {config.showTaskAssignment && (
+                    <div className="flex items-center space-x-2 text-sm">
+                      <span className="text-muted-foreground">Zugewiesen an:</span>
+                      <Select
+                        value={task.assigned_staff_id || 'unassigned'}
+                        onValueChange={(value: string) => 
+                          onStaffUpdate(task.id, value === 'unassigned' ? null : value)
+                        }
+                      >
+                        <SelectTrigger className="w-auto">
+                          <SelectValue>
+                            {task.assigned_staff_id 
+                              ? staff.find(s => s.id === task.assigned_staff_id)?.name || 'Nicht zugewiesen'
+                              : 'Nicht zugewiesen'
+                            }
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="unassigned">Nicht zugewiesen</SelectItem>
+                          {staff.filter(s => s.is_active).map((staffMember) => (
+                            <SelectItem key={staffMember.id} value={staffMember.id}>
+                              {staffMember.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {config.showTaskStatus && (
+                      <Select
+                        value={task.status}
+                        onValueChange={(value: string) => onStatusUpdate(task.id, value)}
+                      >
+                        <SelectTrigger className="w-auto">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="scheduled">Geplant</SelectItem>
+                          <SelectItem value="in_progress">In Bearbeitung</SelectItem>
+                          <SelectItem value="completed">Abgeschlossen</SelectItem>
+                          <SelectItem value="delayed">Verzögert</SelectItem>
+                          <SelectItem value="cancelled">Storniert</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+
+                    {config.showTaskDateTime && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditDateTime(task)}
+                          >
+                            <CalendarIcon className="w-4 h-4 mr-1" />
+                            Termin ändern
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Reinigungstermin ändern</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <Label>Datum</Label>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      "w-full justify-start text-left font-normal",
+                                      !selectedDate && "text-muted-foreground"
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Datum wählen"}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                  <CalendarComponent
+                                    mode="single"
+                                    selected={selectedDate}
+                                    onSelect={setSelectedDate}
+                                    disabled={(date) => date < new Date()}
+                                    initialFocus
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+                            <div>
+                              <Label htmlFor="time">Uhrzeit</Label>
+                              <Input
+                                id="time"
+                                type="time"
+                                value={selectedTime}
+                                onChange={(e) => setSelectedTime(e.target.value)}
+                              />
+                            </div>
+                            <Button 
+                              onClick={handleDateTimeUpdateInternal}
+                              disabled={!selectedDate}
+                              className="w-full hover-scale"
+                            >
+                              Termin aktualisieren
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default ConfigurableBookingCard;
