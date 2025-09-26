@@ -191,31 +191,37 @@ const CleaningPortal = () => {
       {/* Navigation */}
       <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-6">
-            <Button variant="default" size="sm" className="my-2">
+          <div className="grid grid-cols-2 sm:flex sm:space-x-6 gap-2 sm:gap-0 py-2">
+            <Button variant="default" size="sm" className="justify-center">
               <Home className="w-4 h-4 mr-2" />
-              Reinigungen ({totalCleaningTasks})    
+              <span className="hidden xs:inline">Reinigungen</span>
+              <span className="xs:hidden">({totalCleaningTasks})</span>
+              <span className="hidden xs:inline"> ({totalCleaningTasks})</span>    
             </Button>
-            <Link to="/calendar">
-              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+            
+            <Link to="/calendar" className="w-full sm:w-auto">
+              <Button variant="ghost" size="sm" className="w-full justify-center hover-scale">
                 <Calendar className="w-4 h-4 mr-2" />
                 Kalender
               </Button>
             </Link>
-            <Link to="/putzkraefte">
-              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+            
+            <Link to="/putzkraefte" className="w-full sm:w-auto">
+              <Button variant="ghost" size="sm" className="w-full justify-center hover-scale">
                 <Users className="w-4 h-4 mr-2" />
                 Putzkräfte
               </Button>
             </Link>
+            
             <Button 
               variant="ghost" 
               size="sm" 
-              className="my-2 hover-scale"
+              className="w-full sm:w-auto justify-center hover-scale"
               onClick={() => setShowNotificationSettings(!showNotificationSettings)}
             >
               <Bell className="w-4 h-4 mr-2" />
-              Benachrichtigungen
+              <span className="hidden xs:inline">Benachrichtigungen</span>
+              <span className="xs:inline sm:hidden">Alerts</span>
             </Button>
           </div>
         </div>
