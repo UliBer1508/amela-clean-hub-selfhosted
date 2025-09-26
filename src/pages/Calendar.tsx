@@ -279,44 +279,88 @@ const Calendar = () => {
         ) : (
           <>
             {/* Header */}
-            <div className="mb-6 flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold">
-                {viewType === 'week' 
-                  ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
-                  : format(currentDate, 'MMMM yyyy', { locale: de })
-                }
-              </h1>
-              <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm" onClick={previousPeriod}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="sm" onClick={goToToday}>
-                  Heute
-                </Button>
-                <Button variant="outline" size="sm" onClick={nextPeriod}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
+            <div className="mb-6 space-y-4">
+              {/* Mobile Layout - Stack vertically */}
+              <div className="sm:hidden space-y-3">
+                <h1 className="text-2xl font-bold">
+                  {viewType === 'week' 
+                    ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
+                    : format(currentDate, 'MMMM yyyy', { locale: de })
+                  }
+                </h1>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Button variant="outline" size="sm" onClick={previousPeriod}>
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={goToToday}>
+                      Heute
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={nextPeriod}>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant={viewType === 'month' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setViewType('month')}
+                    >
+                      Monat
+                    </Button>
+                    <Button
+                      variant={viewType === 'week' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setViewType('week')}
+                    >
+                      Woche
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop Layout - Single row */}
+              <div className="hidden sm:flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <h1 className="text-2xl font-bold">
+                    {viewType === 'week' 
+                      ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
+                      : format(currentDate, 'MMMM yyyy', { locale: de })
+                    }
+                  </h1>
+                  <div className="flex items-center space-x-2">
+                    <Button variant="outline" size="sm" onClick={previousPeriod}>
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={goToToday}>
+                      Heute
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={nextPeriod}>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant={viewType === 'month' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewType('month')}
+                  >
+                    Monat
+                  </Button>
+                  <Button
+                    variant={viewType === 'week' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewType('week')}
+                  >
+                    Woche
+                  </Button>
+                </div>
               </div>
             </div>
-          
-          <div className="flex items-center space-x-2">
-            <Button
-              variant={viewType === 'month' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewType('month')}
-            >
-              Monat
-            </Button>
-            <Button
-              variant={viewType === 'week' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewType('week')}
-            >
-              Woche
-            </Button>
-          </div>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Calendar */}
