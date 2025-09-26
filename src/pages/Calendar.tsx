@@ -189,9 +189,6 @@ const Calendar = () => {
                 <p className="text-sm text-muted-foreground">Professioneller Reinigungsservice für Ferienhäuser</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" className="hover-scale">
-              Reinigungsservice
-            </Button>
             <PWAInstallButton />
           </div>
         </div>
