@@ -434,7 +434,7 @@ const CleaningPortal = () => {
                     <span className="font-medium text-foreground">Filter</span>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-4">
                     <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Alle Status" />
