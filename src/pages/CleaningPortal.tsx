@@ -22,7 +22,9 @@ import {
   Calendar,
   Users,
   ArrowLeft,
-  UserPlus
+  UserPlus,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -71,6 +73,7 @@ const CleaningPortal = () => {
   const [selectedTime, setSelectedTime] = useState('');
   const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   
   // Booking card configuration
   const { config: cardConfig, updateConfig: updateCardConfig } = useBookingCardConfig();
@@ -391,83 +394,100 @@ const CleaningPortal = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
-          {/* Search and Filters */}
+          {/* Search and Filters Toggle */}
           <Card className="shadow-sm border border-border">
-            <CardContent className="p-6">
-              <div className="space-y-4">
+            <CardContent className="p-4">
+              <button
+                onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                className="w-full flex items-center justify-between text-left hover:bg-muted/50 rounded-lg p-2 transition-colors"
+              >
                 <div className="flex items-center space-x-2">
                   <Search className="w-4 h-4 text-primary" />
-                  <span className="font-medium text-foreground">Suche</span>
+                  <span className="font-medium text-foreground">Such & Filter</span>
                 </div>
-                
-                <div className="relative">
-                  <Input
-                    placeholder="Nach Gast, Haus oder Adresse suchen..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                  <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-3" />
+                {isFiltersOpen ? (
+                  <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                )}
+              </button>
+              
+              {isFiltersOpen && (
+                <div className="mt-4 space-y-4 border-t border-border pt-4">
+                  <div className="flex items-center space-x-2">
+                    <Search className="w-4 h-4 text-primary" />
+                    <span className="font-medium text-foreground">Suche</span>
+                  </div>
+                  
+                  <div className="relative">
+                    <Input
+                      placeholder="Nach Gast, Haus oder Adresse suchen..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                    <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-3" />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Filter className="w-4 h-4 text-primary" />
+                    <span className="font-medium text-foreground">Filter</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Alle Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(STATUS_FILTERS).map(([key, label]) => (
+                          <SelectItem key={key} value={key}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={staffFilter} onValueChange={(value: StaffFilter) => setStaffFilter(value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Alle Putzkräfte" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(STAFF_FILTERS).map(([key, label]) => (
+                          <SelectItem key={key} value={key}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={houseFilter} onValueChange={(value: HouseFilter) => setHouseFilter(value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Alle Häuser" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Alle Häuser</SelectItem>
+                        {houses.map((house) => (
+                          <SelectItem key={house.id} value={house.id}>{house.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={timeFilter} onValueChange={(value: TimeFilter) => setTimeFilter(value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Alle Zeiten" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(TIME_FILTERS).map(([key, label]) => (
+                          <SelectItem key={key} value={key}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex justify-center items-center pt-2 border-t border-border">
+                    <span className="text-sm text-muted-foreground">
+                      {currentFilteredBookings.length} von {totalCleaningTasks} Aufträgen
+                    </span>
+                  </div>
                 </div>
-
-                <div className="flex items-center space-x-2">
-                  <Filter className="w-4 h-4 text-primary" />
-                  <span className="font-medium text-foreground">Filter</span>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Alle Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(STATUS_FILTERS).map(([key, label]) => (
-                        <SelectItem key={key} value={key}>{label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select value={staffFilter} onValueChange={(value: StaffFilter) => setStaffFilter(value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Alle Putzkräfte" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(STAFF_FILTERS).map(([key, label]) => (
-                        <SelectItem key={key} value={key}>{label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select value={houseFilter} onValueChange={(value: HouseFilter) => setHouseFilter(value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Alle Häuser" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Alle Häuser</SelectItem>
-                      {houses.map((house) => (
-                        <SelectItem key={house.id} value={house.id}>{house.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select value={timeFilter} onValueChange={(value: TimeFilter) => setTimeFilter(value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Alle Zeiten" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(TIME_FILTERS).map(([key, label]) => (
-                        <SelectItem key={key} value={key}>{label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex justify-center items-center pt-2 border-t border-border">
-                  <span className="text-sm text-muted-foreground">
-                    {currentFilteredBookings.length} von {totalCleaningTasks} Aufträgen
-                  </span>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
 
