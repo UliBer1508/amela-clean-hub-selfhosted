@@ -26,6 +26,10 @@ export interface BookingCardConfig {
   showTaskAssignment: boolean;
   showTaskDateTime: boolean;
   showTaskNotes: boolean;
+  showCurrency: boolean;
+  showBookingId: boolean;
+  showTaskActions: boolean;
+  showEditableNotes: boolean;
 }
 
 const DEFAULT_CONFIG: BookingCardConfig = {
@@ -47,6 +51,10 @@ const DEFAULT_CONFIG: BookingCardConfig = {
   showTaskAssignment: true,
   showTaskDateTime: true,
   showTaskNotes: true,
+  showCurrency: false,
+  showBookingId: false,
+  showTaskActions: true,
+  showEditableNotes: true,
 };
 
 const FIELD_LABELS = {
@@ -68,13 +76,18 @@ const FIELD_LABELS = {
   showTaskAssignment: 'Aufgaben Zuweisung',
   showTaskDateTime: 'Aufgaben Datum/Zeit',
   showTaskNotes: 'Aufgaben Notizen',
+  showCurrency: 'Währung anzeigen',
+  showBookingId: 'Buchungs-ID anzeigen',
+  showTaskActions: 'Aufgaben-Aktionen',
+  showEditableNotes: 'Notizen editierbar',
 };
 
 const FIELD_CATEGORIES = {
   'Unterkunft': ['showHouseName', 'showHouseAddress'],
   'Gast Information': ['showGuestName', 'showGuestCount', 'showGuestEmail', 'showGuestPhone', 'showNationality'],
-  'Buchung': ['showCheckInDate', 'showCheckOutDate', 'showBookingNotes', 'showBookingAmount', 'showBookingStatus', 'showPlatform'],
-  'Reinigungsaufträge': ['showCleaningTasks', 'showTaskStatus', 'showTaskAssignment', 'showTaskDateTime', 'showTaskNotes'],
+  'Buchung': ['showCheckInDate', 'showCheckOutDate', 'showBookingNotes', 'showBookingAmount', 'showBookingStatus', 'showPlatform', 'showCurrency', 'showBookingId'],
+  'Reinigungsaufträge': ['showCleaningTasks', 'showTaskStatus', 'showTaskAssignment', 'showTaskDateTime', 'showTaskNotes', 'showTaskActions'],
+  'Benutzerinteraktion': ['showEditableNotes'],
 };
 
 interface BookingCardSettingsProps {

@@ -95,6 +95,11 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                     Unterkunft: {booking.houses?.name}
                   </span>
                 </div>
+                {config.showBookingId && (
+                  <span className="text-xs text-muted-foreground font-mono">
+                    ID: {booking.id.slice(-8)}
+                  </span>
+                )}
               </div>
             )}
             {config.showHouseAddress && (
@@ -163,7 +168,10 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
             {config.showBookingAmount && booking.booking_amount && (
               <div className="flex items-center space-x-2">
                 <CreditCard className="w-4 h-4 text-emerald-600" />
-                <span className="text-sm">Betrag: {booking.booking_amount} {booking.currency || 'EUR'}</span>
+                <span className="text-sm">
+                  Betrag: {booking.booking_amount}
+                  {config.showCurrency && ` ${booking.currency || 'EUR'}`}
+                </span>
               </div>
             )}
 
@@ -193,14 +201,16 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-xs font-medium text-muted-foreground">Buchungsnotizen:</p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setEditingBookingNotes(!editingBookingNotes)}
-                        className="h-6 px-2 text-xs"
-                      >
-                        {editingBookingNotes ? 'Abbrechen' : 'Bearbeiten'}
-                      </Button>
+                      {config.showEditableNotes && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingBookingNotes(!editingBookingNotes)}
+                          className="h-6 px-2 text-xs"
+                        >
+                          {editingBookingNotes ? 'Abbrechen' : 'Bearbeiten'}
+                        </Button>
+                      )}
                     </div>
                     {editingBookingNotes ? (
                       <div className="space-y-2">
@@ -260,22 +270,24 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                       <div key={task.id} className="mb-2 last:mb-0">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-xs text-muted-foreground">Reinigung {task.id.slice(-4)}:</span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              if (editingTaskNotes === task.id) {
-                                setEditingTaskNotes(null);
-                                setTaskNotesValue(prev => ({ ...prev, [task.id]: undefined }));
-                              } else {
-                                setEditingTaskNotes(task.id);
-                                setTaskNotesValue(prev => ({ ...prev, [task.id]: task.notes || '' }));
-                              }
-                            }}
-                            className="h-6 px-2 text-xs"
-                          >
-                            {editingTaskNotes === task.id ? 'Abbrechen' : 'Bearbeiten'}
-                          </Button>
+                          {config.showEditableNotes && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                if (editingTaskNotes === task.id) {
+                                  setEditingTaskNotes(null);
+                                  setTaskNotesValue(prev => ({ ...prev, [task.id]: undefined }));
+                                } else {
+                                  setEditingTaskNotes(task.id);
+                                  setTaskNotesValue(prev => ({ ...prev, [task.id]: task.notes || '' }));
+                                }
+                              }}
+                              className="h-6 px-2 text-xs"
+                            >
+                              {editingTaskNotes === task.id ? 'Abbrechen' : 'Bearbeiten'}
+                            </Button>
+                          )}
                         </div>
                         {editingTaskNotes === task.id ? (
                           <div className="space-y-2">
@@ -349,7 +361,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                     </div>
                   )}
 
-                  {config.showTaskAssignment && (
+                  {config.showTaskAssignment && config.showTaskActions && (
                     <div className="flex items-center space-x-2 text-sm">
                       <span className="text-muted-foreground">Zugewiesen an:</span>
                       <Select
@@ -379,7 +391,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                   )}
 
                   <div className="flex flex-wrap gap-2 pt-2">
-                    {config.showTaskStatus && (
+                    {config.showTaskStatus && config.showTaskActions && (
                       <Select
                         value={task.status}
                         onValueChange={(value: string) => onStatusUpdate(task.id, value)}
@@ -397,7 +409,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                       </Select>
                     )}
 
-                    {config.showTaskDateTime && (
+                    {config.showTaskDateTime && config.showTaskActions && (
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
