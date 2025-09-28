@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { 
@@ -42,6 +43,8 @@ interface ConfigurableBookingCardProps {
   onStatusUpdate: (taskId: string, status: string) => void;
   onStaffUpdate: (taskId: string, staffId: string | null) => void;
   onDateTimeUpdate: (taskId: string, date: string, time: string) => void;
+  onBookingNotesUpdate?: (bookingId: string, notes: string) => void;
+  onTaskNotesUpdate?: (taskId: string, notes: string) => void;
   formatDateTime: (date: string, time?: string) => string;
 }
 
@@ -52,11 +55,17 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
   onStatusUpdate,
   onStaffUpdate,
   onDateTimeUpdate,
+  onBookingNotesUpdate,
+  onTaskNotesUpdate,
   formatDateTime,
 }) => {
   const [selectedDate, setSelectedDate] = React.useState<Date>();
   const [selectedTime, setSelectedTime] = React.useState('');
   const [editingTask, setEditingTask] = React.useState<any>(null);
+  const [editingBookingNotes, setEditingBookingNotes] = useState(false);
+  const [editingTaskNotes, setEditingTaskNotes] = useState<string | null>(null);
+  const [bookingNotesValue, setBookingNotesValue] = useState(booking.notes || '');
+  const [taskNotesValue, setTaskNotesValue] = useState<{[key: string]: string}>({});
 
   const handleEditDateTime = (task: any) => {
     setEditingTask(task);
@@ -173,7 +182,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
             )}
 
             {/* Booking Notes */}
-            {config.showBookingNotes && booking.notes && (
+            {config.showBookingNotes && (
               <div className="mt-3 p-2 bg-muted/30 rounded border-l-4 border-blue-500">
                 <div className="flex items-start space-x-2">
                   <div className="text-blue-600 mt-0.5">
@@ -182,15 +191,62 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                     </svg>
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Buchungsnotizen:</p>
-                    <p className="text-sm text-foreground whitespace-pre-wrap">{booking.notes}</p>
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs font-medium text-muted-foreground">Buchungsnotizen:</p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingBookingNotes(!editingBookingNotes)}
+                        className="h-6 px-2 text-xs"
+                      >
+                        {editingBookingNotes ? 'Abbrechen' : 'Bearbeiten'}
+                      </Button>
+                    </div>
+                    {editingBookingNotes ? (
+                      <div className="space-y-2">
+                        <Textarea
+                          value={bookingNotesValue}
+                          onChange={(e) => setBookingNotesValue(e.target.value)}
+                          placeholder="Buchungsnotizen hinzufügen..."
+                          rows={3}
+                          className="text-sm"
+                        />
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              onBookingNotesUpdate?.(booking.id, bookingNotesValue);
+                              setEditingBookingNotes(false);
+                            }}
+                            className="h-7 px-3 text-xs"
+                          >
+                            Speichern
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setBookingNotesValue(booking.notes || '');
+                              setEditingBookingNotes(false);
+                            }}
+                            className="h-7 px-3 text-xs"
+                          >
+                            Abbrechen
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-foreground whitespace-pre-wrap">
+                        {booking.notes || 'Keine Notizen vorhanden'}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
             )}
 
             {/* Task Notes */}
-            {config.showTaskNotes && booking.service_tasks?.some((task: any) => task.notes) && (
+            {config.showTaskNotes && (
               <div className="mt-3 p-2 bg-muted/30 rounded border-l-4 border-blue-500">
                 <div className="flex items-start space-x-2">
                   <div className="text-blue-600 mt-0.5">
@@ -200,13 +256,67 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-medium text-muted-foreground mb-1">Aufgaben Notizen:</p>
-                    {booking.service_tasks?.map((task: any) => 
-                      task.notes ? (
-                        <p key={task.id} className="text-sm text-foreground whitespace-pre-wrap mb-1">
-                          {task.notes}
-                        </p>
-                      ) : null
-                    )}
+                    {booking.service_tasks?.map((task: any) => (
+                      <div key={task.id} className="mb-2 last:mb-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-muted-foreground">Reinigung {task.id.slice(-4)}:</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              if (editingTaskNotes === task.id) {
+                                setEditingTaskNotes(null);
+                                setTaskNotesValue(prev => ({ ...prev, [task.id]: undefined }));
+                              } else {
+                                setEditingTaskNotes(task.id);
+                                setTaskNotesValue(prev => ({ ...prev, [task.id]: task.notes || '' }));
+                              }
+                            }}
+                            className="h-6 px-2 text-xs"
+                          >
+                            {editingTaskNotes === task.id ? 'Abbrechen' : 'Bearbeiten'}
+                          </Button>
+                        </div>
+                        {editingTaskNotes === task.id ? (
+                          <div className="space-y-2">
+                            <Textarea
+                              value={taskNotesValue[task.id] || ''}
+                              onChange={(e) => setTaskNotesValue(prev => ({ ...prev, [task.id]: e.target.value }))}
+                              placeholder="Aufgaben-Notizen hinzufügen..."
+                              rows={3}
+                              className="text-sm"
+                            />
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  onTaskNotesUpdate?.(task.id, taskNotesValue[task.id] || '');
+                                  setEditingTaskNotes(null);
+                                }}
+                                className="h-7 px-3 text-xs"
+                              >
+                                Speichern
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setTaskNotesValue(prev => ({ ...prev, [task.id]: task.notes || '' }));
+                                  setEditingTaskNotes(null);
+                                }}
+                                className="h-7 px-3 text-xs"
+                              >
+                                Abbrechen
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-foreground whitespace-pre-wrap">
+                            {task.notes || 'Keine Notizen vorhanden'}
+                          </p>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>

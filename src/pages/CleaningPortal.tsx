@@ -268,6 +268,56 @@ const CleaningPortal = () => {
     }
   }, [bookingsWithTasks, handleDateTimeUpdate]);
 
+  const handleBookingNotesUpdate = useCallback(async (bookingId: string, notes: string) => {
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .update({ notes })
+        .eq('id', bookingId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Notizen aktualisiert",
+        description: "Die Buchungsnotizen wurden erfolgreich gespeichert.",
+      });
+
+      refetchBookings();
+    } catch (error) {
+      console.error('Error updating booking notes:', error);
+      toast({
+        title: "Fehler",
+        description: "Notizen konnten nicht aktualisiert werden.",
+        variant: "destructive",
+      });
+    }
+  }, [toast, refetchBookings]);
+
+  const handleTaskNotesUpdate = useCallback(async (taskId: string, notes: string) => {
+    try {
+      const { error } = await supabase
+        .from('service_tasks')
+        .update({ notes })
+        .eq('id', taskId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Aufgaben-Notizen aktualisiert",
+        description: "Die Aufgaben-Notizen wurden erfolgreich gespeichert.",
+      });
+
+      refetchBookings();
+    } catch (error) {
+      console.error('Error updating task notes:', error);
+      toast({
+        title: "Fehler",
+        description: "Aufgaben-Notizen konnten nicht aktualisiert werden.",
+        variant: "destructive",
+      });
+    }
+  }, [toast, refetchBookings]);
+
   if (bookingsLoading || housesLoading || staffLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -511,6 +561,8 @@ const CleaningPortal = () => {
                   onStatusUpdate={handleStatusUpdate}
                   onStaffUpdate={handleStaffUpdate}
                   onDateTimeUpdate={handleDateTimeUpdateFromCard}
+                  onBookingNotesUpdate={handleBookingNotesUpdate}
+                  onTaskNotesUpdate={handleTaskNotesUpdate}
                   formatDateTime={formatDateTime}
                 />
               ))
