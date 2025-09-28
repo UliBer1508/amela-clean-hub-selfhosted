@@ -7,12 +7,9 @@ export const APP_CONFIG = {
 
 export const TIME_FILTERS = {
   all: 'Alle Zeiten',
-  today: 'Heute',
   week: 'n. Woche', 
   month: 'n. Monat',
   '3months': 'n. 3 Monate',
-  '6months': 'Letzten 6 Monate',
-  '12months': 'Letzten 12 Monate',
 } as const;
 
 export const STATUS_FILTERS = {
