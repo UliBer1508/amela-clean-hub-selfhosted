@@ -29,7 +29,7 @@ import { Link } from 'react-router-dom';
 type StatusFilter = 'all' | 'scheduled' | 'in_progress' | 'completed' | 'delayed' | 'cancelled';
 type StaffFilter = 'all' | 'assigned' | 'unassigned';
 type HouseFilter = 'all' | string;
-type TimeFilter = 'all' | 'today' | 'tomorrow' | 'this_week' | 'overdue';
+type TimeFilter = 'all' | 'week' | 'month' | '3months';
 
 interface TaskEditingState {
   id: string;
@@ -55,10 +55,9 @@ const STAFF_FILTERS = {
 
 const TIME_FILTERS = {
   all: 'Alle Zeiten',
-  today: 'Heute',
-  tomorrow: 'Morgen', 
-  this_week: 'Diese Woche',
-  overdue: 'Überfällig'
+  week: 'n. Woche', 
+  month: 'n. Monat',
+  '3months': 'n. 3 Monate',
 };
 
 const CleaningPortal = () => {
@@ -122,23 +121,22 @@ const CleaningPortal = () => {
       if (timeFilter !== 'all') {
         const taskDate = new Date(task.scheduled_date);
         const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
         
         switch (timeFilter) {
-          case 'today':
-            matchesTime = taskDate.toDateString() === today.toDateString();
+          case 'week':
+            const nextWeek = new Date(today);
+            nextWeek.setDate(today.getDate() + 7);
+            matchesTime = taskDate >= today && taskDate <= nextWeek;
             break;
-          case 'tomorrow':
-            matchesTime = taskDate.toDateString() === tomorrow.toDateString();
+          case 'month':
+            const nextMonth = new Date(today);
+            nextMonth.setMonth(today.getMonth() + 1);
+            matchesTime = taskDate >= today && taskDate <= nextMonth;
             break;
-          case 'this_week':
-            const weekFromNow = new Date(today);
-            weekFromNow.setDate(today.getDate() + 7);
-            matchesTime = taskDate >= today && taskDate <= weekFromNow;
-            break;
-          case 'overdue':
-            matchesTime = taskDate < today && task.status !== 'completed';
+          case '3months':
+            const next3Months = new Date(today);
+            next3Months.setMonth(today.getMonth() + 3);
+            matchesTime = taskDate >= today && taskDate <= next3Months;
             break;
         }
       }
