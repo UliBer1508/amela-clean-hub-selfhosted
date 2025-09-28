@@ -215,10 +215,10 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
 
           {/* Cleaning Tasks */}
           {config.showCleaningTasks && (
-            <div className="space-y-3">
+            <div className="space-y-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-lg p-4">
               <h4 className="font-medium text-foreground">Reinigungsaufträge</h4>
               {booking.service_tasks?.map((task: any) => (
-                <div key={task.id} className="bg-muted/50 rounded-lg p-3 space-y-2">
+                <div key={task.id} className="bg-background/80 rounded-lg p-3 space-y-2 border border-blue-200/30 dark:border-blue-800/30">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Reinigung</span>
                     {config.showTaskStatus && (
