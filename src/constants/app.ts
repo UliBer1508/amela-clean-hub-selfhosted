@@ -8,9 +8,9 @@ export const APP_CONFIG = {
 export const TIME_FILTERS = {
   all: 'Alle Zeiten',
   today: 'Heute',
-  week: 'Diese Woche', 
-  month: 'Dieser Monat',
-  '3months': 'Letzten 3 Monate',
+  week: 'n. Woche', 
+  month: 'n. Monat',
+  '3months': 'n. 3 Monate',
   '6months': 'Letzten 6 Monate',
   '12months': 'Letzten 12 Monate',
 } as const;
