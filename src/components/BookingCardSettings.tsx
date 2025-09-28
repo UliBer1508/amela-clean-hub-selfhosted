@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Settings, Eye, EyeOff } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface BookingCardConfig {
   showHouseName: boolean;
@@ -220,25 +221,75 @@ const BookingCardSettings: React.FC<BookingCardSettingsProps> = ({
 // Hook for managing booking card configuration
 export const useBookingCardConfig = () => {
   const [config, setConfig] = useState<BookingCardConfig>(DEFAULT_CONFIG);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedConfig = localStorage.getItem('bookingCardConfig');
-    if (savedConfig) {
+    const loadConfig = async () => {
       try {
-        const parsedConfig = JSON.parse(savedConfig);
-        setConfig({ ...DEFAULT_CONFIG, ...parsedConfig });
+        const { data, error } = await supabase
+          .from('booking_card_config')
+          .select('config')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error loading booking card config:', error);
+          setConfig(DEFAULT_CONFIG);
+        } else if (data && data.config) {
+          setConfig({ ...DEFAULT_CONFIG, ...(data.config as unknown as BookingCardConfig) });
+        }
       } catch (error) {
-        console.error('Error parsing booking card config:', error);
+        console.error('Error loading booking card config:', error);
+        setConfig(DEFAULT_CONFIG);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+
+    loadConfig();
   }, []);
 
-  const updateConfig = (newConfig: BookingCardConfig) => {
-    setConfig(newConfig);
-    localStorage.setItem('bookingCardConfig', JSON.stringify(newConfig));
+  const updateConfig = async (newConfig: BookingCardConfig) => {
+    try {
+      // Check if there's an existing config
+      const { data: existingConfig } = await supabase
+        .from('booking_card_config')
+        .select('id')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (existingConfig) {
+        // Update existing config
+        const { error } = await supabase
+          .from('booking_card_config')
+          .update({ config: newConfig as any })
+          .eq('id', existingConfig.id);
+
+        if (error) {
+          console.error('Error updating booking card config:', error);
+          return;
+        }
+      } else {
+        // Create new config
+        const { error } = await supabase
+          .from('booking_card_config')
+          .insert([{ config: newConfig as any }]);
+
+        if (error) {
+          console.error('Error creating booking card config:', error);
+          return;
+        }
+      }
+
+      setConfig(newConfig);
+    } catch (error) {
+      console.error('Error updating booking card config:', error);
+    }
   };
 
-  return { config, updateConfig };
+  return { config, updateConfig, loading };
 };
 
 export default BookingCardSettings;

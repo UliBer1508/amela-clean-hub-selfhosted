@@ -76,7 +76,7 @@ const CleaningPortal = () => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   
   // Booking card configuration
-  const { config: cardConfig, updateConfig: updateCardConfig } = useBookingCardConfig();
+  const { config: cardConfig, updateConfig: updateCardConfig, loading: configLoading } = useBookingCardConfig();
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
@@ -318,7 +318,7 @@ const CleaningPortal = () => {
     }
   }, [toast, refetchBookings]);
 
-  if (bookingsLoading || housesLoading || staffLoading) {
+  if (bookingsLoading || housesLoading || staffLoading || configLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
