@@ -64,7 +64,7 @@ const TIME_FILTERS = {
 const CleaningPortal = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('scheduled');
   const [staffFilter, setStaffFilter] = useState<StaffFilter>('all');
   const [houseFilter, setHouseFilter] = useState<HouseFilter>('all');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
