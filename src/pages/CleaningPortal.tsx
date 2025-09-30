@@ -45,24 +45,24 @@ interface TaskEditingState {
 
 const STATUS_FILTERS = {
   all: 'Alle Status',
-  scheduled: 'Geplant',
-  in_progress: 'In Bearbeitung',
-  completed: 'Abgeschlossen', 
-  delayed: 'Verzögert',
-  cancelled: 'Storniert'
+  scheduled: '📅 Geplant',
+  in_progress: '⏳ In Bearbeitung',
+  completed: '✅ Abgeschlossen', 
+  delayed: '⚠️ Verzögert',
+  cancelled: '❌ Storniert'
 };
 
 const STAFF_FILTERS = {
-  all: 'Alle Putzkräfte',
-  assigned: 'Zugewiesen',
-  unassigned: 'Nicht zugewiesen'
+  all: '👥 Alle Putzkräfte',
+  assigned: '✅ Zugewiesen',
+  unassigned: '❌ Nicht zugewiesen'
 };
 
 const TIME_FILTERS = {
-  all: 'Alle Zeiten',
-  week: 'n. Woche', 
-  month: 'n. Monat',
-  '3months': 'n. 3 Monate',
+  all: '🕐 Alle Zeiten',
+  week: '📅 n. Woche', 
+  month: '🗓️ n. Monat',
+  '3months': '📆 n. 3 Monate',
 };
 
 const CleaningPortal = () => {
