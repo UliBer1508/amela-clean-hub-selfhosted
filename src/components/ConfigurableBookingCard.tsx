@@ -91,9 +91,9 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Home className="w-5 h-5 text-amber-600" />
-                  <span className="font-semibold text-foreground">
-                    Unterkunft: {booking.houses?.name}
-                  </span>
+                   <span className="font-semibold text-foreground">
+                     🏠 Unterkunft: {booking.houses?.name}
+                   </span>
                 </div>
                 {config.showBookingId && (
                   <span className="text-xs text-muted-foreground font-mono">
@@ -105,9 +105,9 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
             {config.showHouseAddress && (
               <div className="flex items-center space-x-2 mt-1">
                 <MapPin className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
-                  Adresse: {booking.houses?.address}
-                </span>
+                 <span className="text-sm text-muted-foreground">
+                   📍 Adresse: {booking.houses?.address}
+                 </span>
               </div>
             )}
           </div>
@@ -119,28 +119,28 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
             {config.showGuestName && (
               <div className="flex items-center space-x-2">
                 <User className="w-4 h-4 text-green-600" />
-                <span className="text-sm font-medium">Gast: {booking.guest_name}</span>
+                <span className="text-sm font-medium">👤 Gast: {booking.guest_name}</span>
               </div>
             )}
             
             {config.showGuestCount && (
               <div className="flex items-center space-x-2">
                 <Users className="w-4 h-4 text-green-600" />
-                <span className="text-sm font-medium">Gäste: {booking.number_of_guests} Personen</span>
+                <span className="text-sm font-medium">👥 Gäste: {booking.number_of_guests} Personen</span>
               </div>
             )}
 
             {config.showGuestEmail && booking.guest_email && (
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4 text-blue-600" />
-                <span className="text-sm">E-Mail: {booking.guest_email}</span>
+                <span className="text-sm">📧 E-Mail: {booking.guest_email}</span>
               </div>
             )}
 
             {config.showGuestPhone && booking.guest_phone && (
               <div className="flex items-center space-x-2">
                 <Phone className="w-4 h-4 text-blue-600" />
-                <span className="text-sm">Telefon: {booking.guest_phone}</span>
+                <span className="text-sm">📞 Telefon: {booking.guest_phone}</span>
               </div>
             )}
 
@@ -154,14 +154,14 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
             {config.showCheckInDate && (
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4 text-purple-600" />
-                <span className="text-sm">Check-in: {formatDateTime(booking.check_in)}</span>
+                <span className="text-sm">📅 Check-in: {formatDateTime(booking.check_in)}</span>
               </div>
             )}
 
             {config.showCheckOutDate && (
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4 text-purple-600" />
-                <span className="text-sm">Check-out: {formatDateTime(booking.check_out)}</span>
+                <span className="text-sm">📅 Check-out: {formatDateTime(booking.check_out)}</span>
               </div>
             )}
 
@@ -338,11 +338,11 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
           {/* Cleaning Tasks */}
           {config.showCleaningTasks && (
             <div className="space-y-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg p-4 border border-blue-100 dark:border-blue-900/50">
-              <h4 className="font-medium text-foreground">Reinigungsaufträge</h4>
+              <h4 className="font-medium text-foreground">🧹 Reinigungsaufträge</h4>
               {booking.service_tasks?.map((task: any) => (
                 <div key={task.id} className="bg-background/80 rounded-lg p-3 space-y-2 border border-blue-200/30 dark:border-blue-800/30">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Reinigung</span>
+                    <span className="text-sm font-medium">🧽 Reinigung</span>
                     {config.showTaskStatus && (
                       <Badge variant={
                         task.status === 'completed' ? 'default' : 
@@ -363,7 +363,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
 
                   {config.showTaskAssignment && config.showTaskActions && (
                     <div className="flex items-center space-x-2 text-sm">
-                      <span className="text-muted-foreground">Zugewiesen an:</span>
+                      <span className="text-muted-foreground">👨‍💼 Zugewiesen an:</span>
                       <Select
                         value={task.assigned_staff_id || 'unassigned'}
                         onValueChange={(value: string) => 
