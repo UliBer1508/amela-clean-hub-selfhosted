@@ -472,7 +472,7 @@ const CleaningPortal = () => {
               >
                 <div className="flex items-center space-x-2">
                   <Search className="w-4 h-4 text-primary" />
-                  <span className="font-medium text-foreground">Such & Filter</span>
+                  <span className="font-medium text-foreground">🔍 Such & Filter</span>
                 </div>
                 {isFiltersOpen ? (
                   <ChevronUp className="w-4 h-4 text-muted-foreground" />
