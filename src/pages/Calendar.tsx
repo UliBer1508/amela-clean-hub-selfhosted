@@ -199,10 +199,12 @@ const Calendar = () => {
             </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <BookingCardSettings 
-                    config={cardConfig}
-                    onConfigChange={updateCardConfig}
-                  />
+                  <div className={cardConfig.showMobileSettingsButton ? '' : 'hidden lg:block'}>
+                    <BookingCardSettings 
+                      config={cardConfig}
+                      onConfigChange={updateCardConfig}
+                    />
+                  </div>
                   <PWAInstallButton />
                 </div>
                 <div className="flex items-center space-x-2">

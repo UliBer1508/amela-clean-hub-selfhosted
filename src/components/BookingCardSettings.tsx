@@ -31,6 +31,7 @@ export interface BookingCardConfig {
   showBookingId: boolean;
   showTaskActions: boolean;
   showEditableNotes: boolean;
+  showMobileSettingsButton: boolean;
 }
 
 const DEFAULT_CONFIG: BookingCardConfig = {
@@ -56,6 +57,7 @@ const DEFAULT_CONFIG: BookingCardConfig = {
   showBookingId: false,
   showTaskActions: true,
   showEditableNotes: true,
+  showMobileSettingsButton: false,
 };
 
 const FIELD_LABELS = {
@@ -81,6 +83,7 @@ const FIELD_LABELS = {
   showBookingId: 'Buchungs-ID anzeigen',
   showTaskActions: 'Aufgaben-Aktionen',
   showEditableNotes: 'Notizen editierbar',
+  showMobileSettingsButton: 'Einstellungsbutton auf Handy anzeigen',
 };
 
 const FIELD_CATEGORIES = {
@@ -89,6 +92,7 @@ const FIELD_CATEGORIES = {
   'Buchung': ['showCheckInDate', 'showCheckOutDate', 'showBookingNotes', 'showBookingAmount', 'showBookingStatus', 'showPlatform', 'showCurrency', 'showBookingId'],
   'Reinigungsaufträge': ['showCleaningTasks', 'showTaskStatus', 'showTaskAssignment', 'showTaskDateTime', 'showTaskNotes', 'showTaskActions'],
   'Benutzerinteraktion': ['showEditableNotes'],
+  'Mobile Einstellungen': ['showMobileSettingsButton'],
 };
 
 interface BookingCardSettingsProps {
