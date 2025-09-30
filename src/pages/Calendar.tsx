@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Home, Calendar as CalendarIcon, Users, Bell } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Home, Calendar as CalendarIcon, Users, Bell, RefreshCw } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import NotificationSettings from '@/components/NotificationSettings';
+import PullToRefresh from '@/components/PullToRefresh';
 import { formatGermanDate } from '@/utils/date';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, addWeeks, subWeeks } from 'date-fns';
 import { de } from 'date-fns/locale';
@@ -23,7 +24,7 @@ const Calendar = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
 
-  const { allBookings, loading, totalCleaningTasks } = useBookings();
+  const { allBookings, loading, totalCleaningTasks, forceRefresh, lastRefresh } = useBookings();
   const { houses } = useHouses();
 
   // Get calendar days for the current month/week
@@ -174,7 +175,12 @@ const Calendar = () => {
 
   const weekDays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
+  const handleRefresh = async () => {
+    await forceRefresh();
+  };
+
   return (
+    <PullToRefresh onRefresh={handleRefresh} disabled={loading}>
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-card border-b border-border">
@@ -189,7 +195,26 @@ const Calendar = () => {
                 <p className="text-sm text-muted-foreground">Professioneller Reinigungsservice für Ferienhäuser</p>
               </div>
             </div>
-            <PWAInstallButton />
+              <div className="flex items-center justify-between">
+                <PWAInstallButton />
+                <div className="flex items-center space-x-2">
+                  {lastRefresh && (
+                    <span className="text-xs text-muted-foreground">
+                      Zuletzt aktualisiert: {format(lastRefresh, 'HH:mm')}
+                    </span>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleRefresh}
+                    disabled={loading}
+                    className="hidden sm:flex"
+                  >
+                    <RefreshCw className={`w-4 h-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
+                    Aktualisieren
+                  </Button>
+                </div>
+              </div>
           </div>
         </div>
       </header>
@@ -518,6 +543,7 @@ const Calendar = () => {
         )}
       </main>
     </div>
+    </PullToRefresh>
   );
 };
 

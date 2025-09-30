@@ -6,8 +6,10 @@ import { useHouses } from '@/hooks/useHouses';
 import { useCleaningStaff } from '@/hooks/useCleaningStaff';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDateTime } from '@/utils/date';
+import { format } from 'date-fns';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import NotificationSettings from '@/components/NotificationSettings';
+import PullToRefresh from '@/components/PullToRefresh';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +25,7 @@ import {
   Users,
   ArrowLeft,
   UserPlus,
+  RefreshCw,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
@@ -84,7 +87,9 @@ const CleaningPortal = () => {
     bookings = [], 
     loading: bookingsLoading, 
     error: bookingsError,
-    refetch: refetchBookings 
+    refetch: refetchBookings,
+    forceRefresh,
+    lastRefresh
   } = useBookings();
 
   const { 
@@ -339,7 +344,12 @@ const CleaningPortal = () => {
     );
   }
 
+  const handleRefresh = async () => {
+    await forceRefresh();
+  };
+
   return (
+    <PullToRefresh onRefresh={handleRefresh} disabled={bookingsLoading}>
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-card border-b border-border">
@@ -359,7 +369,26 @@ const CleaningPortal = () => {
                 config={cardConfig}
                 onConfigChange={updateCardConfig}
               />
-              <PWAInstallButton />
+              <div className="flex items-center justify-between">
+                <PWAInstallButton />
+                <div className="flex items-center space-x-2">
+                  {lastRefresh && (
+                    <span className="text-xs text-muted-foreground">
+                      Zuletzt aktualisiert: {format(lastRefresh, 'HH:mm')}
+                    </span>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleRefresh}
+                    disabled={bookingsLoading}
+                    className="hidden sm:flex"
+                  >
+                    <RefreshCw className={`w-4 h-4 mr-1 ${bookingsLoading ? 'animate-spin' : ''}`} />
+                    Aktualisieren
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -571,6 +600,7 @@ const CleaningPortal = () => {
         </div>
       </main>
     </div>
+    </PullToRefresh>
   );
 };
 

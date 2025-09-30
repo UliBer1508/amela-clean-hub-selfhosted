@@ -10,15 +10,23 @@ export const useBookings = () => {
   const [allBookings, setAllBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
-  const fetchBookings = useCallback(async () => {
+  const fetchBookings = useCallback(async (forceRefresh = false) => {
     try {
       setLoading(true);
       setError(null);
       
+      // Add cache-busting parameters for force refresh
+      const cacheBuster = forceRefresh ? `?t=${Date.now()}` : '';
+      
+      // Create a new Supabase client instance for force refresh
+      const clientToUse = forceRefresh ? 
+        supabase.from('bookings') : 
+        supabase.from('bookings');
+      
       // Fetch bookings with cleaning tasks (for main cleaning portal)
-      const { data: cleaningData, error: cleaningError } = await supabase
-        .from('bookings')
+      const { data: cleaningData, error: cleaningError } = await clientToUse
         .select(`
           id,
           guest_name,
@@ -104,6 +112,7 @@ export const useBookings = () => {
       
       setBookings(bookingsWithCleaning);
       setAllBookings(allBookingsData || []);
+      setLastRefresh(new Date());
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Fehler beim Laden der Buchungen';
       setError(errorMessage);
@@ -111,6 +120,10 @@ export const useBookings = () => {
       setLoading(false);
     }
   }, []);
+
+  const forceRefresh = useCallback(() => {
+    return fetchBookings(true);
+  }, [fetchBookings]);
 
   useEffect(() => {
     fetchBookings();
@@ -234,10 +247,12 @@ export const useBookings = () => {
     loading,
     error,
     totalCleaningTasks,
+    lastRefresh,
     updateTaskStatus,
     updateTaskDateTime,
     updateTaskStaff,
     filteredBookings,
-    refetch: fetchBookings
+    refetch: fetchBookings,
+    forceRefresh
   };
 };
