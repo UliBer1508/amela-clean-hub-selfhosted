@@ -458,8 +458,7 @@ const PutzkraeftePage = () => {
                     </div>
                     <CollapsibleTrigger asChild>
                       <Button variant="ghost" size="sm">
-                        <Filter className="w-4 h-4 mr-2" />
-                        Filter {isFiltersOpen ? 'einklappen' : 'ausklappen'}
+                        <Filter className="w-4 h-4" />
                         {isFiltersOpen ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
                       </Button>
                     </CollapsibleTrigger>
