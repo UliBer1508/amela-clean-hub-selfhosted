@@ -9,6 +9,7 @@ import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import NotificationSettings from '@/components/NotificationSettings';
+import BookingCardSettings, { useBookingCardConfig } from '@/components/BookingCardSettings';
 import PullToRefresh from '@/components/PullToRefresh';
 import { formatGermanDate } from '@/utils/date';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, addWeeks, subWeeks } from 'date-fns';
@@ -25,6 +26,7 @@ const Calendar = () => {
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
 
   const { allBookings, loading, totalCleaningTasks, forceRefresh, lastRefresh } = useBookings();
+  const { config: cardConfig, updateConfig: updateCardConfig, loading: configLoading } = useBookingCardConfig();
   const { houses } = useHouses();
 
   // Get calendar days for the current month/week
@@ -196,7 +198,13 @@ const Calendar = () => {
               </div>
             </div>
               <div className="flex items-center justify-between">
-                <PWAInstallButton />
+                <div className="flex items-center space-x-2">
+                  <BookingCardSettings 
+                    config={cardConfig}
+                    onConfigChange={updateCardConfig}
+                  />
+                  <PWAInstallButton />
+                </div>
                 <div className="flex items-center space-x-2">
                   {lastRefresh && (
                     <span className="text-xs text-muted-foreground">
