@@ -25,9 +25,13 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
   const MAX_PULL = 120;
 
   useEffect(() => {
-    // Show refresh button on PWA
+    // Show refresh button only when data might be stale
     const isPWA = window.matchMedia('(display-mode: standalone)').matches;
-    setShowRefreshButton(isPWA);
+    const isStale = localStorage.getItem('lastDataRefresh');
+    const lastRefresh = isStale ? new Date(isStale) : null;
+    const isOlderThan5Minutes = lastRefresh && (Date.now() - lastRefresh.getTime()) > 5 * 60 * 1000;
+    
+    setShowRefreshButton(isPWA && (!lastRefresh || isOlderThan5Minutes));
   }, []);
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -72,6 +76,8 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
     setIsRefreshing(true);
     try {
       await onRefresh();
+      localStorage.setItem('lastDataRefresh', new Date().toISOString());
+      setShowRefreshButton(false); // Hide button after successful refresh
       toast({
         title: "Aktualisiert",
         description: "Daten wurden erfolgreich aktualisiert.",
@@ -120,7 +126,7 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
         </div>
       )}
 
-      {/* Refresh button for PWA */}
+      {/* Refresh button for PWA - only when data might be stale */}
       {showRefreshButton && (
         <div className="fixed top-20 right-4 z-40">
           <Button
@@ -128,10 +134,10 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
             variant="outline"
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="shadow-lg"
+            className="shadow-lg bg-background/95 backdrop-blur-sm"
           >
             <RefreshCw className={`w-4 h-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {isRefreshing ? 'Lädt...' : 'Aktualisieren'}
+            {isRefreshing ? 'Lädt...' : 'Daten aktualisieren'}
           </Button>
         </div>
       )}

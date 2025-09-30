@@ -377,16 +377,6 @@ const CleaningPortal = () => {
                       Zuletzt aktualisiert: {format(lastRefresh, 'HH:mm')}
                     </span>
                   )}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleRefresh}
-                    disabled={bookingsLoading}
-                    className="hidden sm:flex"
-                  >
-                    <RefreshCw className={`w-4 h-4 mr-1 ${bookingsLoading ? 'animate-spin' : ''}`} />
-                    Aktualisieren
-                  </Button>
                 </div>
               </div>
             </div>

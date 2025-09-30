@@ -211,16 +211,6 @@ const Calendar = () => {
                       Zuletzt aktualisiert: {format(lastRefresh, 'HH:mm')}
                     </span>
                   )}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleRefresh}
-                    disabled={loading}
-                    className="hidden sm:flex"
-                  >
-                    <RefreshCw className={`w-4 h-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
-                    Aktualisieren
-                  </Button>
                 </div>
               </div>
           </div>
