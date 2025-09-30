@@ -89,12 +89,11 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
           <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-4 border-b border-border">
             {config.showHouseName && (
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Home className="w-5 h-5 text-amber-600" />
+                 <div className="flex items-center space-x-2">
                    <span className="font-semibold text-foreground">
                      🏠 Unterkunft: {booking.houses?.name}
                    </span>
-                </div>
+                 </div>
                 {config.showBookingId && (
                   <span className="text-xs text-muted-foreground font-mono">
                     ID: {booking.id.slice(-8)}
@@ -103,12 +102,11 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
               </div>
             )}
             {config.showHouseAddress && (
-              <div className="flex items-center space-x-2 mt-1">
-                <MapPin className="w-4 h-4 text-muted-foreground" />
+               <div className="flex items-center space-x-2 mt-1">
                  <span className="text-sm text-muted-foreground">
                    📍 Adresse: {booking.houses?.address}
                  </span>
-              </div>
+               </div>
             )}
           </div>
         )}
@@ -118,61 +116,53 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
           <div className="space-y-3">
             {config.showGuestName && (
               <div className="flex items-center space-x-2">
-                <User className="w-4 h-4 text-green-600" />
                 <span className="text-sm font-medium">👤 Gast: {booking.guest_name}</span>
               </div>
             )}
             
             {config.showGuestCount && (
               <div className="flex items-center space-x-2">
-                <Users className="w-4 h-4 text-green-600" />
                 <span className="text-sm font-medium">👥 Gäste: {booking.number_of_guests} Personen</span>
               </div>
             )}
 
             {config.showGuestEmail && booking.guest_email && (
               <div className="flex items-center space-x-2">
-                <Mail className="w-4 h-4 text-blue-600" />
                 <span className="text-sm">📧 E-Mail: {booking.guest_email}</span>
               </div>
             )}
 
             {config.showGuestPhone && booking.guest_phone && (
               <div className="flex items-center space-x-2">
-                <Phone className="w-4 h-4 text-blue-600" />
                 <span className="text-sm">📞 Telefon: {booking.guest_phone}</span>
               </div>
             )}
 
             {config.showNationality && booking.nationality && (
               <div className="flex items-center space-x-2">
-                <Globe className="w-4 h-4 text-purple-600" />
-                <span className="text-sm">Nationalität: {booking.nationality}</span>
+                <span className="text-sm">🌍 Nationalität: {booking.nationality}</span>
               </div>
             )}
 
             {config.showCheckInDate && (
               <div className="flex items-center space-x-2">
-                <Calendar className="w-4 h-4 text-purple-600" />
                 <span className="text-sm">📅 Check-in: {formatDateTime(booking.check_in)}</span>
               </div>
             )}
 
             {config.showCheckOutDate && (
               <div className="flex items-center space-x-2">
-                <Calendar className="w-4 h-4 text-purple-600" />
                 <span className="text-sm">📅 Check-out: {formatDateTime(booking.check_out)}</span>
               </div>
             )}
 
             {config.showBookingAmount && booking.booking_amount && (
-              <div className="flex items-center space-x-2">
-                <CreditCard className="w-4 h-4 text-emerald-600" />
-                <span className="text-sm">
-                  Betrag: {booking.booking_amount}
-                  {config.showCurrency && ` ${booking.currency || 'EUR'}`}
-                </span>
-              </div>
+               <div className="flex items-center space-x-2">
+                 <span className="text-sm">
+                   💰 Betrag: {booking.booking_amount}
+                   {config.showCurrency && ` ${booking.currency || 'EUR'}`}
+                 </span>
+               </div>
             )}
 
             {config.showBookingStatus && (
@@ -356,8 +346,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
 
                   {config.showTaskDateTime && (
                     <div className="flex items-center space-x-2 text-sm">
-                      <Clock className="w-4 h-4 text-blue-600" />
-                      <span>{formatDateTime(task.scheduled_date, task.scheduled_time)}</span>
+                      <span>🕐 {formatDateTime(task.scheduled_date, task.scheduled_time)}</span>
                     </div>
                   )}
 
@@ -417,8 +406,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                             size="sm"
                             onClick={() => handleEditDateTime(task)}
                           >
-                            <CalendarIcon className="w-4 h-4 mr-1" />
-                            Termin ändern
+                            📅 Termin ändern
                           </Button>
                         </DialogTrigger>
                         <DialogContent>
