@@ -29,11 +29,11 @@ import type { BookingCardConfig } from './BookingCardSettings';
 
 const STATUS_FILTERS = {
   all: 'Alle Status',
-  scheduled: 'Geplant',
-  in_progress: 'In Bearbeitung',
-  completed: 'Abgeschlossen', 
-  delayed: 'Verzögert',
-  cancelled: 'Storniert'
+  scheduled: '📅 Geplant',
+  in_progress: '⏳ In Bearbeitung',
+  completed: '✅ Abgeschlossen', 
+  delayed: '⚠️ Verzögert',
+  cancelled: '❌ Storniert'
 };
 
 interface ConfigurableBookingCardProps {
@@ -334,13 +334,19 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">🧽 Reinigung</span>
                     {config.showTaskStatus && (
-                      <Badge variant={
-                        task.status === 'completed' ? 'default' : 
-                        task.status === 'cancelled' ? 'destructive' : 
-                        'secondary'
-                      }>
-                        {STATUS_FILTERS[task.status as keyof typeof STATUS_FILTERS]}
-                      </Badge>
+                       <Badge variant={
+                         task.status === 'completed' ? 'default' : 
+                         task.status === 'cancelled' ? 'destructive' : 
+                         task.status === 'delayed' ? 'destructive' :
+                         task.status === 'in_progress' ? 'outline' :
+                         'secondary'
+                       } className={
+                         task.status === 'delayed' ? 'border-orange-500 text-orange-700 bg-orange-50 dark:border-orange-600 dark:text-orange-300 dark:bg-orange-950/30' :
+                         task.status === 'in_progress' ? 'border-yellow-500 text-yellow-700 bg-yellow-50 dark:border-yellow-600 dark:text-yellow-300 dark:bg-yellow-950/30' :
+                         ''
+                       }>
+                         {STATUS_FILTERS[task.status as keyof typeof STATUS_FILTERS]}
+                       </Badge>
                     )}
                   </div>
 
