@@ -224,18 +224,15 @@ const Calendar = () => {
           <div className="hidden sm:flex space-x-6">
             <Link to="/">
               <Button variant="ghost" size="sm" className="my-2 hover-scale">
-                <Home className="w-4 h-4 mr-2" />
-                Reinigungen ({totalCleaningTasks})
+                🏠 Reinigungen ({totalCleaningTasks})
               </Button>
             </Link>
             <Button variant="default" size="sm" className="my-2">
-              <CalendarIcon className="w-4 h-4 mr-2" />
-              Kalender
+              📅 Kalender
             </Button>
             <Link to="/putzkraefte">
               <Button variant="ghost" size="sm" className="my-2 hover-scale">
-                <Users className="w-4 h-4 mr-2" />
-                Putzkräfte
+                👥 Putzkräfte
               </Button>
             </Link>
             <Button 
@@ -244,8 +241,7 @@ const Calendar = () => {
               className="my-2 hover-scale"
               onClick={() => setShowNotificationSettings(!showNotificationSettings)}
             >
-              <Bell className="w-4 h-4 mr-2" />
-              Benachrichtigungen
+              🔔 Benachrichtigungen
             </Button>
           </div>
           
@@ -253,18 +249,15 @@ const Calendar = () => {
           <div className="sm:hidden grid grid-cols-2 gap-2 py-2">
             <Link to="/">
               <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
-                <Home className="w-4 h-4 mr-2" />
-                Reinigungen ({totalCleaningTasks})
+                🏠 Reinigungen ({totalCleaningTasks})
               </Button>
             </Link>
             <Button variant="default" size="sm" className="w-full justify-start">
-              <CalendarIcon className="w-4 h-4 mr-2" />
-              Kalender
+              📅 Kalender
             </Button>
             <Link to="/putzkraefte">
               <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
-                <Users className="w-4 h-4 mr-2" />
-                Putzkräfte
+                👥 Putzkräfte
               </Button>
             </Link>
             <Button 
@@ -273,8 +266,7 @@ const Calendar = () => {
               className="w-full justify-start hover-scale"
               onClick={() => setShowNotificationSettings(!showNotificationSettings)}
             >
-              <Bell className="w-4 h-4 mr-2" />
-              Benachrichtigungen
+              🔔 Benachrichtigungen
             </Button>
           </div>
         </div>
