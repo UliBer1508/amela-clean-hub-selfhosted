@@ -485,7 +485,7 @@ const CleaningPortal = () => {
                 <div className="mt-4 space-y-4 border-t border-border pt-4">
                   <div className="flex items-center space-x-2">
                     <Search className="w-4 h-4 text-primary" />
-                    <span className="font-medium text-foreground">Suche</span>
+                    <span className="font-medium text-foreground">🔍 Suche</span>
                   </div>
                   
                   <div className="relative">
@@ -500,7 +500,7 @@ const CleaningPortal = () => {
 
                   <div className="flex items-center space-x-2">
                     <Filter className="w-4 h-4 text-primary" />
-                    <span className="font-medium text-foreground">Filter</span>
+                    <span className="font-medium text-foreground">🔧 Filter</span>
                   </div>
 
                   <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-4">
