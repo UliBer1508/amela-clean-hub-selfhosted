@@ -211,19 +211,16 @@ const PutzkraeftePage = () => {
             <div className="hidden sm:flex space-x-6">
               <Link to="/">
                 <Button variant="ghost" size="sm" className="my-2 hover-scale">
-                  <Home className="w-4 h-4 mr-2" />
-                  Reinigungen ({totalCleaningTasks})
+                  🏠 Reinigungen ({totalCleaningTasks})
                 </Button>
               </Link>
               <Link to="/calendar">
                 <Button variant="ghost" size="sm" className="my-2 hover-scale">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Kalender
+                  📅 Kalender
                 </Button>
               </Link>
               <Button variant="default" size="sm" className="my-2">
-                <Users className="w-4 h-4 mr-2" />
-                Putzkräfte
+                👥 Putzkräfte
               </Button>
               <Button 
                 variant="ghost" 
@@ -231,8 +228,7 @@ const PutzkraeftePage = () => {
                 className="my-2 hover-scale"
                 onClick={() => setShowNotificationSettings(!showNotificationSettings)}
               >
-                <Bell className="w-4 h-4 mr-2" />
-                Benachrichtigungen
+                🔔 Benachrichtigungen
               </Button>
             </div>
             
@@ -240,19 +236,16 @@ const PutzkraeftePage = () => {
             <div className="sm:hidden grid grid-cols-2 gap-2 py-2">
               <Link to="/">
                 <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
-                  <Home className="w-4 h-4 mr-2" />
-                  Reinigungen ({totalCleaningTasks})
+                  🏠 Reinigungen ({totalCleaningTasks})
                 </Button>
               </Link>
               <Link to="/calendar">
                 <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Kalender
+                  📅 Kalender
                 </Button>
               </Link>
               <Button variant="default" size="sm" className="w-full justify-start">
-                <Users className="w-4 h-4 mr-2" />
-                Putzkräfte
+                👥 Putzkräfte
               </Button>
               <Button 
                 variant="ghost" 
@@ -260,8 +253,7 @@ const PutzkraeftePage = () => {
                 className="w-full justify-start hover-scale"
                 onClick={() => setShowNotificationSettings(!showNotificationSettings)}
               >
-                <Bell className="w-4 h-4 mr-2" />
-                Benachrichtigungen
+                🔔 Benachrichtigungen
               </Button>
             </div>
           </div>
@@ -305,19 +297,16 @@ const PutzkraeftePage = () => {
           <div className="hidden sm:flex space-x-6">
             <Link to="/">
               <Button variant="ghost" size="sm" className="my-2 hover-scale">
-                <Home className="w-4 h-4 mr-2" />
-                Reinigungen ({totalCleaningTasks})
+                🏠 Reinigungen ({totalCleaningTasks})
               </Button>
             </Link>
             <Link to="/calendar">
               <Button variant="ghost" size="sm" className="my-2 hover-scale">
-                <Calendar className="w-4 h-4 mr-2" />
-                Kalender
+                📅 Kalender
               </Button>
             </Link>
             <Button variant="default" size="sm" className="my-2">
-              <Users className="w-4 h-4 mr-2" />
-              Putzkräfte
+              👥 Putzkräfte
             </Button>
             <Button 
               variant="ghost" 
@@ -325,8 +314,7 @@ const PutzkraeftePage = () => {
               className="my-2 hover-scale"
               onClick={() => setShowNotificationSettings(!showNotificationSettings)}
             >
-              <Bell className="w-4 h-4 mr-2" />
-              Benachrichtigungen
+              🔔 Benachrichtigungen
             </Button>
           </div>
           
@@ -334,19 +322,16 @@ const PutzkraeftePage = () => {
           <div className="sm:hidden grid grid-cols-2 gap-2 py-2">
             <Link to="/">
               <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
-                <Home className="w-4 h-4 mr-2" />
-                Reinigungen ({totalCleaningTasks})
+                🏠 Reinigungen ({totalCleaningTasks})
               </Button>
             </Link>
             <Link to="/calendar">
               <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
-                <Calendar className="w-4 h-4 mr-2" />
-                Kalender
+                📅 Kalender
               </Button>
             </Link>
             <Button variant="default" size="sm" className="w-full justify-start">
-              <Users className="w-4 h-4 mr-2" />
-              Putzkräfte
+              👥 Putzkräfte
             </Button>
             <Button 
               variant="ghost" 
@@ -354,8 +339,7 @@ const PutzkraeftePage = () => {
               className="w-full justify-start hover-scale"
               onClick={() => setShowNotificationSettings(!showNotificationSettings)}
             >
-              <Bell className="w-4 h-4 mr-2" />
-              Benachrichtigungen
+              🔔 Benachrichtigungen
             </Button>
           </div>
         </div>
@@ -383,9 +367,8 @@ const PutzkraeftePage = () => {
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-2">
-                    <Users className="w-5 h-5 text-blue-600" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Gesamt</p>
+                      <p className="text-sm text-muted-foreground">👥 Gesamt</p>
                       <p className="text-2xl font-bold">{stats.totalStaff}</p>
                     </div>
                   </div>
@@ -395,9 +378,8 @@ const PutzkraeftePage = () => {
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-2">
-                    <UserCheck className="w-5 h-5 text-green-600" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Aktiv</p>
+                      <p className="text-sm text-muted-foreground">✅ Aktiv</p>
                       <p className="text-2xl font-bold">{stats.activeStaff}</p>
                     </div>
                   </div>
@@ -407,9 +389,8 @@ const PutzkraeftePage = () => {
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-2">
-                    <Star className="w-5 h-5 text-yellow-600" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Ø Bewertung</p>
+                      <p className="text-sm text-muted-foreground">⭐ Ø Bewertung</p>
                       <p className="text-2xl font-bold">{stats.averageRating.toFixed(1)}</p>
                     </div>
                   </div>
@@ -419,9 +400,8 @@ const PutzkraeftePage = () => {
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-2">
-                    <Calendar className="w-5 h-5 text-purple-600" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Aufträge</p>
+                      <p className="text-sm text-muted-foreground">📋 Aufträge</p>
                       <p className="text-2xl font-bold">{stats.totalAssignments}</p>
                     </div>
                   </div>
