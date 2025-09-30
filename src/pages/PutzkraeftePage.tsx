@@ -457,15 +457,15 @@ const PutzkraeftePage = () => {
                       </Badge>
                     </div>
                     <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm" className="md:hidden">
+                      <Button variant="ghost" size="sm">
                         <Filter className="w-4 h-4 mr-2" />
-                        <span className="sr-only">Toggle filters</span>
-                        {isFiltersOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        Filter {isFiltersOpen ? 'einklappen' : 'ausklappen'}
+                        {isFiltersOpen ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
                       </Button>
                     </CollapsibleTrigger>
                   </div>
                   
-                  <CollapsibleContent className="space-y-4 mt-4 md:block">
+                  <CollapsibleContent className="space-y-4 mt-4">
                     <div className="flex flex-col sm:flex-row gap-4">
                       <div className="flex-1">
                         <Input
