@@ -395,11 +395,11 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="scheduled">📅 Geplant</SelectItem>
-                          <SelectItem value="in_progress">⏳ In Bearbeitung</SelectItem>
-                          <SelectItem value="completed">✅ Abgeschlossen</SelectItem>
-                          <SelectItem value="delayed">⚠️ Verzögert</SelectItem>
-                          <SelectItem value="cancelled">❌ Storniert</SelectItem>
+                          <SelectItem value="scheduled" className="text-blue-700 dark:text-blue-300">📅 Geplant</SelectItem>
+                          <SelectItem value="in_progress" className="text-yellow-700 dark:text-yellow-300">⏳ In Bearbeitung</SelectItem>
+                          <SelectItem value="completed" className="text-green-700 dark:text-green-300">✅ Abgeschlossen</SelectItem>
+                          <SelectItem value="delayed" className="text-orange-700 dark:text-orange-300">⚠️ Verzögert</SelectItem>
+                          <SelectItem value="cancelled" className="text-red-700 dark:text-red-300">❌ Storniert</SelectItem>
                         </SelectContent>
                       </Select>
                     )}
