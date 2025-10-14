@@ -51,7 +51,7 @@ const PWAStatusIndicator = () => {
   if (!isPWA) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
       <Badge 
         variant="secondary" 
         className="flex items-center gap-1 bg-primary/10 text-primary border-primary/20"
