@@ -4,16 +4,22 @@ import App from "./App.tsx";
 import "./index.css";
 import { registerSW } from 'virtual:pwa-register';
 
-// Register service worker for PWA functionality
+// Aggressivere Update-Prüfung für schnellere Updates
 const updateSW = registerSW({
+  immediate: true,
   onNeedRefresh() {
-    if (confirm('Neue Version verfügbar! Jetzt aktualisieren?')) {
-      updateSW(true);
-    }
+    // Automatisch updaten ohne Bestätigung für nahtlose Updates
+    updateSW(true);
   },
   onOfflineReady() {
     console.log('App bereit für Offline-Nutzung');
   },
+  onRegisteredSW(swUrl, r) {
+    // Prüfe alle 60 Sekunden auf Updates
+    r && setInterval(() => {
+      r.update();
+    }, 60000);
+  }
 });
 
 createRoot(document.getElementById("root")!).render(<App />);
