@@ -361,7 +361,6 @@ const CleaningPortal = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
-                <p className="text-sm text-muted-foreground">Professioneller Reinigungsservice für Ferienhäuser</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">

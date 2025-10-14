@@ -189,7 +189,6 @@ const PutzkraeftePage = () => {
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
-                  <p className="text-sm text-muted-foreground">Professioneller Reinigungsservice für Ferienhäuser</p>
                 </div>
               </div>
               <Button 
@@ -282,7 +281,6 @@ const PutzkraeftePage = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
-                <p className="text-sm text-muted-foreground">Professioneller Reinigungsservice für Ferienhäuser</p>
               </div>
             </div>
             <PWAInstallButton />
