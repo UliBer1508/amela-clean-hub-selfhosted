@@ -333,40 +333,6 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                 <div key={task.id} className="bg-background/80 rounded-lg p-3 space-y-2 border border-blue-200/30 dark:border-blue-800/30">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">🧽 Reinigung</span>
-                    <div className="flex flex-wrap items-center gap-2">
-                      {config.showTaskStatus && (
-                         <Badge variant={
-                           task.status === 'completed' ? 'default' : 
-                           task.status === 'cancelled' ? 'destructive' : 
-                           task.status === 'delayed' ? 'destructive' :
-                           task.status === 'in_progress' ? 'outline' :
-                           'secondary'
-                         } className={
-                           task.status === 'delayed' ? 'border-orange-500 text-orange-700 bg-orange-50 dark:border-orange-600 dark:text-orange-300 dark:bg-orange-950/30' :
-                           task.status === 'in_progress' ? 'border-yellow-500 text-yellow-700 bg-yellow-50 dark:border-yellow-600 dark:text-yellow-300 dark:bg-yellow-950/30' :
-                           ''
-                         }>
-                           {STATUS_FILTERS[task.status as keyof typeof STATUS_FILTERS]}
-                         </Badge>
-                      )}
-                      
-                      {task.payment_status && (
-                        <Badge 
-                          variant={task.payment_status === 'paid' ? 'default' : 'secondary'}
-                          className={
-                            task.payment_status === 'paid' 
-                              ? 'border-green-500 text-green-700 bg-green-50 dark:border-green-600 dark:text-green-300 dark:bg-green-950/30'
-                              : task.payment_status === 'pending'
-                              ? 'border-orange-500 text-orange-700 bg-orange-50 dark:border-orange-600 dark:text-orange-300 dark:bg-orange-950/30'
-                              : 'border-red-500 text-red-700 bg-red-50 dark:border-red-600 dark:text-red-300 dark:bg-red-950/30'
-                          }
-                        >
-                          {task.payment_status === 'paid' ? '💰 Bezahlt' : 
-                           task.payment_status === 'pending' ? '⏳ Ausstehend' : 
-                           '💸 Unbezahlt'}
-                        </Badge>
-                      )}
-                    </div>
                   </div>
 
                   {config.showTaskDateTime && (
@@ -421,6 +387,23 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                           <SelectItem value="cancelled" className="text-red-700 dark:text-red-300">❌ Storniert</SelectItem>
                         </SelectContent>
                       </Select>
+                    )}
+
+                    {task.payment_status && (
+                      <Badge 
+                        variant={task.payment_status === 'paid' ? 'default' : 'secondary'}
+                        className={
+                          task.payment_status === 'paid' 
+                            ? 'border-green-500 text-green-700 bg-green-50 dark:border-green-600 dark:text-green-300 dark:bg-green-950/30'
+                            : task.payment_status === 'pending'
+                            ? 'border-orange-500 text-orange-700 bg-orange-50 dark:border-orange-600 dark:text-orange-300 dark:bg-orange-950/30'
+                            : 'border-red-500 text-red-700 bg-red-50 dark:border-red-600 dark:text-red-300 dark:bg-red-950/30'
+                        }
+                      >
+                        {task.payment_status === 'paid' ? '💰 Bezahlt' : 
+                         task.payment_status === 'pending' ? '⏳ Ausstehend' : 
+                         '💸 Unbezahlt'}
+                      </Badge>
                     )}
 
                     {config.showTaskDateTime && config.showTaskActions && (
