@@ -8,6 +8,7 @@ export interface ServiceTask {
   provider_id: string;
   completed_at?: string;
   notes?: string;
+  payment_status?: 'paid' | 'unpaid' | 'pending';
   service_providers?: {
     name: string;
   };

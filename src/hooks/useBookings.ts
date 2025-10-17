@@ -50,6 +50,7 @@ export const useBookings = () => {
             provider_id,
             completed_at,
             notes,
+            payment_status,
             service_providers (
               name
             )
@@ -84,6 +85,7 @@ export const useBookings = () => {
             provider_id,
             completed_at,
             notes,
+            payment_status,
             service_providers (
               name
             )
