@@ -15,10 +15,10 @@ const updateSW = registerSW({
     console.log('App bereit für Offline-Nutzung');
   },
   onRegisteredSW(swUrl, r) {
-    // Prüfe alle 10 Sekunden auf Updates
+    // Prüfe alle 60 Sekunden auf Updates
     r && setInterval(() => {
       r.update();
-    }, 10000);
+    }, 60000);
   }
 });
 

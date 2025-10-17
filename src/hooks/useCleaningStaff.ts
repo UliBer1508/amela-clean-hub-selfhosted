@@ -31,6 +31,27 @@ export const useCleaningStaff = () => {
 
   useEffect(() => {
     fetchStaff();
+
+    // Realtime-Subscription für cleaning_staff
+    const staffChannel = supabase
+      .channel('cleaning-staff-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'cleaning_staff'
+        },
+        (payload) => {
+          console.log('Cleaning staff changed:', payload);
+          fetchStaff();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(staffChannel);
+    };
   }, [fetchStaff]);
 
   const createStaff = useCallback(async (formData: CleaningStaffFormData) => {

@@ -129,6 +129,45 @@ export const useBookings = () => {
 
   useEffect(() => {
     fetchBookings();
+    
+    // Realtime-Subscription für bookings
+    const bookingsChannel = supabase
+      .channel('bookings-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'bookings'
+        },
+        (payload) => {
+          console.log('Booking changed:', payload);
+          fetchBookings();
+        }
+      )
+      .subscribe();
+
+    // Realtime-Subscription für service_tasks
+    const tasksChannel = supabase
+      .channel('service-tasks-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'service_tasks'
+        },
+        (payload) => {
+          console.log('Service task changed:', payload);
+          fetchBookings();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(bookingsChannel);
+      supabase.removeChannel(tasksChannel);
+    };
   }, [fetchBookings]);
 
   const updateTaskStatus = useCallback(async (

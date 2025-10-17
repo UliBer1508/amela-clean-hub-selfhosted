@@ -37,6 +37,27 @@ export const useHouses = () => {
     };
 
     fetchHouses();
+
+    // Realtime-Subscription für houses
+    const housesChannel = supabase
+      .channel('houses-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'houses'
+        },
+        (payload) => {
+          console.log('House changed:', payload);
+          fetchHouses();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(housesChannel);
+    };
   }, []);
 
   return { houses, loading, error };
