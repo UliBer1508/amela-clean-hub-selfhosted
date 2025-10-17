@@ -370,16 +370,7 @@ const CleaningPortal = () => {
                   onConfigChange={updateCardConfig}
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <PWAInstallButton />
-                <div className="flex items-center space-x-2">
-                  {lastRefresh && (
-                    <span className="text-xs text-muted-foreground">
-                      Zuletzt aktualisiert: {format(lastRefresh, 'HH:mm')}
-                    </span>
-                  )}
-                </div>
-              </div>
+              <PWAInstallButton />
             </div>
           </div>
         </div>

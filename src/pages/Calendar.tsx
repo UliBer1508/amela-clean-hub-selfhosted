@@ -196,23 +196,14 @@ const Calendar = () => {
                 <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
               </div>
             </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className={cardConfig.showMobileSettingsButton ? '' : 'hidden lg:block'}>
-                    <BookingCardSettings 
-                      config={cardConfig}
-                      onConfigChange={updateCardConfig}
-                    />
-                  </div>
-                  <PWAInstallButton />
+              <div className="flex items-center space-x-2">
+                <div className={cardConfig.showMobileSettingsButton ? '' : 'hidden lg:block'}>
+                  <BookingCardSettings 
+                    config={cardConfig}
+                    onConfigChange={updateCardConfig}
+                  />
                 </div>
-                <div className="flex items-center space-x-2">
-                  {lastRefresh && (
-                    <span className="text-xs text-muted-foreground">
-                      Zuletzt aktualisiert: {format(lastRefresh, 'HH:mm')}
-                    </span>
-                  )}
-                </div>
+                <PWAInstallButton />
               </div>
           </div>
         </div>
