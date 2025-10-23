@@ -111,7 +111,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
           </div>
         )}
 
-        <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-yellow-50 dark:bg-yellow-950/20 p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Guest Information */}
           <div className="space-y-3">
             {config.showGuestName && (
