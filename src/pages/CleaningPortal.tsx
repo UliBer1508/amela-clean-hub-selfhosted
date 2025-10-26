@@ -364,12 +364,10 @@ const CleaningPortal = () => {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="hidden lg:block">
-                <BookingCardSettings 
+              <BookingCardSettings
                   config={cardConfig}
                   onConfigChange={updateCardConfig}
                 />
-              </div>
               <PWAInstallButton />
             </div>
           </div>
