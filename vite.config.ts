@@ -15,11 +15,13 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
+      includeAssets: ['icon-192x192.png', 'icon-512x512.png', 'robots.txt'],
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        // Kürzere Cache-Zeiten für schnellere Updates
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         clientsClaim: true,
         skipWaiting: true,
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api/],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\//,
@@ -53,13 +55,15 @@ export default defineConfig(({ mode }) => ({
       manifest: {
         name: 'Amela Reinigungsportal',
         short_name: 'Amela Clean',
-        description: 'Professioneller Reinigungsservice für Ferienhäuser',
+        description: 'Professioneller Reinigungsservice für Ferienhäuser - Buchungen, Aufgaben und Kalender verwalten',
         theme_color: '#1e3a8a',
         background_color: '#ffffff',
         display: 'standalone',
-        orientation: 'portrait',
+        orientation: 'portrait-primary',
         scope: '/',
-        start_url: '/',
+        start_url: '/?source=pwa',
+        categories: ['business', 'productivity', 'utilities'],
+        lang: 'de-DE',
         icons: [
           {
             src: '/icon-192x192.png',
