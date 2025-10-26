@@ -341,7 +341,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                     </div>
                   )}
 
-                  {config.showTaskAssignment && config.showTaskActions && (
+                  {config.showTaskAssignment && (
                     <div className="flex items-center space-x-2 text-sm">
                       <span className="text-muted-foreground">👨‍💼 Zugewiesen an:</span>
                       <Select
@@ -371,7 +371,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                   )}
 
                   <div className="flex flex-wrap gap-2 pt-2">
-                    {config.showTaskStatus && config.showTaskActions && (
+                    {config.showTaskStatus && (
                       <Select
                         value={task.status}
                         onValueChange={(value: string) => onStatusUpdate(task.id, value)}
