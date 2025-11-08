@@ -74,7 +74,7 @@ const FIELD_LABELS = {
   showBookingStatus: 'Buchungsstatus',
   showNationality: 'Nationalität',
   showPlatform: 'Buchungsplattform',
-  showCleaningTasks: 'Reinigungsaufträge',
+  showCleaningTasks: 'Reinigungsauftrag',
   showTaskStatus: 'Aufgaben Status',
   showTaskAssignment: 'Aufgaben Zuweisung',
   showTaskDateTime: 'Aufgaben Datum/Zeit',
@@ -90,7 +90,7 @@ const FIELD_CATEGORIES = {
   'Unterkunft': ['showHouseName', 'showHouseAddress'],
   'Gast Information': ['showGuestName', 'showGuestCount', 'showGuestEmail', 'showGuestPhone', 'showNationality'],
   'Buchung': ['showCheckInDate', 'showCheckOutDate', 'showBookingNotes', 'showBookingAmount', 'showBookingStatus', 'showPlatform', 'showCurrency', 'showBookingId'],
-  'Reinigungsaufträge': ['showCleaningTasks', 'showTaskStatus', 'showTaskAssignment', 'showTaskDateTime', 'showTaskNotes', 'showTaskActions'],
+  'Reinigungsauftrag': ['showCleaningTasks', 'showTaskStatus', 'showTaskAssignment', 'showTaskDateTime', 'showTaskNotes', 'showTaskActions'],
   'Benutzerinteraktion': ['showEditableNotes'],
   'Mobile Einstellungen': ['showMobileSettingsButton'],
 };

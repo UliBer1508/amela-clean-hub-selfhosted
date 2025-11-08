@@ -553,7 +553,7 @@ const CleaningPortal = () => {
               <Card>
                 <CardContent className="p-8 text-center">
                   <p className="text-muted-foreground">
-                    Keine Reinigungsaufträge gefunden. Versuchen Sie andere Filter.
+                    Kein Reinigungsauftrag gefunden. Versuchen Sie andere Filter.
                   </p>
                 </CardContent>
               </Card>

@@ -243,7 +243,7 @@ const NotificationSettings = () => {
               <div className="flex items-center space-x-3">
                 <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                 <div>
-                  <Label className="font-medium">Neue Reinigungsaufträge</Label>
+                  <Label className="font-medium">Neuer Reinigungsauftrag</Label>
                   <p className="text-sm text-muted-foreground">
                     Wenn ein neuer Auftrag erstellt wird
                   </p>
