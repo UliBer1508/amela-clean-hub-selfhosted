@@ -367,7 +367,7 @@ const CleaningPortal = () => {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="hidden sm:block">
+              <div className={cardConfig.showMobileSettingsButton ? "block" : "hidden sm:block"}>
                 <BookingCardSettings
                   config={cardConfig}
                   onConfigChange={updateCardConfig}
