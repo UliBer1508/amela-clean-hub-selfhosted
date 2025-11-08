@@ -9,7 +9,6 @@ import PutzkraeftePage from "./pages/PutzkraeftePage";
 import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
 import Offline from "./pages/Offline";
-import PWAStatusIndicator from "./components/PWAStatusIndicator";
 import PWAUpdateNotification from "./components/PWAUpdateNotification";
 
 const queryClient = new QueryClient();
@@ -18,7 +17,6 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <Toaster />
     <Sonner />
-    <PWAStatusIndicator />
     <PWAUpdateNotification />
     <BrowserRouter>
         <Routes>

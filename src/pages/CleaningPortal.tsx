@@ -9,6 +9,7 @@ import { formatDateTime } from '@/utils/date';
 import { format } from 'date-fns';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import NotificationSettings from '@/components/NotificationSettings';
+import PWAStatusBar from '@/components/PWAStatusBar';
 import PullToRefresh from '@/components/PullToRefresh';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -351,8 +352,10 @@ const CleaningPortal = () => {
   return (
     <PullToRefresh onRefresh={handleRefresh} disabled={bookingsLoading}>
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-card border-b border-border">
+      <PWAStatusBar />
+      <div className="pt-12 md:pt-0">
+        {/* Header */}
+        <header className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
@@ -573,6 +576,7 @@ const CleaningPortal = () => {
           </div>
         </div>
       </main>
+      </div>
     </div>
     </PullToRefresh>
   );
