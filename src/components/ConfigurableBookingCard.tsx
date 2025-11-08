@@ -22,7 +22,7 @@ import {
   Globe,
   Calendar as CalendarIcon
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, getColorFromString } from '@/lib/utils';
 import { format } from 'date-fns';
 
 import type { BookingCardConfig } from './BookingCardSettings';
@@ -82,7 +82,10 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
   };
 
   return (
-    <Card className="overflow-hidden hover-scale">
+    <Card className={cn(
+      "overflow-hidden hover-scale border-l-8",
+      getColorFromString(booking.id)
+    )}>
       <CardContent className="p-0">
         {/* House Information Header */}
         {(config.showHouseName || config.showHouseAddress) && (
