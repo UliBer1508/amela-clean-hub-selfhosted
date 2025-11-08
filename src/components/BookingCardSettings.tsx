@@ -144,8 +144,10 @@ const BookingCardSettings: React.FC<BookingCardSettingsProps> = ({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="hover-scale">
-          <Settings className="w-4 h-4 mr-2" />
-          Kartenansicht ({visibleFieldsCount}/{totalFieldsCount})
+          <Settings className="w-4 h-4 mr-0 sm:mr-2" />
+          <span className="hidden sm:inline">
+            Kartenansicht ({visibleFieldsCount}/{totalFieldsCount})
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
