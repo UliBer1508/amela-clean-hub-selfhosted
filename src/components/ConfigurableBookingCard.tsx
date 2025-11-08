@@ -94,7 +94,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
               <div className="flex items-center justify-between">
                  <div className="flex items-center space-x-2">
                    <span className="font-semibold text-foreground">
-                     🏠 Unterkunft: {booking.houses?.name}
+                     🏠 {booking.houses?.name}
                    </span>
                  </div>
                 {config.showBookingId && (
