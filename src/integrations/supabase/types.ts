@@ -914,6 +914,27 @@ export type Database = {
           },
         ]
       }
+      boris_card_config: {
+        Row: {
+          config: Json
+          created_at: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          config?: Json
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          config?: Json
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       buffer_settings: {
         Row: {
           created_at: string
