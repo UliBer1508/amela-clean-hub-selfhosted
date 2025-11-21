@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon-192x192.png', 'icon-512x512.png', 'robots.txt'],
+      includeAssets: ['icon-192x192.png', 'icon-512x512.png', 'icon-180x180.png', 'icon-384x384.png', 'icon-152x152.png', 'robots.txt', 'splash-1125x2436.png'],
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         clientsClaim: true,
@@ -49,6 +49,34 @@ export default defineConfig(({ mode }) => ({
                 maxAgeSeconds: 60 * 5 // 5 Minuten
               }
             }
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 Tage
+              }
+            }
+          },
+          {
+            urlPattern: /\.(?:woff|woff2|ttf|otf)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'fonts-cache',
+              expiration: {
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 Jahr
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'google-fonts-stylesheets'
+            }
           }
         ]
       },
@@ -66,8 +94,23 @@ export default defineConfig(({ mode }) => ({
         lang: 'de-DE',
         icons: [
           {
+            src: '/icon-152x152.png',
+            sizes: '152x152',
+            type: 'image/png'
+          },
+          {
+            src: '/icon-180x180.png',
+            sizes: '180x180',
+            type: 'image/png'
+          },
+          {
             src: '/icon-192x192.png',
             sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/icon-384x384.png',
+            sizes: '384x384',
             type: 'image/png'
           },
           {
@@ -80,6 +123,29 @@ export default defineConfig(({ mode }) => ({
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
+          }
+        ],
+        shortcuts: [
+          {
+            name: "Kalender öffnen",
+            short_name: "Kalender",
+            description: "Öffne den Buchungskalender",
+            url: "/calendar",
+            icons: [{ src: "/icon-192x192.png", sizes: "192x192" }]
+          },
+          {
+            name: "Putzkräfte verwalten",
+            short_name: "Putzkräfte",
+            description: "Verwalte Reinigungspersonal",
+            url: "/putzkraefte",
+            icons: [{ src: "/icon-192x192.png", sizes: "192x192" }]
+          },
+          {
+            name: "Reinigungsportal",
+            short_name: "Portal",
+            description: "Öffne das Reinigungsportal",
+            url: "/",
+            icons: [{ src: "/icon-192x192.png", sizes: "192x192" }]
           }
         ]
       }
