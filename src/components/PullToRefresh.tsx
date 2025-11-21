@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { useNotify } from '@/hooks/useNotify';
 
 interface PullToRefreshProps {
   onRefresh: () => Promise<void>;
@@ -18,7 +18,7 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
   const [pullDistance, setPullDistance] = useState(0);
   const [isPulling, setIsPulling] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
-  const { toast } = useToast();
+  const { notify } = useNotify();
 
   const PULL_THRESHOLD = 80;
   const MAX_PULL = 120;
@@ -66,17 +66,19 @@ const PullToRefresh: React.FC<PullToRefreshProps> = ({
     try {
       await onRefresh();
       localStorage.setItem('lastDataRefresh', new Date().toISOString());
-      toast({
+      notify({
         title: "Aktualisiert",
         description: "Daten wurden erfolgreich aktualisiert.",
         duration: 2000,
+        eventType: "system"
       });
     } catch (error) {
-      toast({
+      notify({
         title: "Fehler",
         description: "Beim Aktualisieren ist ein Fehler aufgetreten.",
         variant: "destructive",
         duration: 3000,
+        eventType: "system"
       });
     } finally {
       setIsRefreshing(false);
