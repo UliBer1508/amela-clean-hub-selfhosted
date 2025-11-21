@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useToast } from '@/hooks/use-toast';
+import { useNotify } from '@/hooks/useNotify';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import { useCleaningStaff } from '@/hooks/useCleaningStaff';
@@ -67,7 +67,7 @@ const TIME_FILTERS = {
 };
 
 const CleaningPortal = () => {
-  const { toast } = useToast();
+  const { notify } = useNotify();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('scheduled');
   const [staffFilter, setStaffFilter] = useState<StaffFilter>('all');
@@ -170,21 +170,23 @@ const CleaningPortal = () => {
 
       if (error) throw error;
 
-      toast({
+      notify({
         title: "Status aktualisiert",
         description: `Der Status wurde erfolgreich auf "${STATUS_FILTERS[newStatus as StatusFilter]}" geändert.`,
+        eventType: "status_update"
       });
 
       refetchBookings();
     } catch (error) {
       console.error('Error updating task status:', error);
-      toast({
+      notify({
         title: "Fehler",
         description: "Status konnte nicht aktualisiert werden.",
         variant: "destructive",
+        eventType: "info"
       });
     }
-  }, [toast, refetchBookings]);
+  }, [notify, refetchBookings]);
 
   const handleStaffUpdate = useCallback(async (taskId: string, staffId: string | null) => {
     try {
@@ -199,21 +201,23 @@ const CleaningPortal = () => {
 
       const staffName = staffId ? staff.find(s => s.id === staffId)?.name || 'Unbekannt' : 'Nicht zugewiesen';
       
-      toast({
+      notify({
         title: "Zuweisung aktualisiert",
         description: `Die Aufgabe wurde ${staffName} zugewiesen.`,
+        eventType: "staff_change"
       });
 
       refetchBookings();
     } catch (error) {
       console.error('Error updating staff assignment:', error);
-      toast({
+      notify({
         title: "Fehler",
         description: "Zuweisung konnte nicht aktualisiert werden.",
         variant: "destructive",
+        eventType: "info"
       });
     }
-  }, [toast, refetchBookings, staff]);
+  }, [notify, refetchBookings, staff]);
 
   const handleEditDateTime = (task: TaskEditingState) => {
     setEditingTask(task);
@@ -237,9 +241,10 @@ const CleaningPortal = () => {
 
       if (error) throw error;
 
-      toast({
+      notify({
         title: "Termin aktualisiert",
         description: `Der Termin wurde erfolgreich aktualisiert.`,
+        eventType: "task_change"
       });
 
       refetchBookings();
@@ -248,13 +253,14 @@ const CleaningPortal = () => {
       setSelectedTime('');
     } catch (error) {
       console.error('Error updating task datetime:', error);
-      toast({
+      notify({
         title: "Fehler",
         description: "Termin konnte nicht aktualisiert werden.",
         variant: "destructive",
+        eventType: "info"
       });
     }
-  }, [editingTask, selectedDate, selectedTime, toast, refetchBookings]);
+  }, [editingTask, selectedDate, selectedTime, notify, refetchBookings]);
 
   const handleDateTimeUpdateFromCard = useCallback((taskId: string, date: string, time: string) => {
     const task = bookingsWithTasks
@@ -283,21 +289,23 @@ const CleaningPortal = () => {
 
       if (error) throw error;
 
-      toast({
+      notify({
         title: "Notizen aktualisiert",
         description: "Die Buchungsnotizen wurden erfolgreich gespeichert.",
+        eventType: "task_change"
       });
 
       refetchBookings();
     } catch (error) {
       console.error('Error updating booking notes:', error);
-      toast({
+      notify({
         title: "Fehler",
         description: "Notizen konnten nicht aktualisiert werden.",
         variant: "destructive",
+        eventType: "info"
       });
     }
-  }, [toast, refetchBookings]);
+  }, [notify, refetchBookings]);
 
   const handleTaskNotesUpdate = useCallback(async (taskId: string, notes: string) => {
     try {
@@ -308,21 +316,23 @@ const CleaningPortal = () => {
 
       if (error) throw error;
 
-      toast({
+      notify({
         title: "Aufgaben-Notizen aktualisiert",
         description: "Die Aufgaben-Notizen wurden erfolgreich gespeichert.",
+        eventType: "task_change"
       });
 
       refetchBookings();
     } catch (error) {
       console.error('Error updating task notes:', error);
-      toast({
+      notify({
         title: "Fehler",
         description: "Aufgaben-Notizen konnten nicht aktualisiert werden.",
         variant: "destructive",
+        eventType: "info"
       });
     }
-  }, [toast, refetchBookings]);
+  }, [notify, refetchBookings]);
 
   if (bookingsLoading || housesLoading || staffLoading || configLoading) {
     return (

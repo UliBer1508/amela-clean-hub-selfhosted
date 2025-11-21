@@ -12,7 +12,7 @@ import {
   Phone, Mail, Euro, Edit2, Trash2, UserCheck, UserX, ArrowLeft, Home, Bell, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { useNotify } from '@/hooks/useNotify';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useCleaningStaff } from '@/hooks/useCleaningStaff';
 import { useBookings } from '@/hooks/useBookings';
@@ -33,7 +33,7 @@ const PutzkraeftePage = () => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const debouncedSearchTerm = useDebounce(searchTerm, APP_CONFIG.SEARCH_DEBOUNCE_MS);
-  const { toast } = useToast();
+  const { notify } = useNotify();
   
   const { bookings, totalCleaningTasks } = useBookings();
   
@@ -54,21 +54,23 @@ const PutzkraeftePage = () => {
     const result = await createStaff(formData);
     
     if (result.success) {
-      toast({
+      notify({
         title: "Putzkraft hinzugefügt",
         description: "Die neue Putzkraft wurde erfolgreich erstellt.",
+        eventType: "info"
       });
       setShowForm(false);
     } else {
-      toast({
+      notify({
         title: "Fehler",
         description: result.error || "Putzkraft konnte nicht erstellt werden.",
         variant: "destructive",
+        eventType: "info"
       });
     }
     
     return result;
-  }, [createStaff, toast]);
+  }, [createStaff, notify]);
 
   const handleUpdateStaff = useCallback(async (formData: any) => {
     if (!editingStaff) return { success: false, error: 'Keine Putzkraft ausgewählt' };
@@ -76,56 +78,62 @@ const PutzkraeftePage = () => {
     const result = await updateStaff(editingStaff.id, formData);
     
     if (result.success) {
-      toast({
-        title: "Putzkraft aktualisiert", 
+      notify({
+        title: "Putzkraft aktualisiert",
         description: "Die Änderungen wurden erfolgreich gespeichert.",
+        eventType: "info"
       });
       setEditingStaff(null);
       setShowForm(false);
     } else {
-      toast({
+      notify({
         title: "Fehler",
         description: result.error || "Änderungen konnten nicht gespeichert werden.",
         variant: "destructive",
+        eventType: "info"
       });
     }
     
     return result;
-  }, [editingStaff, updateStaff, toast]);
+  }, [editingStaff, updateStaff, notify]);
 
   const handleToggleStatus = useCallback(async (staff: CleaningStaff) => {
     const result = await toggleStaffStatus(staff.id, !staff.is_active);
     
     if (result.success) {
-      toast({
+      notify({
         title: "Status geändert",
         description: `${staff.name} wurde ${staff.is_active ? 'deaktiviert' : 'aktiviert'}.`,
+        eventType: "info"
       });
     } else {
-      toast({
+      notify({
         title: "Fehler",
         description: result.error || "Status konnte nicht geändert werden.",
         variant: "destructive",
+        eventType: "info"
       });
     }
-  }, [toggleStaffStatus, toast]);
+  }, [toggleStaffStatus, notify]);
 
   const handleDelete = useCallback(async (staff: CleaningStaff) => {
     const result = await deleteStaff(staff.id);
     
     if (result.success) {
-      toast({
+      notify({
         title: "Putzkraft entfernt",
         description: `${staff.name} wurde erfolgreich gelöscht.`,
+        eventType: "info"
       });
     } else {
-      toast({
+      notify({
         title: "Fehler",
         description: result.error || "Putzkraft konnte nicht gelöscht werden.",
         variant: "destructive",
+        eventType: "info"
       });
     }
-  }, [deleteStaff, toast]);
+  }, [deleteStaff, notify]);
 
   const handleEdit = useCallback((staff: CleaningStaff) => {
     setEditingStaff(staff);

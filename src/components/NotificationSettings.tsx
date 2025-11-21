@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Bell, Mail, Volume2, Smartphone, AlertTriangle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useNotify } from '@/hooks/useNotify';
 import { validateEmail } from '@/utils/validation';
 
 interface NotificationPreferences {
@@ -28,7 +28,7 @@ const NotificationSettings = () => {
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const { toast } = useToast();
+  const { notify } = useNotify();
 
   useEffect(() => {
     fetchPreferences();
@@ -72,10 +72,11 @@ const NotificationSettings = () => {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unbekannter Fehler';
-      toast({
+      notify({
         title: "Fehler",
         description: `Benachrichtigungseinstellungen konnten nicht geladen werden: ${errorMessage}`,
         variant: "destructive",
+        eventType: "system"
       });
     } finally {
       setLoading(false);
@@ -97,16 +98,18 @@ const NotificationSettings = () => {
 
       if (error) throw error;
 
-      toast({
+      notify({
         title: "Gespeichert",
         description: "Benachrichtigungseinstellungen wurden aktualisiert.",
+        eventType: "system"
       });
     } catch (error) {
       console.error('Error updating preferences:', error);
-      toast({
+      notify({
         title: "Fehler",
         description: "Einstellungen konnten nicht gespeichert werden.",
         variant: "destructive",
+        eventType: "system"
       });
       // Revert changes on error
       setPreferences(preferences);
