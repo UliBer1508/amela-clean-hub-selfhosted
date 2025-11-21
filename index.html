@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
     <title>Amela Reinigungsportal - Professionelle Reinigungsdienste</title>
     <meta name="description" content="Professionelle Reinigungsdienste für Büro und Haushalt. Qualität, Zuverlässigkeit und Kundenzufriedenheit seit über 10 Jahren." />
     <meta name="author" content="Amela Reinigungsportal" />
@@ -16,12 +16,19 @@
     <meta name="background-color" content="#ffffff" />
     <meta name="display" content="standalone" />
     <meta name="orientation" content="portrait" />
+    <meta name="mobile-web-app-capable" content="yes" />
     
     <!-- Apple specific meta tags -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Amela Clean" />
-    <link rel="apple-touch-icon" href="/icon-192x192.png" />
+    <link rel="apple-touch-icon" href="/icon-180x180.png" />
+    <link rel="apple-touch-startup-image" href="/splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" />
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="/icon-192x192.png" as="image" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://e5b83bdb-6160-487b-9b9b-edf54d51ab06.lovableproject.com" />
     
     <!-- Microsoft specific meta tags -->
     <meta name="msapplication-TileColor" content="#1e3a8a" />
