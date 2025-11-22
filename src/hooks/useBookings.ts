@@ -312,7 +312,7 @@ export const useBookings = () => {
         const matchesStatus = statusFilter === 'all' || 
           booking.service_tasks?.some(task => task.status === statusFilter);
         
-        const matchesStaff = !staffFilter || 
+        const matchesStaff = !staffFilter || staffFilter === 'all' || 
           booking.service_tasks?.some(task => task.assigned_staff_id === staffFilter);
         
         const matchesTime = timeFilter === 'all' || 
@@ -337,7 +337,7 @@ export const useBookings = () => {
         
         const matchesStatus = statusFilter === 'all' || cleaning.status === statusFilter;
         
-        const matchesStaff = !staffFilter || cleaning.assigned_staff_id === staffFilter;
+        const matchesStaff = !staffFilter || staffFilter === 'all' || cleaning.assigned_staff_id === staffFilter;
         
         const matchesTime = timeFilter === 'all' || 
           isWithinTimeRange(cleaning.scheduled_date, timeFilter);
