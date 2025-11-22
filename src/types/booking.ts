@@ -48,6 +48,7 @@ export interface StandaloneCleaningTask {
   scheduled_time: string;
   status: 'cancelled' | 'completed' | 'scheduled' | 'in_progress' | 'delayed';
   assigned_staff_id: string | null;
+  provider_id?: string | null;
   notes?: string;
   payment_status?: 'paid' | 'unpaid' | 'pending';
   houses?: House;
@@ -65,3 +66,4 @@ export type StatusFilter = 'all' | 'scheduled' | 'completed' | 'cancelled' | 'in
 export type TimeFilter = 'all' | 'today' | 'week' | 'month' | '3months' | '6months' | '12months';
 export type StaffFilter = 'all' | 'amela' | 'tatort' | 'assigned' | 'unassigned';
 export type HouseFilter = 'all' | string; // 'all' or house ID
+export type ProviderFilter = 'all' | 'unassigned' | string; // 'all', 'unassigned', or provider ID
