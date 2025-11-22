@@ -125,13 +125,14 @@ export const useBookings = () => {
           scheduled_time,
           status,
           assigned_staff_id,
+          provider_id,
           notes,
           payment_status,
           houses (
             name,
             address
           ),
-          service_providers:boris_cleaning_staff (
+          service_providers!provider_id (
             name
           )
         `)
