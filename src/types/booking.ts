@@ -17,6 +17,7 @@ export interface ServiceTask {
 export interface House {
   name: string;
   address: string;
+  rental_type?: string;
 }
 
 export interface Booking {
