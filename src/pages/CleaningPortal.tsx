@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import BookingCardSettings, { useBookingCardConfig } from "@/components/BookingCardSettings";
 import ConfigurableBookingCard from "@/components/ConfigurableBookingCard";
+import StandaloneCleaningCard from "@/components/StandaloneCleaningCard";
+import AddStandaloneCleaningDialog from "@/components/AddStandaloneCleaningDialog";
 import {
   Home,
   Search,
@@ -85,9 +87,13 @@ const CleaningPortal = () => {
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const { 
-    bookings = [], 
+    bookings = [],
+    standaloneCleanings = [],
+    combinedEntries = [],
+    filteredBookings: filteredEntries,
     loading: bookingsLoading, 
     error: bookingsError,
+    totalCleaningTasks: hookTotalCleaningTasks,
     refetch: refetchBookings,
     forceRefresh,
     lastRefresh
@@ -103,60 +109,15 @@ const CleaningPortal = () => {
     loading: staffLoading 
   } = useCleaningStaff();
 
-  const bookingsWithTasks = bookings.filter(booking => 
-    booking.service_tasks && booking.service_tasks.length > 0
+  const currentFilteredEntries = filteredEntries(
+    debouncedSearchTerm,
+    statusFilter,
+    staffFilter,
+    timeFilter,
+    houseFilter
   );
 
-  const totalCleaningTasks = bookingsWithTasks.reduce((total, booking) => 
-    total + (booking.service_tasks?.length || 0), 0
-  );
-
-  const filteredBookings = bookingsWithTasks.filter(booking => {
-    const matchesSearch = debouncedSearchTerm === '' || 
-      booking.guest_name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-      booking.houses?.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-      booking.houses?.address.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
-
-    const matchesHouse = houseFilter === 'all' || booking.house_id === houseFilter;
-
-    const hasMatchingTask = booking.service_tasks?.some(task => {
-      const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
-      
-      const matchesStaff = staffFilter === 'all' || 
-        (staffFilter === 'assigned' && task.assigned_staff_id) ||
-        (staffFilter === 'unassigned' && !task.assigned_staff_id);
-
-      let matchesTime = true;
-      if (timeFilter !== 'all') {
-        const taskDate = new Date(task.scheduled_date);
-        const today = new Date();
-        
-        switch (timeFilter) {
-          case 'week':
-            const nextWeek = new Date(today);
-            nextWeek.setDate(today.getDate() + 7);
-            matchesTime = taskDate >= today && taskDate <= nextWeek;
-            break;
-          case 'month':
-            const nextMonth = new Date(today);
-            nextMonth.setMonth(today.getMonth() + 1);
-            matchesTime = taskDate >= today && taskDate <= nextMonth;
-            break;
-          case '3months':
-            const next3Months = new Date(today);
-            next3Months.setMonth(today.getMonth() + 3);
-            matchesTime = taskDate >= today && taskDate <= next3Months;
-            break;
-        }
-      }
-
-      return matchesStatus && matchesStaff && matchesTime;
-    });
-
-    return matchesSearch && matchesHouse && hasMatchingTask;
-  });
-
-  const currentFilteredBookings = filteredBookings;
+  const totalCleaningTasks = hookTotalCleaningTasks;
 
   const handleStatusUpdate = useCallback(async (taskId: string, newStatus: 'scheduled' | 'completed' | 'cancelled' | 'in_progress' | 'delayed') => {
     try {
@@ -263,9 +224,16 @@ const CleaningPortal = () => {
   }, [editingTask, selectedDate, selectedTime, notify, refetchBookings]);
 
   const handleDateTimeUpdateFromCard = useCallback((taskId: string, date: string, time: string) => {
-    const task = bookingsWithTasks
-      .flatMap(b => b.service_tasks || [])
-      .find(t => t.id === taskId);
+    // Find task from combined entries
+    let task = null;
+    for (const entry of combinedEntries) {
+      if (entry.type === 'booking') {
+        task = entry.data.service_tasks?.find(t => t.id === taskId);
+      } else if (entry.data.id === taskId) {
+        task = entry.data;
+      }
+      if (task) break;
+    }
     
     if (task) {
       setEditingTask({
@@ -278,7 +246,7 @@ const CleaningPortal = () => {
       setSelectedTime(time);
       handleDateTimeUpdate();
     }
-  }, [bookingsWithTasks, handleDateTimeUpdate]);
+  }, [combinedEntries, handleDateTimeUpdate]);
 
   const handleBookingNotesUpdate = useCallback(async (bookingId: string, notes: string) => {
     try {
@@ -334,6 +302,33 @@ const CleaningPortal = () => {
     }
   }, [notify, refetchBookings]);
 
+  const handleStandaloneNotesUpdate = useCallback(async (taskId: string, notes: string) => {
+    try {
+      const { error } = await supabase
+        .from('service_tasks')
+        .update({ notes })
+        .eq('id', taskId);
+
+      if (error) throw error;
+
+      notify({
+        title: "Notizen aktualisiert",
+        description: "Die Notizen wurden erfolgreich gespeichert.",
+        eventType: "task_change"
+      });
+
+      refetchBookings();
+    } catch (error) {
+      console.error('Error updating standalone cleaning notes:', error);
+      notify({
+        title: "Fehler",
+        description: "Notizen konnten nicht aktualisiert werden.",
+        variant: "destructive",
+        eventType: "info"
+      });
+    }
+  }, [notify, refetchBookings]);
+
   if (bookingsLoading || housesLoading || staffLoading || configLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -377,6 +372,11 @@ const CleaningPortal = () => {
               </div>
             </div>
             <div className="flex items-center space-x-3">
+              <AddStandaloneCleaningDialog
+                houses={houses}
+                staff={staff}
+                onSuccess={refetchBookings}
+              />
               <div className={cardConfig.showMobileSettingsButton ? "block" : "hidden sm:block"}>
                 <BookingCardSettings
                   config={cardConfig}
@@ -549,7 +549,7 @@ const CleaningPortal = () => {
 
                   <div className="flex justify-center items-center pt-2 border-t border-border">
                     <span className="text-sm text-muted-foreground">
-                      {currentFilteredBookings.length} von {totalCleaningTasks} Aufträgen
+                      {currentFilteredEntries.length} von {totalCleaningTasks} Aufträgen
                     </span>
                   </div>
                 </div>
@@ -557,9 +557,9 @@ const CleaningPortal = () => {
             </CardContent>
           </Card>
 
-          {/* Booking Cards */}
+          {/* Booking and Standalone Cleaning Cards */}
           <div className="space-y-4">
-            {currentFilteredBookings.length === 0 ? (
+            {currentFilteredEntries.length === 0 ? (
               <Card>
                 <CardContent className="p-8 text-center">
                   <p className="text-muted-foreground">
@@ -568,20 +568,38 @@ const CleaningPortal = () => {
                 </CardContent>
               </Card>
             ) : (
-              currentFilteredBookings.map((booking) => (
-                <ConfigurableBookingCard
-                  key={booking.id}
-                  booking={booking}
-                  config={cardConfig}
-                  staff={staff}
-                  onStatusUpdate={handleStatusUpdate}
-                  onStaffUpdate={handleStaffUpdate}
-                  onDateTimeUpdate={handleDateTimeUpdateFromCard}
-                  onBookingNotesUpdate={handleBookingNotesUpdate}
-                  onTaskNotesUpdate={handleTaskNotesUpdate}
-                  formatDateTime={formatDateTime}
-                />
-              ))
+              currentFilteredEntries.map((entry) => {
+                if (entry.type === 'booking') {
+                  return (
+                    <ConfigurableBookingCard
+                      key={entry.data.id}
+                      booking={entry.data}
+                      config={cardConfig}
+                      staff={staff}
+                      onStatusUpdate={handleStatusUpdate}
+                      onStaffUpdate={handleStaffUpdate}
+                      onDateTimeUpdate={handleDateTimeUpdateFromCard}
+                      onBookingNotesUpdate={handleBookingNotesUpdate}
+                      onTaskNotesUpdate={handleTaskNotesUpdate}
+                      formatDateTime={formatDateTime}
+                    />
+                  );
+                } else {
+                  return (
+                    <StandaloneCleaningCard
+                      key={entry.data.id}
+                      cleaning={entry.data}
+                      config={cardConfig}
+                      staff={staff}
+                      onStatusUpdate={handleStatusUpdate}
+                      onStaffUpdate={handleStaffUpdate}
+                      onDateTimeUpdate={handleDateTimeUpdateFromCard}
+                      onNotesUpdate={handleStandaloneNotesUpdate}
+                      formatDateTime={formatDateTime}
+                    />
+                  );
+                }
+              })
             )}
           </div>
         </div>

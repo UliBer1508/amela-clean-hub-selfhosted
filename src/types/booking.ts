@@ -39,7 +39,29 @@ export interface TaskEditingState {
   status: ServiceTask['status'];
 }
 
+// Standalone Cleaning Task (ohne Buchung)
+export interface StandaloneCleaningTask {
+  id: string;
+  house_id: string;
+  service_type: 'cleaning';
+  scheduled_date: string;
+  scheduled_time: string;
+  status: 'cancelled' | 'completed' | 'scheduled' | 'in_progress' | 'delayed';
+  assigned_staff_id: string | null;
+  notes?: string;
+  payment_status?: 'paid' | 'unpaid' | 'pending';
+  houses?: House;
+  service_providers?: {
+    name: string;
+  };
+}
+
+// Union Type für beide Arten von Einträgen
+export type CleaningEntry = 
+  | { type: 'booking'; data: Booking }
+  | { type: 'standalone'; data: StandaloneCleaningTask };
+
 export type StatusFilter = 'all' | 'scheduled' | 'completed' | 'cancelled' | 'in_progress' | 'delayed';
 export type TimeFilter = 'all' | 'today' | 'week' | 'month' | '3months' | '6months' | '12months';
-export type StaffFilter = 'all' | 'amela' | 'tatort';
+export type StaffFilter = 'all' | 'amela' | 'tatort' | 'assigned' | 'unassigned';
 export type HouseFilter = 'all' | string; // 'all' or house ID
