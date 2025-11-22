@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Booking, StatusFilter, TimeFilter, StaffFilter, HouseFilter } from '@/types/booking';
+import { Booking, StatusFilter, TimeFilter, StaffFilter, HouseFilter, StandaloneCleaningTask, CleaningEntry } from '@/types/booking';
 import { APP_CONFIG } from '@/constants/app';
 import { isWithinTimeRange } from '@/utils/date';
 import { sanitizeSearchTerm } from '@/utils/validation';
@@ -8,6 +8,8 @@ import { sanitizeSearchTerm } from '@/utils/validation';
 export const useBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [allBookings, setAllBookings] = useState<Booking[]>([]);
+  const [standaloneCleanings, setStandaloneCleanings] = useState<StandaloneCleaningTask[]>([]);
+  const [combinedEntries, setCombinedEntries] = useState<CleaningEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
@@ -112,6 +114,55 @@ export const useBookings = () => {
         return new Date(aDate).getTime() - new Date(bDate).getTime();
       });
       
+      // Fetch standalone cleaning tasks (ohne booking_id)
+      const { data: standaloneData, error: standaloneError } = await supabase
+        .from('service_tasks')
+        .select(`
+          id,
+          house_id,
+          service_type,
+          scheduled_date,
+          scheduled_time,
+          status,
+          assigned_staff_id,
+          notes,
+          payment_status,
+          houses (
+            name,
+            address
+          ),
+          service_providers:boris_cleaning_staff (
+            name
+          )
+        `)
+        .eq('service_type', 'cleaning')
+        .is('booking_id', null)
+        .order('scheduled_date', { ascending: true });
+
+      if (standaloneError) throw standaloneError;
+
+      const standaloneCleaningsData = standaloneData as unknown as StandaloneCleaningTask[];
+      setStandaloneCleanings(standaloneCleaningsData || []);
+
+      // Kombiniere beide Listen
+      const combined: CleaningEntry[] = [
+        ...bookingsWithCleaning.map(b => ({ type: 'booking' as const, data: b })),
+        ...(standaloneCleaningsData || []).map(s => ({ type: 'standalone' as const, data: s }))
+      ];
+
+      // Sortiere nach Datum
+      combined.sort((a, b) => {
+        const aDate = a.type === 'booking' 
+          ? a.data.service_tasks?.[0]?.scheduled_date 
+          : a.data.scheduled_date;
+        const bDate = b.type === 'booking' 
+          ? b.data.service_tasks?.[0]?.scheduled_date 
+          : b.data.scheduled_date;
+        if (!aDate || !bDate) return 0;
+        return new Date(aDate).getTime() - new Date(bDate).getTime();
+      });
+
+      setCombinedEntries(combined);
       setBookings(bookingsWithCleaning);
       setAllBookings(allBookingsData || []);
       setLastRefresh(new Date());
@@ -239,52 +290,76 @@ export const useBookings = () => {
     }
   }, [fetchBookings]);
 
-  const filteredBookings = useCallback((
+  const filteredEntries = useCallback((
     searchTerm: string,
     statusFilter: StatusFilter,
     staffFilter: StaffFilter,
     timeFilter: TimeFilter,
     houseFilter: HouseFilter
-  ): Booking[] => {
+  ): CleaningEntry[] => {
     const sanitizedSearch = sanitizeSearchTerm(searchTerm.toLowerCase());
     
-    return bookings.filter(booking => {
-      const matchesSearch = !sanitizedSearch || 
-        booking.guest_name?.toLowerCase().includes(sanitizedSearch) ||
-        booking.houses?.name?.toLowerCase().includes(sanitizedSearch) ||
-        booking.houses?.address?.toLowerCase().includes(sanitizedSearch);
+    return combinedEntries.filter(entry => {
+      if (entry.type === 'booking') {
+        const booking = entry.data;
+        const matchesSearch = !sanitizedSearch || 
+          booking.guest_name?.toLowerCase().includes(sanitizedSearch) ||
+          booking.houses?.name?.toLowerCase().includes(sanitizedSearch) ||
+          booking.houses?.address?.toLowerCase().includes(sanitizedSearch);
 
-      const matchesStatus = statusFilter === 'all' || 
-        booking.service_tasks?.some(task => task.status === statusFilter);
-      
-      const matchesStaff = staffFilter === 'all' || 
-        booking.service_tasks?.some(task => {
-          if (!task.service_providers?.name) return false;
-          const providerName = task.service_providers.name.toLowerCase();
-          return (
-            (staffFilter === 'amela' && providerName.includes('amela')) ||
-            (staffFilter === 'tatort' && providerName.includes('tatort'))
-          );
-        });
-      
-      const matchesTime = timeFilter === 'all' || 
-        booking.service_tasks?.some(task => isWithinTimeRange(task.scheduled_date, timeFilter));
-      
-      const matchesHouse = houseFilter === 'all' || booking.house_id === houseFilter;
-      
-      return matchesSearch && matchesStatus && matchesStaff && matchesTime && matchesHouse;
+        const matchesStatus = statusFilter === 'all' || 
+          booking.service_tasks?.some(task => task.status === statusFilter);
+        
+        const matchesStaff = staffFilter === 'all' || 
+          booking.service_tasks?.some(task => {
+            if (!task.service_providers?.name) return false;
+            const providerName = task.service_providers.name.toLowerCase();
+            return (
+              (staffFilter === 'amela' && providerName.includes('amela')) ||
+              (staffFilter === 'tatort' && providerName.includes('tatort'))
+            );
+          });
+        
+        const matchesTime = timeFilter === 'all' || 
+          booking.service_tasks?.some(task => isWithinTimeRange(task.scheduled_date, timeFilter));
+        
+        const matchesHouse = houseFilter === 'all' || booking.house_id === houseFilter;
+        
+        return matchesSearch && matchesStatus && matchesStaff && matchesTime && matchesHouse;
+      } else {
+        const cleaning = entry.data;
+        const matchesSearch = !sanitizedSearch || 
+          cleaning.houses?.name?.toLowerCase().includes(sanitizedSearch) ||
+          cleaning.houses?.address?.toLowerCase().includes(sanitizedSearch);
+        
+        const matchesStatus = statusFilter === 'all' || cleaning.status === statusFilter;
+        
+        const matchesStaff = staffFilter === 'all' || 
+          (cleaning.service_providers?.name?.toLowerCase().includes(staffFilter));
+        
+        const matchesTime = timeFilter === 'all' || 
+          isWithinTimeRange(cleaning.scheduled_date, timeFilter);
+        
+        const matchesHouse = houseFilter === 'all' || cleaning.house_id === houseFilter;
+        
+        return matchesSearch && matchesStatus && matchesStaff && matchesTime && matchesHouse;
+      }
     });
-  }, [bookings]);
+  }, [combinedEntries]);
 
-  const totalCleaningTasks = useMemo(() => 
-    bookings.reduce((total, booking) => 
+  const totalCleaningTasks = useMemo(() => {
+    const bookingTasks = bookings.reduce((total, booking) => 
       total + (booking.service_tasks?.length || 0), 0
-    ), [bookings]
-  );
+    );
+    const standaloneTasks = standaloneCleanings.length;
+    return bookingTasks + standaloneTasks;
+  }, [bookings, standaloneCleanings]);
 
   return {
     bookings,
     allBookings, // All bookings for calendar view
+    standaloneCleanings,
+    combinedEntries,
     loading,
     error,
     totalCleaningTasks,
@@ -292,7 +367,7 @@ export const useBookings = () => {
     updateTaskStatus,
     updateTaskDateTime,
     updateTaskStaff,
-    filteredBookings,
+    filteredBookings: filteredEntries,
     refetch: fetchBookings,
     forceRefresh
   };
