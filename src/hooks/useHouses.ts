@@ -5,6 +5,7 @@ export interface House {
   id: string;
   name: string;
   address: string;
+  rental_type?: string;
 }
 
 export const useHouses = () => {
@@ -20,7 +21,7 @@ export const useHouses = () => {
         
         const { data, error: fetchError } = await supabase
           .from('houses')
-          .select('id, name, address')
+          .select('id, name, address, rental_type')
           .order('name');
 
         if (fetchError) throw fetchError;

@@ -105,9 +105,12 @@ const CleaningPortal = () => {
   } = useBookings();
 
   const { 
-    houses = [], 
+    houses: allHouses = [], 
     loading: housesLoading 
   } = useHouses();
+
+  // Nur touristische Objekte anzeigen
+  const houses = allHouses.filter(house => house.rental_type === 'tourist');
 
   const { 
     staff = [], 
