@@ -68,7 +68,7 @@ const CleaningPortal = () => {
   const { notify } = useNotify();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('scheduled');
-  const [staffFilter, setStaffFilter] = useState<string>(''); // Leerer String = alle anzeigen
+  const [staffFilter, setStaffFilter] = useState<string>('all'); // "all" = alle anzeigen
   const [houseFilter, setHouseFilter] = useState<HouseFilter>('all');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
   // Portal zeigt nur Amela-zugewiesene Reinigungen
@@ -516,7 +516,7 @@ const CleaningPortal = () => {
                         <SelectValue placeholder="Putzkraft auswählen" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Alle Putzkräfte</SelectItem>
+                        <SelectItem value="all">Alle Putzkräfte</SelectItem>
                         {staff.map((member) => (
                           <SelectItem key={member.id} value={member.id}>
                             {member.name}
