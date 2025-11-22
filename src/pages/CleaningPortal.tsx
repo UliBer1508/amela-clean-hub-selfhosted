@@ -378,11 +378,6 @@ const CleaningPortal = () => {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <AddStandaloneCleaningDialog
-                houses={houses}
-                staff={staff}
-                onSuccess={refetchBookings}
-              />
               <div className={cardConfig.showMobileSettingsButton ? "block" : "hidden sm:block"}>
                 <BookingCardSettings
                   config={cardConfig}
