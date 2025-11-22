@@ -56,11 +56,6 @@ const STATUS_FILTERS = {
   cancelled: '❌ Storniert'
 };
 
-const STAFF_FILTERS = {
-  all: '👥 Alle Putzkräfte',
-  assigned: '✅ Zugewiesen',
-  unassigned: '❌ Nicht zugewiesen'
-};
 
 const TIME_FILTERS = {
   all: '🕐 Alle Zeiten',
@@ -73,7 +68,7 @@ const CleaningPortal = () => {
   const { notify } = useNotify();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('scheduled');
-  const [staffFilter, setStaffFilter] = useState<StaffFilter>('all');
+  const [staffFilter, setStaffFilter] = useState<string>(''); // Leerer String = alle anzeigen
   const [houseFilter, setHouseFilter] = useState<HouseFilter>('all');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
   // Portal zeigt nur Amela-zugewiesene Reinigungen
@@ -518,15 +513,13 @@ const CleaningPortal = () => {
 
                     <Select value={staffFilter} onValueChange={(value: StaffFilter) => setStaffFilter(value)}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Alle Putzkräfte" />
+                        <SelectValue placeholder="Putzkraft auswählen" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">👥 Alle Putzkräfte</SelectItem>
-                        <SelectItem value="assigned">✅ Zugewiesen</SelectItem>
-                        <SelectItem value="unassigned">❌ Nicht zugewiesen</SelectItem>
+                        <SelectItem value="">Alle Putzkräfte</SelectItem>
                         {staff.map((member) => (
                           <SelectItem key={member.id} value={member.id}>
-                            👤 {member.name}
+                            {member.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

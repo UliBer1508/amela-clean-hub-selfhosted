@@ -65,6 +65,6 @@ export type CleaningEntry =
 
 export type StatusFilter = 'all' | 'scheduled' | 'completed' | 'cancelled' | 'in_progress' | 'delayed';
 export type TimeFilter = 'all' | 'today' | 'week' | 'month' | '3months' | '6months' | '12months';
-export type StaffFilter = 'all' | 'amela' | 'tatort' | 'assigned' | 'unassigned';
+export type StaffFilter = string; // Staff-ID oder leerer String für "alle"
 export type HouseFilter = 'all' | string; // 'all' or house ID
 export type ProviderFilter = 'all' | 'unassigned' | string; // 'all', 'unassigned', or provider ID
