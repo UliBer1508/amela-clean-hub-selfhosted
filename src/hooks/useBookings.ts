@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Booking, StatusFilter, TimeFilter, StaffFilter, HouseFilter, StandaloneCleaningTask, CleaningEntry } from '@/types/booking';
+import { Booking, StatusFilter, TimeFilter, StaffFilter, HouseFilter, ProviderFilter, StandaloneCleaningTask, CleaningEntry } from '@/types/booking';
 import { APP_CONFIG } from '@/constants/app';
 import { isWithinTimeRange } from '@/utils/date';
 import { sanitizeSearchTerm } from '@/utils/validation';
@@ -296,7 +296,8 @@ export const useBookings = () => {
     statusFilter: StatusFilter,
     staffFilter: StaffFilter,
     timeFilter: TimeFilter,
-    houseFilter: HouseFilter
+    houseFilter: HouseFilter,
+    providerFilter: ProviderFilter
   ): CleaningEntry[] => {
     const sanitizedSearch = sanitizeSearchTerm(searchTerm.toLowerCase());
     
@@ -326,7 +327,15 @@ export const useBookings = () => {
         
         const matchesHouse = houseFilter === 'all' || booking.house_id === houseFilter;
         
-        return matchesSearch && matchesStatus && matchesStaff && matchesTime && matchesHouse;
+        const matchesProvider = providerFilter === 'all' || 
+          booking.service_tasks?.some(task => {
+            if (providerFilter === 'unassigned') {
+              return !task.provider_id;
+            }
+            return task.provider_id === providerFilter;
+          });
+        
+        return matchesSearch && matchesStatus && matchesStaff && matchesTime && matchesHouse && matchesProvider;
       } else {
         const cleaning = entry.data;
         const matchesSearch = !sanitizedSearch || 
@@ -343,7 +352,10 @@ export const useBookings = () => {
         
         const matchesHouse = houseFilter === 'all' || cleaning.house_id === houseFilter;
         
-        return matchesSearch && matchesStatus && matchesStaff && matchesTime && matchesHouse;
+        const matchesProvider = providerFilter === 'all' || 
+          (providerFilter === 'unassigned' ? !cleaning.provider_id : cleaning.provider_id === providerFilter);
+        
+        return matchesSearch && matchesStatus && matchesStaff && matchesTime && matchesHouse && matchesProvider;
       }
     });
   }, [combinedEntries]);

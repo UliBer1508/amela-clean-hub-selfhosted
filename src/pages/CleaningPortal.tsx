@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useNotify } from '@/hooks/useNotify';
 import { useBookings } from '@/hooks/useBookings';
@@ -38,6 +38,7 @@ type StatusFilter = 'all' | 'scheduled' | 'in_progress' | 'completed' | 'delayed
 type StaffFilter = 'all' | 'assigned' | 'unassigned';
 type HouseFilter = 'all' | string;
 type TimeFilter = 'all' | 'week' | 'month' | '3months';
+type ProviderFilter = 'all' | 'unassigned' | string;
 
 interface TaskEditingState {
   id: string;
@@ -75,6 +76,8 @@ const CleaningPortal = () => {
   const [staffFilter, setStaffFilter] = useState<StaffFilter>('all');
   const [houseFilter, setHouseFilter] = useState<HouseFilter>('all');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
+  const [providerFilter, setProviderFilter] = useState<ProviderFilter>('all');
+  const [serviceProviders, setServiceProviders] = useState<Array<{ id: string; name: string }>>([]);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState('');
   const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
@@ -85,6 +88,19 @@ const CleaningPortal = () => {
   const { config: cardConfig, updateConfig: updateCardConfig, loading: configLoading } = useBookingCardConfig();
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  // Fetch service providers
+  useEffect(() => {
+    const fetchProviders = async () => {
+      const { data } = await supabase
+        .from('service_providers')
+        .select('id, name')
+        .eq('service_type', 'cleaning')
+        .order('name');
+      if (data) setServiceProviders(data);
+    };
+    fetchProviders();
+  }, []);
 
   const { 
     bookings = [],
@@ -114,7 +130,8 @@ const CleaningPortal = () => {
     statusFilter,
     staffFilter,
     timeFilter,
-    houseFilter
+    houseFilter,
+    providerFilter
   );
 
   const totalCleaningTasks = hookTotalCleaningTasks;
@@ -500,7 +517,7 @@ const CleaningPortal = () => {
                     <span className="font-medium text-foreground">🔧 Filter</span>
                   </div>
 
-                  <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
                     <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Alle Status" />
@@ -542,6 +559,21 @@ const CleaningPortal = () => {
                       <SelectContent>
                         {Object.entries(TIME_FILTERS).map(([key, label]) => (
                           <SelectItem key={key} value={key}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={providerFilter} onValueChange={(value: ProviderFilter) => setProviderFilter(value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Dienstleister" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">🏢 Alle Dienstleister</SelectItem>
+                        <SelectItem value="unassigned">❌ Nicht zugewiesen</SelectItem>
+                        {serviceProviders.map((provider) => (
+                          <SelectItem key={provider.id} value={provider.id}>
+                            {provider.name}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
