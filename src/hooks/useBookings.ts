@@ -312,15 +312,8 @@ export const useBookings = () => {
         const matchesStatus = statusFilter === 'all' || 
           booking.service_tasks?.some(task => task.status === statusFilter);
         
-        const matchesStaff = staffFilter === 'all' || 
-          booking.service_tasks?.some(task => {
-            if (!task.service_providers?.name) return false;
-            const providerName = task.service_providers.name.toLowerCase();
-            return (
-              (staffFilter === 'amela' && providerName.includes('amela')) ||
-              (staffFilter === 'tatort' && providerName.includes('tatort'))
-            );
-          });
+        const matchesStaff = !staffFilter || 
+          booking.service_tasks?.some(task => task.assigned_staff_id === staffFilter);
         
         const matchesTime = timeFilter === 'all' || 
           booking.service_tasks?.some(task => isWithinTimeRange(task.scheduled_date, timeFilter));
@@ -344,8 +337,7 @@ export const useBookings = () => {
         
         const matchesStatus = statusFilter === 'all' || cleaning.status === statusFilter;
         
-        const matchesStaff = staffFilter === 'all' || 
-          (cleaning.service_providers?.name?.toLowerCase().includes(staffFilter));
+        const matchesStaff = !staffFilter || cleaning.assigned_staff_id === staffFilter;
         
         const matchesTime = timeFilter === 'all' || 
           isWithinTimeRange(cleaning.scheduled_date, timeFilter);
