@@ -76,8 +76,8 @@ const CleaningPortal = () => {
   const [staffFilter, setStaffFilter] = useState<StaffFilter>('all');
   const [houseFilter, setHouseFilter] = useState<HouseFilter>('all');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
-  const [providerFilter, setProviderFilter] = useState<ProviderFilter>('all');
-  const [serviceProviders, setServiceProviders] = useState<Array<{ id: string; name: string }>>([]);
+  // Portal zeigt nur Amela-zugewiesene Reinigungen
+  const [providerFilter, setProviderFilter] = useState<ProviderFilter>('9de6e071-7e89-4d66-9433-a5f01acaa493');
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState('');
   const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
@@ -89,18 +89,7 @@ const CleaningPortal = () => {
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  // Fetch service providers
-  useEffect(() => {
-    const fetchProviders = async () => {
-      const { data } = await supabase
-        .from('service_providers')
-        .select('id, name')
-        .eq('service_type', 'cleaning')
-        .order('name');
-      if (data) setServiceProviders(data);
-    };
-    fetchProviders();
-  }, []);
+  // Service Provider Filter ist fest auf Amela gesetzt (ID: 9de6e071-7e89-4d66-9433-a5f01acaa493)
 
   const { 
     bookings = [],
@@ -517,7 +506,7 @@ const CleaningPortal = () => {
                     <span className="font-medium text-foreground">🔧 Filter</span>
                   </div>
 
-                  <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
+                  <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-4">
                     <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Alle Status" />
@@ -563,20 +552,8 @@ const CleaningPortal = () => {
                       </SelectContent>
                     </Select>
 
-                    <Select value={providerFilter} onValueChange={(value: ProviderFilter) => setProviderFilter(value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Dienstleister" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">🏢 Alle Dienstleister</SelectItem>
-                        <SelectItem value="unassigned">❌ Nicht zugewiesen</SelectItem>
-                        {serviceProviders.map((provider) => (
-                          <SelectItem key={provider.id} value={provider.id}>
-                            {provider.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {/* Provider-Filter ist im Amela-Portal fest auf Amela gesetzt */}
+                    {/* Das Dropdown wird nicht angezeigt, um Verwirrung zu vermeiden */}
                   </div>
 
                   <div className="flex justify-center items-center pt-2 border-t border-border">
