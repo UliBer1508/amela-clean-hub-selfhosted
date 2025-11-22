@@ -65,7 +65,7 @@ const TIME_FILTERS = {
 };
 
 const CleaningPortal = () => {
-  const { notify } = useNotify();
+  const { notify, preferences } = useNotify();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('scheduled');
   const [staffFilter, setStaffFilter] = useState<string>('all'); // "all" = alle anzeigen
@@ -78,6 +78,8 @@ const CleaningPortal = () => {
   const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+  const [newTaskCount, setNewTaskCount] = useState(0);
   
   // Booking card configuration
   const { config: cardConfig, updateConfig: updateCardConfig, loading: configLoading } = useBookingCardConfig();
@@ -85,6 +87,16 @@ const CleaningPortal = () => {
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   // Service Provider Filter ist fest auf Amela gesetzt (ID: 9de6e071-7e89-4d66-9433-a5f01acaa493)
+
+  // Handler für Benachrichtigungsklick
+  const handleNotificationClick = () => {
+    // Animation stoppen
+    setHasUnreadNotifications(false);
+    setNewTaskCount(0);
+    
+    // Benachrichtigungseinstellungen öffnen/schließen
+    setShowNotificationSettings(!showNotificationSettings);
+  };
 
   const { 
     bookings = [],
@@ -98,6 +110,50 @@ const CleaningPortal = () => {
     forceRefresh,
     lastRefresh
   } = useBookings();
+
+  // Realtime-Überwachung für neue Reinigungsaufträge
+  useEffect(() => {
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'service_tasks',
+          filter: `provider_id=eq.9de6e071-7e89-4d66-9433-a5f01acaa493` // Amela's ID
+        },
+        (payload) => {
+          console.log('🆕 Neuer Reinigungsauftrag:', payload);
+          
+          // Animation aktivieren
+          setHasUnreadNotifications(true);
+          setNewTaskCount(prev => prev + 1);
+          
+          // Toast-Benachrichtigung anzeigen
+          notify({
+            title: "🆕 Neuer Reinigungsauftrag",
+            description: "Ein neuer Auftrag wurde zugewiesen.",
+            eventType: "new_task",
+            duration: 5000,
+          });
+          
+          // Optional: Sound abspielen (wenn aktiviert in Einstellungen)
+          if (preferences?.sound_notifications) {
+            const audio = new Audio('/notification-sound.mp3');
+            audio.play().catch(e => console.log('Sound konnte nicht abgespielt werden:', e));
+          }
+          
+          // Daten neu laden
+          refetchBookings();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [notify, preferences, refetchBookings]);
 
   const { 
     houses: allHouses = [], 
@@ -411,10 +467,16 @@ const CleaningPortal = () => {
             <Button 
               variant="ghost" 
               size="sm" 
-              className="my-2 hover-scale"
-              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+              className={`my-2 hover-scale relative ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
+              onClick={handleNotificationClick}
             >
+              <Bell className={`w-4 h-4 mr-2 ${hasUnreadNotifications ? 'text-orange-500' : ''}`} />
               🔔 Benachrichtigungen
+              {newTaskCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                  {newTaskCount}
+                </span>
+              )}
             </Button>
           </div>
           
@@ -438,10 +500,16 @@ const CleaningPortal = () => {
             <Button 
               variant="ghost" 
               size="sm" 
-              className="w-full justify-start hover-scale"
-              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+              className={`w-full justify-start hover-scale relative ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
+              onClick={handleNotificationClick}
             >
+              <Bell className={`w-4 h-4 mr-2 ${hasUnreadNotifications ? 'text-orange-500' : ''}`} />
               🔔 Benachrichtigungen
+              {newTaskCount > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                  {newTaskCount}
+                </span>
+              )}
             </Button>
           </div>
         </div>

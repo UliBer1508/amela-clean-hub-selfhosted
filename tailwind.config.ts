@@ -122,6 +122,15 @@ export default {
             opacity: "1"
           }
         },
+        "bell-ring": {
+          "0%": { transform: "rotate(0)" },
+          "10%": { transform: "rotate(15deg)" },
+          "20%": { transform: "rotate(-15deg)" },
+          "30%": { transform: "rotate(15deg)" },
+          "40%": { transform: "rotate(-15deg)" },
+          "50%": { transform: "rotate(0)" },
+          "100%": { transform: "rotate(0)" }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -129,6 +138,7 @@ export default {
         "fade-in": "fade-in 0.3s ease-out",
         "fade-out": "fade-out 0.3s ease-out",
         "scale-in": "scale-in 0.2s ease-out",
+        "bell-ring": "bell-ring 1s ease-in-out infinite",
       },
     },
   },
