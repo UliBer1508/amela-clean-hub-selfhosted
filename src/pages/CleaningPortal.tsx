@@ -521,8 +521,13 @@ const CleaningPortal = () => {
                         <SelectValue placeholder="Alle Putzkräfte" />
                       </SelectTrigger>
                       <SelectContent>
-                        {Object.entries(STAFF_FILTERS).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>{label}</SelectItem>
+                        <SelectItem value="all">👥 Alle Putzkräfte</SelectItem>
+                        <SelectItem value="assigned">✅ Zugewiesen</SelectItem>
+                        <SelectItem value="unassigned">❌ Nicht zugewiesen</SelectItem>
+                        {staff.map((member) => (
+                          <SelectItem key={member.id} value={member.id}>
+                            👤 {member.name}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
