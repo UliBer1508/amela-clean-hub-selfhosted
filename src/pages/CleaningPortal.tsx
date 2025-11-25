@@ -466,9 +466,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
               <div>
                 <h1 className="text-lg md:text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
               </div>
-              <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 md:space-x-3">
+              <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
               <div className={cardConfig.showMobileSettingsButton ? "block" : "hidden sm:block"}>
                 <BookingCardSettings
                   config={cardConfig}
