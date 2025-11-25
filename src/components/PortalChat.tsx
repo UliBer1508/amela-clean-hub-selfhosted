@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, X } from 'lucide-react';
+import { Send, X, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
@@ -17,13 +17,13 @@ interface ChatButtonProps {
 export const ChatButton = ({ onClick, unreadCount }: ChatButtonProps) => (
   <button
     onClick={onClick}
-    className="relative w-12 h-12 md:w-14 md:h-14 flex-shrink-0 transition-transform hover:scale-105"
+    className="relative w-16 h-16 md:w-18 md:h-18 flex-shrink-0 bg-primary rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 flex items-center justify-center"
   >
-    <img src={chatIcon} alt="Chat" className="w-full h-full object-contain" />
+    <MessageCircle className="w-8 h-8 md:w-9 md:h-9 text-primary-foreground" />
     {unreadCount > 0 && (
       <Badge 
         variant="destructive" 
-        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+        className="absolute -top-1 -right-1 h-6 w-6 flex items-center justify-center p-0 text-sm font-bold"
       >
         {unreadCount}
       </Badge>
