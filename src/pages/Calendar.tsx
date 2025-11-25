@@ -241,18 +241,18 @@ const Calendar = () => {
           <div className="sm:hidden flex justify-around items-center gap-1 py-2">
             <Link to="/">
               <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center relative hover-scale">
-                <span className="text-lg">🏠</span>
+                <Home className="w-5 h-5" />
                 <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] text-[10px] px-1 bg-primary text-primary-foreground">
                   {totalCleaningTasks}
                 </Badge>
               </Button>
             </Link>
             <Button variant="default" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center">
-              <span className="text-lg">📅</span>
+              <CalendarIcon className="w-5 h-5" />
             </Button>
             <Link to="/putzkraefte">
               <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale">
-                <span className="text-lg">👥</span>
+                <Users className="w-5 h-5" />
               </Button>
             </Link>
             <Button 
@@ -261,7 +261,7 @@ const Calendar = () => {
               className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale"
               onClick={() => setShowNotificationSettings(!showNotificationSettings)}
             >
-              <span className="text-lg">🔔</span>
+              <Bell className="w-5 h-5" />
             </Button>
           </div>
         </div>
