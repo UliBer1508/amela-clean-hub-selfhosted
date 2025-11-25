@@ -89,11 +89,11 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
       <CardContent className="p-0">
         {/* House Information Header */}
         {(config.showHouseName || config.showHouseAddress) && (
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-4 border-b border-border">
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-3 md:p-4 border-b border-border">
             {config.showHouseName && (
               <div className="flex items-center justify-between">
                  <div className="flex items-center space-x-2">
-                   <span className="font-semibold text-foreground">
+                   <span className="font-semibold text-foreground text-sm md:text-base">
                      🏠 {booking.houses?.name}
                    </span>
                  </div>
@@ -106,7 +106,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
             )}
             {config.showHouseAddress && (
                <div className="flex items-center space-x-2 mt-1">
-                 <span className="text-sm text-muted-foreground">
+                 <span className="text-xs md:text-sm text-muted-foreground">
                    📍 Adresse: {booking.houses?.address}
                  </span>
                </div>
@@ -114,54 +114,54 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
           </div>
         )}
 
-        <div className="bg-yellow-50 dark:bg-yellow-950/20 p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-yellow-50 dark:bg-yellow-950/20 p-3 md:p-4 grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
           {/* Guest Information */}
-          <div className="space-y-3">
+          <div className="space-y-2 md:space-y-3">
             {config.showGuestName && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">👤 Gast: {booking.guest_name}</span>
+                <span className="text-xs md:text-sm font-medium">👤 Gast: {booking.guest_name}</span>
               </div>
             )}
             
             {config.showGuestCount && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">👥 Gäste: {booking.number_of_guests} Personen</span>
+                <span className="text-xs md:text-sm font-medium">👥 Gäste: {booking.number_of_guests} Personen</span>
               </div>
             )}
 
             {config.showGuestEmail && booking.guest_email && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm">📧 E-Mail: {booking.guest_email}</span>
+                <span className="text-xs md:text-sm">📧 E-Mail: {booking.guest_email}</span>
               </div>
             )}
 
             {config.showGuestPhone && booking.guest_phone && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm">📞 Telefon: {booking.guest_phone}</span>
+                <span className="text-xs md:text-sm">📞 Telefon: {booking.guest_phone}</span>
               </div>
             )}
 
             {config.showNationality && booking.nationality && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm">🌍 Nationalität: {booking.nationality}</span>
+                <span className="text-xs md:text-sm">🌍 Nationalität: {booking.nationality}</span>
               </div>
             )}
 
             {config.showCheckInDate && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm">📅 Check-in: {formatDateTime(booking.check_in)}</span>
+                <span className="text-xs md:text-sm">📅 Check-in: {formatDateTime(booking.check_in)}</span>
               </div>
             )}
 
             {config.showCheckOutDate && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm">📅 Check-out: {formatDateTime(booking.check_out)}</span>
+                <span className="text-xs md:text-sm">📅 Check-out: {formatDateTime(booking.check_out)}</span>
               </div>
             )}
 
             {config.showBookingAmount && booking.booking_amount && (
                <div className="flex items-center space-x-2">
-                 <span className="text-sm">
+                 <span className="text-xs md:text-sm">
                    💰 Betrag: {booking.booking_amount}
                    {config.showCurrency && ` ${booking.currency || 'EUR'}`}
                  </span>
@@ -178,13 +178,13 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
 
             {config.showPlatform && booking.platform && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm">Plattform: {booking.platform}</span>
+                <span className="text-xs md:text-sm">Plattform: {booking.platform}</span>
               </div>
             )}
 
             {/* Booking Notes */}
             {config.showBookingNotes && (
-              <div className="mt-3 p-2 bg-muted/30 rounded border-l-4 border-blue-500">
+              <div className="mt-2 md:mt-3 p-2 bg-muted/30 rounded border-l-4 border-blue-500">
                 <div className="flex items-start space-x-2">
                   <div className="text-blue-600 mt-0.5">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -199,7 +199,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                           variant="ghost"
                           size="sm"
                           onClick={() => setEditingBookingNotes(!editingBookingNotes)}
-                          className="h-6 px-2 text-xs"
+                          className="h-8 px-2 text-xs min-h-[32px]"
                         >
                           {editingBookingNotes ? 'Abbrechen' : 'Bearbeiten'}
                         </Button>
@@ -212,7 +212,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                           onChange={(e) => setBookingNotesValue(e.target.value)}
                           placeholder="Buchungsnotizen hinzufügen..."
                           rows={3}
-                          className="text-sm"
+                          className="text-xs md:text-sm"
                         />
                         <div className="flex gap-2">
                           <Button
@@ -221,7 +221,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                               onBookingNotesUpdate?.(booking.id, bookingNotesValue);
                               setEditingBookingNotes(false);
                             }}
-                            className="h-7 px-3 text-xs"
+                            className="h-8 px-3 text-xs min-h-[32px]"
                           >
                             Speichern
                           </Button>
@@ -232,14 +232,14 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                               setBookingNotesValue(booking.notes || '');
                               setEditingBookingNotes(false);
                             }}
-                            className="h-7 px-3 text-xs"
+                            className="h-8 px-3 text-xs min-h-[32px]"
                           >
                             Abbrechen
                           </Button>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-sm text-foreground whitespace-pre-wrap">
+                      <p className="text-xs md:text-sm text-foreground whitespace-pre-wrap">
                         {booking.notes || 'Keine Notizen vorhanden'}
                       </p>
                     )}
@@ -330,22 +330,22 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
 
           {/* Cleaning Tasks */}
           {config.showCleaningTasks && (
-            <div className="space-y-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg p-4 border border-blue-100 dark:border-blue-900/50">
-              <h4 className="font-medium text-foreground">🧹 Reinigungsauftrag</h4>
+            <div className="space-y-2 md:space-y-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg p-3 md:p-4 border border-blue-100 dark:border-blue-900/50">
+              <h4 className="font-medium text-foreground text-sm md:text-base">🧹 Reinigungsauftrag</h4>
               {booking.service_tasks?.map((task: any) => (
-                <div key={task.id} className="bg-background/80 rounded-lg p-3 space-y-2 border border-blue-200/30 dark:border-blue-800/30">
+                <div key={task.id} className="bg-background/80 rounded-lg p-2 md:p-3 space-y-2 border border-blue-200/30 dark:border-blue-800/30">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">🧽 Reinigung</span>
+                    <span className="text-xs md:text-sm font-medium">🧽 Reinigung</span>
                   </div>
 
                   {config.showTaskDateTime && (
-                    <div className="flex items-center space-x-2 text-sm">
+                    <div className="flex items-center space-x-2 text-xs md:text-sm">
                       <span>🕐 {formatDateTime(task.scheduled_date, task.scheduled_time)}</span>
                     </div>
                   )}
 
                   {config.showTaskAssignment && (
-                    <div className="flex items-center space-x-2 text-sm">
+                    <div className="flex items-center space-x-2 text-xs md:text-sm">
                       <span className="text-muted-foreground">👨‍💼 Zugewiesen an:</span>
                       <Select
                         value={task.assigned_staff_id || 'unassigned'}
@@ -353,7 +353,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                           onStaffUpdate(task.id, value === 'unassigned' ? null : value)
                         }
                       >
-                        <SelectTrigger className="w-auto">
+                        <SelectTrigger className="w-auto min-h-[44px]">
                           <SelectValue>
                             {task.assigned_staff_id 
                               ? staff.find(s => s.id === task.assigned_staff_id)?.name || 'Nicht zugewiesen'
@@ -379,7 +379,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                         value={task.status}
                         onValueChange={(value: string) => onStatusUpdate(task.id, value)}
                       >
-                        <SelectTrigger className="w-auto">
+                        <SelectTrigger className="w-auto min-h-[44px]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>

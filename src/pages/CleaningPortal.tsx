@@ -419,16 +419,16 @@ const CleaningPortal = () => {
     <div className="min-h-screen bg-background">
       <PWAStatusBar />
       <div className="pt-12 md:pt-0">
-        {/* Header */}
+      {/* Header */}
         <header className="bg-card border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <Home className="w-6 h-6 text-primary-foreground" />
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-primary rounded-lg flex items-center justify-center">
+                <Home className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
+                <h1 className="text-lg md:text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
               </div>
             </div>
             <div className="flex items-center space-x-3">
@@ -446,28 +446,28 @@ const CleaningPortal = () => {
 
       {/* Navigation */}
       <div className="bg-card border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-8">
           {/* Desktop Navigation */}
           <div className="hidden sm:flex space-x-6">
             <Link to="/">
-              <Button variant="default" size="sm" className="my-2 hover-scale">
+              <Button variant="default" size="sm" className="my-2 hover-scale min-h-[44px]">
                 🏠 Reinigungen ({totalCleaningTasks})
               </Button>
             </Link>
             <Link to="/calendar">
-              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+              <Button variant="ghost" size="sm" className="my-2 hover-scale min-h-[44px]">
                 📅 Kalender
               </Button>
             </Link>
             <Link to="/putzkraefte">
-              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+              <Button variant="ghost" size="sm" className="my-2 hover-scale min-h-[44px]">
                 👥 Putzkräfte
               </Button>
             </Link>
             <Button 
               variant="ghost" 
               size="sm" 
-              className={`my-2 hover-scale relative ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
+              className={`my-2 hover-scale relative min-h-[44px] ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
               onClick={handleNotificationClick}
             >
               <Bell className={`w-4 h-4 mr-2 ${hasUnreadNotifications ? 'text-orange-500' : ''}`} />
@@ -483,28 +483,28 @@ const CleaningPortal = () => {
           {/* Mobile Navigation - 2x2 Grid */}
           <div className="sm:hidden grid grid-cols-2 gap-2 py-2">
             <Link to="/">
-              <Button variant="default" size="sm" className="w-full justify-start hover-scale">
-                🏠 Reinigungen ({totalCleaningTasks})
+              <Button variant="default" size="sm" className="w-full justify-start hover-scale min-h-[44px]">
+                🏠 <span className="hidden sm:inline">Reinigungen</span> ({totalCleaningTasks})
               </Button>
             </Link>
             <Link to="/calendar">
-              <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
-                📅 Kalender
+              <Button variant="ghost" size="sm" className="w-full justify-start hover-scale min-h-[44px]">
+                📅 <span className="hidden sm:inline">Kalender</span>
               </Button>
             </Link>
             <Link to="/putzkraefte">
-              <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
-                👥 Putzkräfte
+              <Button variant="ghost" size="sm" className="w-full justify-start hover-scale min-h-[44px]">
+                👥 <span className="hidden sm:inline">Putzkräfte</span>
               </Button>
             </Link>
-            <Button 
+            <Button
               variant="ghost" 
               size="sm" 
-              className={`w-full justify-start hover-scale relative ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
+              className={`w-full justify-start hover-scale relative min-h-[44px] ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
               onClick={handleNotificationClick}
             >
               <Bell className={`w-4 h-4 mr-2 ${hasUnreadNotifications ? 'text-orange-500' : ''}`} />
-              🔔 Benachrichtigungen
+              🔔 <span className="hidden sm:inline">Benachrichtigungen</span>
               {newTaskCount > 0 && (
                 <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
                   {newTaskCount}
@@ -525,18 +525,18 @@ const CleaningPortal = () => {
       )}
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-6">
+      <main className="max-w-7xl mx-auto px-3 py-4 md:px-4 md:py-8 lg:px-8">
+        <div className="space-y-4 md:space-y-6">
           {/* Search and Filters Toggle */}
           <Card className="shadow-sm border border-border">
-            <CardContent className="p-4">
+            <CardContent className="p-3 md:p-4">
               <button
                 onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-                className="w-full flex items-center justify-between text-left hover:bg-muted/50 rounded-lg p-2 transition-colors"
+                className="w-full flex items-center justify-between text-left hover:bg-muted/50 rounded-lg p-2 transition-colors min-h-[44px]"
               >
                 <div className="flex items-center space-x-2">
                   <Search className="w-4 h-4 text-primary" />
-                  <span className="font-medium text-foreground">🔍 Such & Filter</span>
+                  <span className="font-medium text-foreground text-xs md:text-sm">🔍 Such & Filter</span>
                 </div>
                 {isFiltersOpen ? (
                   <ChevronUp className="w-4 h-4 text-muted-foreground" />
@@ -549,7 +549,7 @@ const CleaningPortal = () => {
                 <div className="mt-4 space-y-4 border-t border-border pt-4">
                   <div className="flex items-center space-x-2">
                     <Search className="w-4 h-4 text-primary" />
-                    <span className="font-medium text-foreground">🔍 Suche</span>
+                    <span className="font-medium text-foreground text-xs md:text-sm">🔍 Suche</span>
                   </div>
                   
                   <div className="relative">
@@ -557,20 +557,20 @@ const CleaningPortal = () => {
                       placeholder="Nach Gast, Haus oder Adresse suchen..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 min-h-[44px]"
                     />
                     <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-3" />
                   </div>
 
                   <div className="flex items-center space-x-2">
                     <Filter className="w-4 h-4 text-primary" />
-                    <span className="font-medium text-foreground">🔧 Filter</span>
+                    <span className="font-medium text-foreground text-xs md:text-sm">🔧 Filter</span>
                   </div>
 
-                  <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                     <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Alle Status" />
+                      <SelectTrigger className="min-h-[44px]">
+                        <SelectValue placeholder="Status" />
                       </SelectTrigger>
                       <SelectContent>
                         {Object.entries(STATUS_FILTERS).map(([key, label]) => (
@@ -580,8 +580,8 @@ const CleaningPortal = () => {
                     </Select>
 
                     <Select value={staffFilter} onValueChange={(value: StaffFilter) => setStaffFilter(value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Putzkraft auswählen" />
+                      <SelectTrigger className="min-h-[44px]">
+                        <SelectValue placeholder="Putzkraft" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">Alle Putzkräfte</SelectItem>
@@ -594,8 +594,8 @@ const CleaningPortal = () => {
                     </Select>
 
                     <Select value={houseFilter} onValueChange={(value: HouseFilter) => setHouseFilter(value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Alle Häuser" />
+                      <SelectTrigger className="min-h-[44px]">
+                        <SelectValue placeholder="Haus" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">Alle Häuser</SelectItem>
@@ -606,8 +606,8 @@ const CleaningPortal = () => {
                     </Select>
 
                     <Select value={timeFilter} onValueChange={(value: TimeFilter) => setTimeFilter(value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Alle Zeiten" />
+                      <SelectTrigger className="min-h-[44px]">
+                        <SelectValue placeholder="Zeitraum" />
                       </SelectTrigger>
                       <SelectContent>
                         {Object.entries(TIME_FILTERS).map(([key, label]) => (
@@ -631,11 +631,11 @@ const CleaningPortal = () => {
           </Card>
 
           {/* Booking and Standalone Cleaning Cards */}
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             {currentFilteredEntries.length === 0 ? (
               <Card>
-                <CardContent className="p-8 text-center">
-                  <p className="text-muted-foreground">
+                <CardContent className="p-6 md:p-8 text-center">
+                  <p className="text-sm md:text-base text-muted-foreground">
                     Kein Reinigungsauftrag gefunden. Versuchen Sie andere Filter.
                   </p>
                 </CardContent>

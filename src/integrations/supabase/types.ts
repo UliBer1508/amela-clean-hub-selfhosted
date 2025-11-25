@@ -790,6 +790,59 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_inquiries: {
+        Row: {
+          check_in: string
+          check_out: string
+          created_at: string | null
+          guest_email: string
+          guest_name: string
+          guest_phone: string
+          house_id: string
+          id: string
+          message: string | null
+          number_of_guests: number
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          check_in: string
+          check_out: string
+          created_at?: string | null
+          guest_email: string
+          guest_name: string
+          guest_phone: string
+          house_id: string
+          id?: string
+          message?: string | null
+          number_of_guests: number
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          check_in?: string
+          check_out?: string
+          created_at?: string | null
+          guest_email?: string
+          guest_name?: string
+          guest_phone?: string
+          house_id?: string
+          id?: string
+          message?: string | null
+          number_of_guests?: number
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_inquiries_house_id_fkey"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booking_linen_config: {
         Row: {
           auto_suggest: boolean | null
@@ -4052,6 +4105,75 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_view_settings: {
+        Row: {
+          created_at: string
+          id: string
+          show_accommodation_address: boolean
+          show_accommodation_name: boolean
+          show_assigned_staff: boolean
+          show_booking_status: boolean
+          show_button_on_mobile: boolean
+          show_check_in_date: boolean
+          show_check_out_date: boolean
+          show_delivery_date: boolean
+          show_delivery_time: boolean
+          show_delivery_type: boolean
+          show_guest_count: boolean
+          show_guest_name: boolean
+          show_linen_orders: boolean
+          show_order_items: boolean
+          show_order_notes: boolean
+          show_order_status: boolean
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          show_accommodation_address?: boolean
+          show_accommodation_name?: boolean
+          show_assigned_staff?: boolean
+          show_booking_status?: boolean
+          show_button_on_mobile?: boolean
+          show_check_in_date?: boolean
+          show_check_out_date?: boolean
+          show_delivery_date?: boolean
+          show_delivery_time?: boolean
+          show_delivery_type?: boolean
+          show_guest_count?: boolean
+          show_guest_name?: boolean
+          show_linen_orders?: boolean
+          show_order_items?: boolean
+          show_order_notes?: boolean
+          show_order_status?: boolean
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          show_accommodation_address?: boolean
+          show_accommodation_name?: boolean
+          show_assigned_staff?: boolean
+          show_booking_status?: boolean
+          show_button_on_mobile?: boolean
+          show_check_in_date?: boolean
+          show_check_out_date?: boolean
+          show_delivery_date?: boolean
+          show_delivery_time?: boolean
+          show_delivery_type?: boolean
+          show_guest_count?: boolean
+          show_guest_name?: boolean
+          show_linen_orders?: boolean
+          show_order_items?: boolean
+          show_order_notes?: boolean
+          show_order_status?: boolean
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
