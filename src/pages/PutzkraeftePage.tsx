@@ -239,28 +239,31 @@ const PutzkraeftePage = () => {
               </Button>
             </div>
             
-            {/* Mobile Navigation - 2x2 Grid */}
-            <div className="sm:hidden grid grid-cols-2 gap-2 py-2">
+            {/* Mobile Navigation - Icon Only */}
+            <div className="sm:hidden flex justify-around items-center gap-1 py-2">
               <Link to="/">
-                <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
-                  🏠 Reinigungen ({totalCleaningTasks})
+                <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center relative hover-scale">
+                  <span className="text-lg">🏠</span>
+                  <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] text-[10px] px-1 bg-primary text-primary-foreground">
+                    {totalCleaningTasks}
+                  </Badge>
                 </Button>
               </Link>
               <Link to="/calendar">
-                <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
-                  📅 Kalender
+                <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale">
+                  <span className="text-lg">📅</span>
                 </Button>
               </Link>
-              <Button variant="default" size="sm" className="w-full justify-start">
-                👥 Putzkräfte
+              <Button variant="default" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center">
+                <span className="text-lg">👥</span>
               </Button>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="w-full justify-start hover-scale"
+                className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale"
                 onClick={() => setShowNotificationSettings(!showNotificationSettings)}
               >
-                🔔 Benachrichtigungen
+                <span className="text-lg">🔔</span>
               </Button>
             </div>
           </div>
@@ -324,28 +327,31 @@ const PutzkraeftePage = () => {
             </Button>
           </div>
           
-          {/* Mobile Navigation - 2x2 Grid */}
-          <div className="sm:hidden grid grid-cols-2 gap-2 py-2">
+          {/* Mobile Navigation - Icon Only */}
+          <div className="sm:hidden flex justify-around items-center gap-1 py-2">
             <Link to="/">
-              <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
-                🏠 Reinigungen ({totalCleaningTasks})
+              <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center relative hover-scale">
+                <span className="text-lg">🏠</span>
+                <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] text-[10px] px-1 bg-primary text-primary-foreground">
+                  {totalCleaningTasks}
+                </Badge>
               </Button>
             </Link>
             <Link to="/calendar">
-              <Button variant="ghost" size="sm" className="w-full justify-start hover-scale">
-                📅 Kalender
+              <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale">
+                <span className="text-lg">📅</span>
               </Button>
             </Link>
-            <Button variant="default" size="sm" className="w-full justify-start">
-              👥 Putzkräfte
+            <Button variant="default" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center">
+              <span className="text-lg">👥</span>
             </Button>
             <Button 
               variant="ghost" 
               size="sm" 
-              className="w-full justify-start hover-scale"
+              className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale"
               onClick={() => setShowNotificationSettings(!showNotificationSettings)}
             >
-              🔔 Benachrichtigungen
+              <span className="text-lg">🔔</span>
             </Button>
           </div>
         </div>
