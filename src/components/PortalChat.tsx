@@ -70,12 +70,21 @@ const PortalChat = ({ isOpen, onClose }: PortalChatProps) => {
     }
   };
 
+  const handleFocus = () => {
+    // Scroll to bottom when keyboard appears
+    setTimeout(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    }, 300);
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed top-20 right-4 md:right-6 w-96 h-[500px] bg-background border rounded-lg shadow-xl z-[100] flex flex-col max-w-[calc(100vw-2rem)] md:w-96">
+    <div className="fixed inset-0 md:top-20 md:right-6 md:inset-auto md:w-96 h-[100dvh] md:h-[500px] bg-background border-0 md:border md:rounded-lg shadow-xl z-[100] flex flex-col">
           {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b bg-primary text-primary-foreground rounded-t-lg">
+        <div className="flex items-center justify-between p-4 pt-[calc(1rem+env(safe-area-inset-top))] md:pt-4 border-b bg-primary text-primary-foreground md:rounded-t-lg">
           <div className="flex items-center gap-2">
             <img src={chatIcon} alt="Chat" className="h-5 w-5" />
             <span className="font-semibold">Nachrichten</span>
@@ -128,12 +137,13 @@ const PortalChat = ({ isOpen, onClose }: PortalChatProps) => {
           </ScrollArea>
 
           {/* Input Area */}
-          <div className="p-4 border-t">
+          <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t">
             <div className="flex gap-2">
               <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
+                onFocus={handleFocus}
                 placeholder="Nachricht eingeben..."
                 className="min-h-[44px] max-h-[100px] resize-none"
                 rows={1}
