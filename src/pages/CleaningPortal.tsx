@@ -480,33 +480,37 @@ const CleaningPortal = () => {
             </Button>
           </div>
           
-          {/* Mobile Navigation - 2x2 Grid */}
-          <div className="sm:hidden grid grid-cols-2 gap-2 py-2">
+          {/* Mobile Navigation - Single Row */}
+          <div className="sm:hidden flex justify-around items-center gap-1 py-2">
             <Link to="/">
-              <Button variant="default" size="sm" className="w-full justify-start hover-scale min-h-[44px]">
-                🏠 <span className="hidden sm:inline">Reinigungen</span> ({totalCleaningTasks})
+              <Button variant="default" size="sm" className="relative flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale">
+                <Home className="w-5 h-5 shrink-0" />
+                {totalCleaningTasks > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-secondary text-secondary-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                    {totalCleaningTasks}
+                  </span>
+                )}
               </Button>
             </Link>
             <Link to="/calendar">
-              <Button variant="ghost" size="sm" className="w-full justify-start hover-scale min-h-[44px]">
-                📅 <span className="hidden sm:inline">Kalender</span>
+              <Button variant="ghost" size="sm" className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale">
+                <Calendar className="w-5 h-5 shrink-0" />
               </Button>
             </Link>
             <Link to="/putzkraefte">
-              <Button variant="ghost" size="sm" className="w-full justify-start hover-scale min-h-[44px]">
-                👥 <span className="hidden sm:inline">Putzkräfte</span>
+              <Button variant="ghost" size="sm" className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale">
+                <Users className="w-5 h-5 shrink-0" />
               </Button>
             </Link>
             <Button
               variant="ghost" 
               size="sm" 
-              className={`w-full justify-start hover-scale relative min-h-[44px] ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
+              className={`relative flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
               onClick={handleNotificationClick}
             >
-              <Bell className={`w-4 h-4 mr-2 ${hasUnreadNotifications ? 'text-orange-500' : ''}`} />
-              🔔 <span className="hidden sm:inline">Benachrichtigungen</span>
+              <Bell className={`w-5 h-5 shrink-0 ${hasUnreadNotifications ? 'text-orange-500' : ''}`} />
               {newTaskCount > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center animate-pulse">
                   {newTaskCount}
                 </span>
               )}
