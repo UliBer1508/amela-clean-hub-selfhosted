@@ -243,7 +243,7 @@ const PutzkraeftePage = () => {
             <div className="sm:hidden flex justify-around items-center gap-1 py-2">
               <Link to="/">
                 <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center relative hover-scale">
-                  <Home className="w-5 h-5" />
+                  <Home className="w-6 h-6" />
                   <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] text-[10px] px-1 bg-primary text-primary-foreground">
                     {totalCleaningTasks}
                   </Badge>
@@ -251,11 +251,11 @@ const PutzkraeftePage = () => {
               </Link>
               <Link to="/calendar">
                 <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale">
-                  <CalendarIcon className="w-5 h-5" />
+                  <CalendarIcon className="w-6 h-6" />
                 </Button>
               </Link>
               <Button variant="default" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center">
-                <Users className="w-5 h-5" />
+                <Users className="w-6 h-6" />
               </Button>
               <Button 
                 variant="ghost" 
@@ -263,7 +263,7 @@ const PutzkraeftePage = () => {
                 className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale"
                 onClick={() => setShowNotificationSettings(!showNotificationSettings)}
               >
-                <Bell className="w-5 h-5" />
+                <Bell className="w-6 h-6" />
               </Button>
             </div>
           </div>
@@ -327,33 +327,33 @@ const PutzkraeftePage = () => {
             </Button>
           </div>
           
-          {/* Mobile Navigation - Icon Only */}
-          <div className="sm:hidden flex justify-around items-center gap-1 py-2">
-            <Link to="/">
-              <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center relative hover-scale">
-                <Home className="w-5 h-5" />
-                <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] text-[10px] px-1 bg-primary text-primary-foreground">
-                  {totalCleaningTasks}
-                </Badge>
+            {/* Mobile Navigation - Icon Only */}
+            <div className="sm:hidden flex justify-around items-center gap-1 py-2">
+              <Link to="/">
+                <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center relative hover-scale">
+                  <Home className="w-6 h-6" />
+                  <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] text-[10px] px-1 bg-primary text-primary-foreground">
+                    {totalCleaningTasks}
+                  </Badge>
+                </Button>
+              </Link>
+              <Link to="/calendar">
+                <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale">
+                  <CalendarIcon className="w-6 h-6" />
+                </Button>
+              </Link>
+              <Button variant="default" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center">
+                <Users className="w-6 h-6" />
               </Button>
-            </Link>
-            <Link to="/calendar">
-              <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale">
-                <CalendarIcon className="w-5 h-5" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale"
+                onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+              >
+                <Bell className="w-6 h-6" />
               </Button>
-            </Link>
-            <Button variant="default" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center">
-              <Users className="w-5 h-5" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale"
-              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
-            >
-              <Bell className="w-5 h-5" />
-            </Button>
-          </div>
+            </div>
         </div>
       </div>
 
