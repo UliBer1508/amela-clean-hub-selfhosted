@@ -68,14 +68,14 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
     <Card className="overflow-hidden hover-scale border-l-8 border-l-purple-500">
       <CardContent className="p-0">
         {/* House Information Header with Standalone Badge */}
-        <div className="bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-950/20 dark:to-violet-950/20 p-4 border-b border-border">
+        <div className="bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-950/20 dark:to-violet-950/20 p-3 md:p-4 border-b border-border">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100">
+              <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100 text-xs">
                 🔧 Standalone
               </Badge>
               {config.showHouseName && (
-                <span className="font-semibold text-foreground">
+                <span className="font-semibold text-foreground text-sm md:text-base">
                   🏠 {cleaning.houses?.name}
                 </span>
               )}
@@ -86,7 +86,7 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
           </div>
           {config.showHouseAddress && cleaning.houses?.address && (
             <div className="flex items-center space-x-2 mt-1">
-              <span className="text-sm text-muted-foreground">
+              <span className="text-xs md:text-sm text-muted-foreground">
                 📍 Adresse: {cleaning.houses.address}
               </span>
             </div>
@@ -94,20 +94,20 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
         </div>
 
         {/* Cleaning Task Details */}
-        <div className="bg-purple-50 dark:bg-purple-950/20 p-4">
-          <div className="bg-background/80 rounded-lg p-4 space-y-3 border border-purple-200/30 dark:border-purple-800/30">
-            <h4 className="font-medium text-foreground">🧹 Reinigungsauftrag</h4>
+        <div className="bg-purple-50 dark:bg-purple-950/20 p-3 md:p-4">
+          <div className="bg-background/80 rounded-lg p-3 md:p-4 space-y-2 md:space-y-3 border border-purple-200/30 dark:border-purple-800/30">
+            <h4 className="font-medium text-foreground text-sm md:text-base">🧹 Reinigungsauftrag</h4>
 
             {/* Date and Time */}
             {config.showTaskDateTime && (
-              <div className="flex items-center space-x-2 text-sm">
+              <div className="flex items-center space-x-2 text-xs md:text-sm">
                 <span>🕐 {formatDateTime(cleaning.scheduled_date, cleaning.scheduled_time)}</span>
               </div>
             )}
 
             {/* Staff Assignment */}
             {config.showTaskAssignment && (
-              <div className="flex items-center space-x-2 text-sm">
+              <div className="flex items-center space-x-2 text-xs md:text-sm">
                 <span className="text-muted-foreground">👨‍💼 Zugewiesen an:</span>
                 <Select
                   value={cleaning.assigned_staff_id || 'unassigned'}
@@ -115,7 +115,7 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
                     onStaffUpdate(cleaning.id, value === 'unassigned' ? null : value)
                   }
                 >
-                  <SelectTrigger className="w-auto">
+                  <SelectTrigger className="w-auto min-h-[44px]">
                     <SelectValue>
                       {cleaning.assigned_staff_id 
                         ? staff.find(s => s.id === cleaning.assigned_staff_id)?.name || 'Nicht zugewiesen'
@@ -138,12 +138,12 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
             {/* Status */}
             {config.showTaskStatus && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-muted-foreground">Status:</span>
+                <span className="text-xs md:text-sm text-muted-foreground">Status:</span>
                 <Select
                   value={cleaning.status}
                   onValueChange={(value: string) => onStatusUpdate(cleaning.id, value)}
                 >
-                  <SelectTrigger className="w-auto">
+                  <SelectTrigger className="w-auto min-h-[44px]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -159,7 +159,7 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
 
             {/* Payment Status */}
             {cleaning.payment_status && (
-              <div className="flex items-center space-x-2 text-sm">
+              <div className="flex items-center space-x-2 text-xs md:text-sm">
                 <span className="text-muted-foreground">💰 Zahlung:</span>
                 <Badge variant={
                   cleaning.payment_status === 'paid' ? 'default' : 
@@ -175,7 +175,7 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
 
             {/* Notes */}
             {config.showTaskNotes && (
-              <div className="mt-3 p-2 bg-muted/30 rounded border-l-4 border-purple-500">
+              <div className="mt-2 md:mt-3 p-2 bg-muted/30 rounded border-l-4 border-purple-500">
                 <div className="flex items-start space-x-2">
                   <div className="text-purple-600 mt-0.5">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -190,7 +190,7 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
                           variant="ghost"
                           size="sm"
                           onClick={() => setEditingNotes(!editingNotes)}
-                          className="h-6 px-2 text-xs"
+                          className="h-8 px-2 text-xs min-h-[32px]"
                         >
                           {editingNotes ? 'Abbrechen' : 'Bearbeiten'}
                         </Button>
@@ -203,7 +203,7 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
                           onChange={(e) => setNotesValue(e.target.value)}
                           placeholder="Notizen hinzufügen..."
                           rows={3}
-                          className="text-sm"
+                          className="text-xs md:text-sm"
                         />
                         <div className="flex gap-2">
                           <Button
@@ -212,7 +212,7 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
                               onNotesUpdate?.(cleaning.id, notesValue);
                               setEditingNotes(false);
                             }}
-                            className="h-7 px-3 text-xs"
+                            className="h-8 px-3 text-xs min-h-[32px]"
                           >
                             Speichern
                           </Button>
@@ -223,14 +223,14 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
                               setNotesValue(cleaning.notes || '');
                               setEditingNotes(false);
                             }}
-                            className="h-7 px-3 text-xs"
+                            className="h-8 px-3 text-xs min-h-[32px]"
                           >
                             Abbrechen
                           </Button>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-sm text-foreground whitespace-pre-wrap">
+                      <p className="text-xs md:text-sm text-foreground whitespace-pre-wrap">
                         {cleaning.notes || 'Keine Notizen vorhanden'}
                       </p>
                     )}
