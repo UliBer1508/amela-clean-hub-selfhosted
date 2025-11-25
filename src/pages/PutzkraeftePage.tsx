@@ -361,7 +361,10 @@ const PutzkraeftePage = () => {
         {showNotificationSettings ? (
           <div className="space-y-6 animate-fade-in">
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold">Benachrichtigungseinstellungen</h1>
+              <h1 className="text-lg md:text-2xl font-bold">
+                <span className="md:hidden">Benachrichtigungen</span>
+                <span className="hidden md:inline">Benachrichtigungseinstellungen</span>
+              </h1>
               <Button 
                 variant="outline" 
                 onClick={() => setShowNotificationSettings(false)}

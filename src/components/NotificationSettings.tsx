@@ -145,24 +145,27 @@ const NotificationSettings = () => {
 
   return (
     <Card className="max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <Bell className="w-5 h-5" />
-          <span>Benachrichtigungseinstellungen für {preferences.user_name}</span>
+      <CardHeader className="p-4 md:p-6">
+        <CardTitle className="flex items-center gap-2 text-base md:text-xl">
+          <Bell className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
+          <span className="truncate">
+            <span className="md:hidden">Benachrichtigungen</span>
+            <span className="hidden md:inline">Benachrichtigungseinstellungen für {preferences.user_name}</span>
+          </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 md:space-y-6 p-4 md:p-6">
         {/* Benachrichtigungsarten */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">Benachrichtigungsarten</h3>
+          <h3 className="text-base md:text-lg font-medium">Benachrichtigungsarten</h3>
           
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Bell className="w-4 h-4 text-blue-600" />
-                <div>
-                  <Label className="font-medium">Popup-Benachrichtigungen</Label>
-                  <p className="text-sm text-muted-foreground">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
+                <Bell className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-600" />
+                <div className="min-w-0 flex-1">
+                  <Label className="text-sm md:text-base font-medium">Popup-Benachrichtigungen</Label>
+                  <p className="text-xs md:text-sm text-muted-foreground">
                     Sofortige Benachrichtigungen im Browser
                   </p>
                 </div>
@@ -173,15 +176,16 @@ const NotificationSettings = () => {
                   updatePreferences({ toast_notifications: checked })
                 }
                 disabled={saving}
+                className="flex-shrink-0"
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Mail className="w-4 h-4 text-green-600" />
-                <div>
-                  <Label className="font-medium">E-Mail-Benachrichtigungen</Label>
-                  <p className="text-sm text-muted-foreground">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
+                <Mail className="w-4 h-4 mt-0.5 flex-shrink-0 text-green-600" />
+                <div className="min-w-0 flex-1">
+                  <Label className="text-sm md:text-base font-medium">E-Mail-Benachrichtigungen</Label>
+                  <p className="text-xs md:text-sm text-muted-foreground">
                     Benachrichtigungen per E-Mail erhalten
                   </p>
                 </div>
@@ -192,15 +196,16 @@ const NotificationSettings = () => {
                   updatePreferences({ email_notifications: checked })
                 }
                 disabled={saving}
+                className="flex-shrink-0"
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Smartphone className="w-4 h-4 text-purple-600" />
-                <div>
-                  <Label className="font-medium">Push-Benachrichtigungen</Label>
-                  <p className="text-sm text-muted-foreground">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
+                <Smartphone className="w-4 h-4 mt-0.5 flex-shrink-0 text-purple-600" />
+                <div className="min-w-0 flex-1">
+                  <Label className="text-sm md:text-base font-medium">Push-Benachrichtigungen</Label>
+                  <p className="text-xs md:text-sm text-muted-foreground">
                     Browser-Push-Benachrichtigungen
                   </p>
                 </div>
@@ -211,15 +216,16 @@ const NotificationSettings = () => {
                   updatePreferences({ push_notifications: checked })
                 }
                 disabled={saving}
+                className="flex-shrink-0"
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Volume2 className="w-4 h-4 text-orange-600" />
-                <div>
-                  <Label className="font-medium">Soundbenachrichtigungen</Label>
-                  <p className="text-sm text-muted-foreground">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
+                <Volume2 className="w-4 h-4 mt-0.5 flex-shrink-0 text-orange-600" />
+                <div className="min-w-0 flex-1">
+                  <Label className="text-sm md:text-base font-medium">Soundbenachrichtigungen</Label>
+                  <p className="text-xs md:text-sm text-muted-foreground">
                     Ton bei neuen Benachrichtigungen
                   </p>
                 </div>
@@ -230,6 +236,7 @@ const NotificationSettings = () => {
                   updatePreferences({ sound_notifications: checked })
                 }
                 disabled={saving}
+                className="flex-shrink-0"
               />
             </div>
           </div>
@@ -239,15 +246,15 @@ const NotificationSettings = () => {
 
         {/* Was soll benachrichtigt werden */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">Benachrichtigen bei</h3>
+          <h3 className="text-base md:text-lg font-medium">Benachrichtigen bei</h3>
           
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <div>
-                  <Label className="font-medium">Neuer Reinigungsauftrag</Label>
-                  <p className="text-sm text-muted-foreground">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
+                <div className="w-3 h-3 mt-1 bg-blue-500 rounded-full flex-shrink-0"></div>
+                <div className="min-w-0 flex-1">
+                  <Label className="text-sm md:text-base font-medium">Neuer Reinigungsauftrag</Label>
+                  <p className="text-xs md:text-sm text-muted-foreground">
                     Wenn ein neuer Auftrag erstellt wird
                   </p>
                 </div>
@@ -258,15 +265,16 @@ const NotificationSettings = () => {
                   updatePreferences({ notify_new_tasks: checked })
                 }
                 disabled={saving}
+                className="flex-shrink-0"
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                <div>
-                  <Label className="font-medium">Auftragsänderungen</Label>
-                  <p className="text-sm text-muted-foreground">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
+                <div className="w-3 h-3 mt-1 bg-orange-500 rounded-full flex-shrink-0"></div>
+                <div className="min-w-0 flex-1">
+                  <Label className="text-sm md:text-base font-medium">Auftragsänderungen</Label>
+                  <p className="text-xs md:text-sm text-muted-foreground">
                     Datum, Zeit oder Details wurden geändert
                   </p>
                 </div>
@@ -277,15 +285,16 @@ const NotificationSettings = () => {
                   updatePreferences({ notify_task_changes: checked })
                 }
                 disabled={saving}
+                className="flex-shrink-0"
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <div>
-                  <Label className="font-medium">Statusänderungen</Label>
-                  <p className="text-sm text-muted-foreground">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
+                <div className="w-3 h-3 mt-1 bg-green-500 rounded-full flex-shrink-0"></div>
+                <div className="min-w-0 flex-1">
+                  <Label className="text-sm md:text-base font-medium">Statusänderungen</Label>
+                  <p className="text-xs md:text-sm text-muted-foreground">
                     Wenn ein Auftrag abgeschlossen oder storniert wird
                   </p>
                 </div>
@@ -296,15 +305,16 @@ const NotificationSettings = () => {
                   updatePreferences({ notify_status_updates: checked })
                 }
                 disabled={saving}
+                className="flex-shrink-0"
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <AlertTriangle className="w-4 h-4 text-red-600" />
-                <div>
-                  <Label className="font-medium">Dringende Aufträge</Label>
-                  <p className="text-sm text-muted-foreground">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
+                <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0 text-red-600" />
+                <div className="min-w-0 flex-1">
+                  <Label className="text-sm md:text-base font-medium">Dringende Aufträge</Label>
+                  <p className="text-xs md:text-sm text-muted-foreground">
                     Aufträge die heute oder morgen stattfinden
                   </p>
                 </div>
@@ -315,6 +325,7 @@ const NotificationSettings = () => {
                   updatePreferences({ notify_urgent_tasks: checked })
                 }
                 disabled={saving}
+                className="flex-shrink-0"
               />
             </div>
           </div>
@@ -325,7 +336,7 @@ const NotificationSettings = () => {
           <>
             <Separator />
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">E-Mail Einstellungen</h3>
+              <h3 className="text-base md:text-lg font-medium">E-Mail Einstellungen</h3>
               <div className="space-y-2">
                 <Label htmlFor="email">E-Mail Adresse</Label>
                 <Input
