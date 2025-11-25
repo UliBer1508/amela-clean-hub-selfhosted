@@ -14,10 +14,20 @@ import PullToRefresh from '@/components/PullToRefresh';
 import { formatGermanDate } from '@/utils/date';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, addWeeks, subWeeks } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { ChatButton } from '@/components/PortalChat';
+import { usePortalMessages } from '@/hooks/usePortalMessages';
 
 type ViewType = 'month' | 'week';
 
-const Calendar = () => {
+interface CalendarProps {
+  chatProps: {
+    isChatOpen: boolean;
+    setIsChatOpen: (open: boolean) => void;
+  };
+}
+
+const Calendar = ({ chatProps }: CalendarProps) => {
+  const { unreadCount } = usePortalMessages();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [viewType, setViewType] = useState<ViewType>('month');
@@ -195,6 +205,7 @@ const Calendar = () => {
               <div>
                 <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
               </div>
+              <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
             </div>
               <div className="flex items-center space-x-2">
                 <div className={cardConfig.showMobileSettingsButton ? '' : 'hidden lg:block'}>

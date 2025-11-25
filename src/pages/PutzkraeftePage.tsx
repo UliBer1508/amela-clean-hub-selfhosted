@@ -22,8 +22,18 @@ import NotificationSettings from '@/components/NotificationSettings';
 import { CleaningStaff, StaffFilter, StaffSortBy } from '@/types/staff';
 import { APP_CONFIG } from '@/constants/app';
 import { sanitizeSearchTerm } from '@/utils/validation';
+import { ChatButton } from '@/components/PortalChat';
+import { usePortalMessages } from '@/hooks/usePortalMessages';
 
-const PutzkraeftePage = () => {
+interface PutzkraeftePageProps {
+  chatProps: {
+    isChatOpen: boolean;
+    setIsChatOpen: (open: boolean) => void;
+  };
+}
+
+const PutzkraeftePage = ({ chatProps }: PutzkraeftePageProps) => {
+  const { unreadCount } = usePortalMessages();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StaffFilter>('active');
   const [sortBy, setSortBy] = useState<StaffSortBy>('name');
@@ -198,6 +208,7 @@ const PutzkraeftePage = () => {
                 <div>
                   <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
                 </div>
+                <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
               </div>
               <Button 
                 onClick={handleCancelForm}
@@ -293,6 +304,7 @@ const PutzkraeftePage = () => {
               <div>
                 <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
               </div>
+              <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
             </div>
             <PWAInstallButton />
           </div>
