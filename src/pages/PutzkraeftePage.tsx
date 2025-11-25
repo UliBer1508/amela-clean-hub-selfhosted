@@ -269,7 +269,7 @@ const PutzkraeftePage = () => {
           </div>
         </div>
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 md:py-8">
           <StaffForm
             staff={editingStaff || undefined}
             onSubmit={editingStaff ? handleUpdateStaff : handleCreateStaff}
@@ -357,10 +357,10 @@ const PutzkraeftePage = () => {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 md:py-8">
         {showNotificationSettings ? (
           <div className="space-y-6 animate-fade-in">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <h1 className="text-lg md:text-2xl font-bold">
                 <span className="md:hidden">Benachrichtigungen</span>
                 <span className="hidden md:inline">Benachrichtigungseinstellungen</span>
@@ -368,7 +368,7 @@ const PutzkraeftePage = () => {
               <Button 
                 variant="outline" 
                 onClick={() => setShowNotificationSettings(false)}
-                className="hover-scale"
+                className="hover-scale w-full sm:w-auto"
               >
                 Zurück zu Putzkräfte
               </Button>
@@ -378,46 +378,46 @@ const PutzkraeftePage = () => {
         ) : (
           <div className="animate-fade-in">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3 md:p-4">
                   <div className="flex items-center space-x-2">
                     <div>
-                      <p className="text-sm text-muted-foreground">👥 Gesamt</p>
-                      <p className="text-2xl font-bold">{stats.totalStaff}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground">👥 Gesamt</p>
+                      <p className="text-xl md:text-2xl font-bold">{stats.totalStaff}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3 md:p-4">
                   <div className="flex items-center space-x-2">
                     <div>
-                      <p className="text-sm text-muted-foreground">✅ Aktiv</p>
-                      <p className="text-2xl font-bold">{stats.activeStaff}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground">✅ Aktiv</p>
+                      <p className="text-xl md:text-2xl font-bold">{stats.activeStaff}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3 md:p-4">
                   <div className="flex items-center space-x-2">
                     <div>
-                      <p className="text-sm text-muted-foreground">⭐ Ø Bewertung</p>
-                      <p className="text-2xl font-bold">{stats.averageRating.toFixed(1)}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground">⭐ Ø Bewertung</p>
+                      <p className="text-xl md:text-2xl font-bold">{stats.averageRating.toFixed(1)}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardContent className="p-4">
+                <CardContent className="p-3 md:p-4">
                   <div className="flex items-center space-x-2">
                     <div>
-                      <p className="text-sm text-muted-foreground">📋 Aufträge</p>
-                      <p className="text-2xl font-bold">{stats.totalAssignments}</p>
+                      <p className="text-xs md:text-sm text-muted-foreground">📋 Aufträge</p>
+                      <p className="text-xl md:text-2xl font-bold">{stats.totalAssignments}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -425,36 +425,38 @@ const PutzkraeftePage = () => {
             </div>
 
             {/* Section Header with Action Button */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 md:mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-foreground">Putzkräfte verwalten</h2>
-                <p className="text-sm text-muted-foreground">Verwalten Sie Ihr Reinigungsteam</p>
+                <h2 className="text-lg md:text-2xl font-bold text-foreground">Putzkräfte verwalten</h2>
+                <p className="text-xs md:text-sm text-muted-foreground">Verwalten Sie Ihr Reinigungsteam</p>
               </div>
               <Button 
                 onClick={() => setShowForm(true)}
-                className="hover-scale"
+                className="hover-scale w-full sm:w-auto"
               >
                 <UserPlus className="w-4 h-4 mr-2" />
-                Neue Putzkraft
+                <span className="sm:inline">Neue Putzkraft</span>
               </Button>
             </div>
 
             {/* Search and Filter */}
-            <Card className="mb-6">
-              <CardContent className="p-6">
+            <Card className="mb-4 md:mb-6">
+              <CardContent className="p-3 md:p-6">
                 <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Search className="w-5 h-5 text-primary" />
-                      <span className="font-medium text-foreground">Suche & Filter</span>
-                      <Badge variant="secondary" className="ml-2">
-                        {activeFilterCount} aktiv
-                      </Badge>
+                    <div className="flex items-center gap-2">
+                      <Search className="w-4 h-4 md:w-5 md:h-5 text-primary flex-shrink-0" />
+                      <span className="font-medium text-sm md:text-base text-foreground">Suche & Filter</span>
+                      {activeFilterCount > 0 && (
+                        <Badge variant="secondary" className="text-xs">
+                          {activeFilterCount} aktiv
+                        </Badge>
+                      )}
                     </div>
                     <CollapsibleTrigger asChild>
                       <Button variant="ghost" size="sm">
                         <Filter className="w-4 h-4" />
-                        {isFiltersOpen ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
+                        {isFiltersOpen ? <ChevronUp className="w-4 h-4 ml-1" /> : <ChevronDown className="w-4 h-4 ml-1" />}
                       </Button>
                     </CollapsibleTrigger>
                   </div>
@@ -503,14 +505,15 @@ const PutzkraeftePage = () => {
                           setSortBy('name');
                         }}
                         disabled={activeFilterCount === 0}
-                        className="hover-scale"
+                        className="hover-scale text-xs md:text-sm"
                       >
-                        Filter zurücksetzen
+                        <span className="sm:hidden">Zurücksetzen</span>
+                        <span className="hidden sm:inline">Filter zurücksetzen</span>
                       </Button>
                     </div>
 
                     <div className="flex justify-between items-center pt-2 border-t border-border">
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-xs md:text-sm text-muted-foreground">
                         {currentStaff.length} von {stats.totalStaff} Putzkräften
                       </span>
                     </div>
@@ -520,11 +523,11 @@ const PutzkraeftePage = () => {
             </Card>
 
             {/* Staff Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
               {currentStaff.length === 0 ? (
                 <Card className="col-span-full">
-                  <CardContent className="p-8 text-center">
-                    <p className="text-muted-foreground">
+                  <CardContent className="p-6 md:p-8 text-center">
+                    <p className="text-sm md:text-base text-muted-foreground">
                       Keine Putzkräfte gefunden. Versuchen Sie andere Filter oder fügen Sie neue hinzu.
                     </p>
                   </CardContent>
@@ -532,69 +535,69 @@ const PutzkraeftePage = () => {
               ) : (
                 currentStaff.map((member) => (
                   <Card key={member.id} className="hover-scale">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-foreground mb-1">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex items-start justify-between mb-3 md:mb-4">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base md:text-lg font-semibold text-foreground mb-1 truncate">
                             {member.name}
                           </h3>
-                          <Badge variant={member.is_active ? "default" : "secondary"}>
+                          <Badge variant={member.is_active ? "default" : "secondary"} className="text-xs">
                             {member.is_active ? "Aktiv" : "Inaktiv"}
                           </Badge>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          <Star className="w-4 h-4 text-yellow-500" />
-                          <span className="text-sm font-medium">
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <Star className="w-3 h-3 md:w-4 md:h-4 text-yellow-500" />
+                          <span className="text-xs md:text-sm font-medium">
                             {member.quality_rating.toFixed(1)}
                           </span>
                         </div>
                       </div>
 
-                      <div className="space-y-2 mb-4">
-                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                          <Mail className="w-4 h-4" />
-                          <span>{member.email}</span>
+                      <div className="space-y-1.5 md:space-y-2 mb-3 md:mb-4">
+                        <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
+                          <Mail className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+                          <span className="truncate">{member.email}</span>
                         </div>
                         
                         {member.phone && (
-                          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                            <Phone className="w-4 h-4" />
-                            <span>{member.phone}</span>
+                          <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
+                            <Phone className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+                            <span className="truncate">{member.phone}</span>
                           </div>
                         )}
                         
                         {member.address && (
-                          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                            <MapPin className="w-4 h-4" />
-                            <span>{member.address}</span>
+                          <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
+                            <MapPin className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+                            <span className="truncate">{member.address}</span>
                           </div>
                         )}
                         
                         {member.hourly_rate && (
-                          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                            <Euro className="w-4 h-4" />
+                          <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
+                            <Euro className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
                             <span>{member.hourly_rate.toFixed(2)} €/Std</span>
                           </div>
                         )}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4 mb-4 text-center">
+                      <div className="grid grid-cols-2 gap-3 md:gap-4 mb-3 md:mb-4 text-center">
                         <div>
-                          <p className="text-lg font-semibold">{member.total_assignments}</p>
-                          <p className="text-xs text-muted-foreground">Aufträge gesamt</p>
+                          <p className="text-base md:text-lg font-semibold">{member.total_assignments}</p>
+                          <p className="text-[10px] md:text-xs text-muted-foreground">Aufträge gesamt</p>
                         </div>
                         <div>
-                          <p className="text-lg font-semibold">{member.completed_assignments}</p>
-                          <p className="text-xs text-muted-foreground">Abgeschlossen</p>
+                          <p className="text-base md:text-lg font-semibold">{member.completed_assignments}</p>
+                          <p className="text-[10px] md:text-xs text-muted-foreground">Abgeschlossen</p>
                         </div>
                       </div>
 
                       {member.availability_days.length > 0 && (
-                        <div className="mb-4">
-                          <p className="text-xs text-muted-foreground mb-1">Verfügbare Tage:</p>
+                        <div className="mb-3 md:mb-4">
+                          <p className="text-[10px] md:text-xs text-muted-foreground mb-1">Verfügbare Tage:</p>
                           <div className="flex flex-wrap gap-1">
                             {member.availability_days.map(day => (
-                              <Badge key={day} variant="outline" className="text-xs">
+                              <Badge key={day} variant="outline" className="text-[10px] md:text-xs px-1.5 md:px-2">
                                 {day.slice(0, 2)}
                               </Badge>
                             ))}
@@ -602,21 +605,23 @@ const PutzkraeftePage = () => {
                         </div>
                       )}
 
-                      <div className="flex space-x-2">
+                      <div className="flex gap-2">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleEdit(member)}
-                          className="flex-1"
+                          className="flex-1 text-xs md:text-sm"
                         >
                           <Edit2 className="w-3 h-3 mr-1" />
-                          Bearbeiten
+                          <span className="hidden sm:inline">Bearbeiten</span>
+                          <span className="sm:hidden">Edit</span>
                         </Button>
                         
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleToggleStatus(member)}
+                          className="px-2 md:px-3"
                         >
                           {member.is_active ? (
                             <UserX className="w-3 h-3" />
@@ -627,7 +632,7 @@ const PutzkraeftePage = () => {
 
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" className="px-2 md:px-3">
                               <Trash2 className="w-3 h-3" />
                             </Button>
                           </AlertDialogTrigger>
