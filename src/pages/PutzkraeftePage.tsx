@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
-  Search, Filter, UserPlus, Users, Star, Calendar, MapPin, 
+  Search, Filter, UserPlus, Users, Star, Calendar as CalendarIcon, MapPin, 
   Phone, Mail, Euro, Edit2, Trash2, UserCheck, UserX, ArrowLeft, Home, Bell, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -243,7 +243,7 @@ const PutzkraeftePage = () => {
             <div className="sm:hidden flex justify-around items-center gap-1 py-2">
               <Link to="/">
                 <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center relative hover-scale">
-                  <span className="text-lg">🏠</span>
+                  <Home className="w-5 h-5" />
                   <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] text-[10px] px-1 bg-primary text-primary-foreground">
                     {totalCleaningTasks}
                   </Badge>
@@ -251,11 +251,11 @@ const PutzkraeftePage = () => {
               </Link>
               <Link to="/calendar">
                 <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale">
-                  <span className="text-lg">📅</span>
+                  <CalendarIcon className="w-5 h-5" />
                 </Button>
               </Link>
               <Button variant="default" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center">
-                <span className="text-lg">👥</span>
+                <Users className="w-5 h-5" />
               </Button>
               <Button 
                 variant="ghost" 
@@ -263,7 +263,7 @@ const PutzkraeftePage = () => {
                 className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale"
                 onClick={() => setShowNotificationSettings(!showNotificationSettings)}
               >
-                <span className="text-lg">🔔</span>
+                <Bell className="w-5 h-5" />
               </Button>
             </div>
           </div>
@@ -331,7 +331,7 @@ const PutzkraeftePage = () => {
           <div className="sm:hidden flex justify-around items-center gap-1 py-2">
             <Link to="/">
               <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center relative hover-scale">
-                <span className="text-lg">🏠</span>
+                <Home className="w-5 h-5" />
                 <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] text-[10px] px-1 bg-primary text-primary-foreground">
                   {totalCleaningTasks}
                 </Badge>
@@ -339,11 +339,11 @@ const PutzkraeftePage = () => {
             </Link>
             <Link to="/calendar">
               <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale">
-                <span className="text-lg">📅</span>
+                <CalendarIcon className="w-5 h-5" />
               </Button>
             </Link>
             <Button variant="default" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center">
-              <span className="text-lg">👥</span>
+              <Users className="w-5 h-5" />
             </Button>
             <Button 
               variant="ghost" 
@@ -351,7 +351,7 @@ const PutzkraeftePage = () => {
               className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale"
               onClick={() => setShowNotificationSettings(!showNotificationSettings)}
             >
-              <span className="text-lg">🔔</span>
+              <Bell className="w-5 h-5" />
             </Button>
           </div>
         </div>
