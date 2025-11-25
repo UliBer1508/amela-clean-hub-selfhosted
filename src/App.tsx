@@ -10,6 +10,7 @@ import Calendar from "./pages/Calendar";
 import NotFound from "./pages/NotFound";
 import Offline from "./pages/Offline";
 import PWAUpdateNotification from "./components/PWAUpdateNotification";
+import PortalChat from "./components/PortalChat";
 import { usePWAAnalytics } from "./hooks/usePWAAnalytics";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const AppContent = () => {
       <Toaster />
       <Sonner />
       <PWAUpdateNotification />
+      <PortalChat />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/putzkraefte" element={<PutzkraeftePage />} />
