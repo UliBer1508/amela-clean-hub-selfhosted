@@ -17,7 +17,7 @@ interface ChatButtonProps {
 export const ChatButton = ({ onClick, unreadCount }: ChatButtonProps) => (
   <button
     onClick={onClick}
-    className="relative w-10 h-10 md:w-12 md:h-12 flex-shrink-0 transition-transform hover:scale-105"
+    className="relative w-12 h-12 md:w-14 md:h-14 flex-shrink-0 transition-transform hover:scale-105"
   >
     <img src={chatIcon} alt="Chat" className="w-full h-full object-contain" />
     {unreadCount > 0 && (

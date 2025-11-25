@@ -208,16 +208,18 @@ const PutzkraeftePage = ({ chatProps }: PutzkraeftePageProps) => {
                 <div>
                   <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
                 </div>
-                <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
               </div>
-              <Button 
-                onClick={handleCancelForm}
-                variant="outline"
-                className="hover-scale"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Zurück zur Liste
-              </Button>
+              <div className="flex items-center space-x-2 md:space-x-3">
+                <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
+                <Button 
+                  onClick={handleCancelForm}
+                  variant="outline"
+                  className="hover-scale"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Zurück zur Liste
+                </Button>
+              </div>
             </div>
           </div>
         </header>
@@ -304,9 +306,11 @@ const PutzkraeftePage = ({ chatProps }: PutzkraeftePageProps) => {
               <div>
                 <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
               </div>
-              <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
             </div>
-            <PWAInstallButton />
+            <div className="flex items-center space-x-2 md:space-x-3">
+              <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
+              <PWAInstallButton />
+            </div>
           </div>
         </div>
       </header>
