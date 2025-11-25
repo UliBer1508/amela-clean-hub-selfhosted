@@ -148,6 +148,32 @@ const CleaningPortal = () => {
           refetchBookings();
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'service_tasks',
+          filter: `provider_id=eq.9de6e071-7e89-4d66-9433-a5f01acaa493` // Amela's ID
+        },
+        (payload) => {
+          console.log('🔄 Reinigungsauftrag aktualisiert:', payload);
+          
+          // Animation aktivieren (aber keinen Zähler erhöhen, da kein neuer Auftrag)
+          setHasUnreadNotifications(true);
+          
+          // Toast-Benachrichtigung anzeigen
+          notify({
+            title: "🔄 Auftrag aktualisiert",
+            description: "Ein Reinigungsauftrag wurde geändert.",
+            eventType: "task_change",
+            duration: 4000,
+          });
+          
+          // Daten neu laden
+          refetchBookings();
+        }
+      )
       .subscribe();
 
     return () => {
