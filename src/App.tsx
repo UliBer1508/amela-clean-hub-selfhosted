@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,17 +17,18 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   usePWAAnalytics();
+  const [isChatOpen, setIsChatOpen] = useState(false);
   
   return (
     <>
       <Toaster />
       <Sonner />
       <PWAUpdateNotification />
-      <PortalChat />
+      <PortalChat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/putzkraefte" element={<PutzkraeftePage />} />
-        <Route path="/calendar" element={<Calendar />} />
+        <Route path="/" element={<Index chatProps={{ isChatOpen, setIsChatOpen }} />} />
+        <Route path="/putzkraefte" element={<PutzkraeftePage chatProps={{ isChatOpen, setIsChatOpen }} />} />
+        <Route path="/calendar" element={<Calendar chatProps={{ isChatOpen, setIsChatOpen }} />} />
         <Route path="/offline" element={<Offline />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />

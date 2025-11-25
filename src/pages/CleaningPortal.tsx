@@ -19,6 +19,8 @@ import BookingCardSettings, { useBookingCardConfig } from "@/components/BookingC
 import ConfigurableBookingCard from "@/components/ConfigurableBookingCard";
 import StandaloneCleaningCard from "@/components/StandaloneCleaningCard";
 import AddStandaloneCleaningDialog from "@/components/AddStandaloneCleaningDialog";
+import { ChatButton } from '@/components/PortalChat';
+import { usePortalMessages } from '@/hooks/usePortalMessages';
 import {
   Home,
   Search,
@@ -64,8 +66,16 @@ const TIME_FILTERS = {
   '3months': '📆 n. 3 Monate',
 };
 
-const CleaningPortal = () => {
+interface CleaningPortalProps {
+  chatProps: {
+    isChatOpen: boolean;
+    setIsChatOpen: (open: boolean) => void;
+  };
+}
+
+const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   const { notify, preferences } = useNotify();
+  const { unreadCount } = usePortalMessages();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('scheduled');
   const [staffFilter, setStaffFilter] = useState<string>('all'); // "all" = alle anzeigen
@@ -456,6 +466,7 @@ const CleaningPortal = () => {
               <div>
                 <h1 className="text-lg md:text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
               </div>
+              <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
             </div>
             <div className="flex items-center space-x-3">
               <div className={cardConfig.showMobileSettingsButton ? "block" : "hidden sm:block"}>

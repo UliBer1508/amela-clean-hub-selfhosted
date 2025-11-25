@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, X } from 'lucide-react';
+import { Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
@@ -7,9 +7,36 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { usePortalMessages } from '@/hooks/usePortalMessages';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
+import chatIcon from '@/assets/chat-icon.png';
 
-const PortalChat = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface ChatButtonProps {
+  onClick: () => void;
+  unreadCount: number;
+}
+
+export const ChatButton = ({ onClick, unreadCount }: ChatButtonProps) => (
+  <button
+    onClick={onClick}
+    className="relative w-10 h-10 md:w-12 md:h-12 flex-shrink-0 transition-transform hover:scale-105"
+  >
+    <img src={chatIcon} alt="Chat" className="w-full h-full object-contain" />
+    {unreadCount > 0 && (
+      <Badge 
+        variant="destructive" 
+        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+      >
+        {unreadCount}
+      </Badge>
+    )}
+  </button>
+);
+
+interface PortalChatProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const PortalChat = ({ isOpen, onClose }: PortalChatProps) => {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const { messages, isLoading, unreadCount, sendMessage, markAsRead } = usePortalMessages();
@@ -43,43 +70,25 @@ const PortalChat = () => {
     }
   };
 
-  return (
-    <>
-      {/* Floating Chat Button */}
-      <Button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50"
-        size="icon"
-      >
-        <MessageCircle className="h-6 w-6" />
-        {unreadCount > 0 && (
-          <Badge 
-            variant="destructive" 
-            className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-          >
-            {unreadCount}
-          </Badge>
-        )}
-      </Button>
+  if (!isOpen) return null;
 
-      {/* Chat Window */}
-      {isOpen && (
-        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-background border rounded-lg shadow-xl z-[100] flex flex-col max-w-[calc(100vw-3rem)] md:w-96">
+  return (
+    <div className="fixed top-20 right-4 md:right-6 w-96 h-[500px] bg-background border rounded-lg shadow-xl z-[100] flex flex-col max-w-[calc(100vw-2rem)] md:w-96">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b bg-primary text-primary-foreground rounded-t-lg">
-            <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5" />
-              <span className="font-semibold">Nachrichten</span>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => setIsOpen(false)}
-              className="text-primary-foreground hover:bg-primary/80"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+        <div className="flex items-center justify-between p-4 border-b bg-primary text-primary-foreground rounded-t-lg">
+          <div className="flex items-center gap-2">
+            <img src={chatIcon} alt="Chat" className="h-5 w-5" />
+            <span className="font-semibold">Nachrichten</span>
           </div>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose}
+            className="text-primary-foreground hover:bg-primary/80"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
 
           {/* Messages Area */}
           <ScrollArea className="flex-1 p-4" ref={scrollRef}>
@@ -143,8 +152,6 @@ const PortalChat = () => {
             </p>
           </div>
         </div>
-      )}
-    </>
   );
 };
 
