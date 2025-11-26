@@ -521,7 +521,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           <div className="sm:hidden flex justify-around items-center gap-1 py-2">
             <Link to="/">
               <Button variant="default" size="sm" className="relative flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale">
-                <Home className="w-6 h-6 shrink-0" />
+                <span className="text-xl">🏠</span>
                 {totalCleaningTasks > 0 && (
                   <span className="absolute -top-1 -right-1 bg-secondary text-secondary-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
                     {totalCleaningTasks}
@@ -531,12 +531,12 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
             </Link>
             <Link to="/calendar">
               <Button variant="ghost" size="sm" className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale">
-                <Calendar className="w-6 h-6 shrink-0" />
+                <span className="text-xl">📅</span>
               </Button>
             </Link>
             <Link to="/putzkraefte">
               <Button variant="ghost" size="sm" className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale">
-                <Users className="w-6 h-6 shrink-0" />
+                <span className="text-xl">👥</span>
               </Button>
             </Link>
             <Button
@@ -545,7 +545,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
               className={`relative flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
               onClick={handleNotificationClick}
             >
-              <Bell className={`w-6 h-6 shrink-0 ${hasUnreadNotifications ? 'text-orange-500' : ''}`} />
+              <span className={`text-xl ${hasUnreadNotifications ? 'brightness-75' : ''}`}>🔔</span>
               {newTaskCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center animate-pulse">
                   {newTaskCount}
