@@ -256,7 +256,7 @@ const PutzkraeftePage = ({ chatProps }: PutzkraeftePageProps) => {
             <div className="sm:hidden flex justify-around items-center gap-1 py-2">
               <Link to="/">
                 <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center relative hover-scale">
-                  <Home className="w-6 h-6" />
+                  <span className="text-xl">🏠</span>
                   <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] text-[10px] px-1 bg-primary text-primary-foreground">
                     {totalCleaningTasks}
                   </Badge>
@@ -264,11 +264,11 @@ const PutzkraeftePage = ({ chatProps }: PutzkraeftePageProps) => {
               </Link>
               <Link to="/calendar">
                 <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale">
-                  <CalendarIcon className="w-6 h-6" />
+                  <span className="text-xl">📅</span>
                 </Button>
               </Link>
               <Button variant="default" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center">
-                <Users className="w-6 h-6" />
+                <span className="text-xl">👥</span>
               </Button>
               <Button 
                 variant="ghost" 
@@ -276,7 +276,7 @@ const PutzkraeftePage = ({ chatProps }: PutzkraeftePageProps) => {
                 className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale"
                 onClick={() => setShowNotificationSettings(!showNotificationSettings)}
               >
-                <Bell className="w-6 h-6" />
+                <span className="text-xl">🔔</span>
               </Button>
             </div>
           </div>
@@ -347,7 +347,7 @@ const PutzkraeftePage = ({ chatProps }: PutzkraeftePageProps) => {
             <div className="sm:hidden flex justify-around items-center gap-1 py-2">
               <Link to="/">
                 <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center relative hover-scale">
-                  <Home className="w-6 h-6" />
+                  <span className="text-xl">🏠</span>
                   <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] text-[10px] px-1 bg-primary text-primary-foreground">
                     {totalCleaningTasks}
                   </Badge>
@@ -355,11 +355,11 @@ const PutzkraeftePage = ({ chatProps }: PutzkraeftePageProps) => {
               </Link>
               <Link to="/calendar">
                 <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale">
-                  <CalendarIcon className="w-6 h-6" />
+                  <span className="text-xl">📅</span>
                 </Button>
               </Link>
               <Button variant="default" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center">
-                <Users className="w-6 h-6" />
+                <span className="text-xl">👥</span>
               </Button>
               <Button 
                 variant="ghost" 
@@ -367,7 +367,7 @@ const PutzkraeftePage = ({ chatProps }: PutzkraeftePageProps) => {
                 className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale"
                 onClick={() => setShowNotificationSettings(!showNotificationSettings)}
               >
-                <Bell className="w-6 h-6" />
+                <span className="text-xl">🔔</span>
               </Button>
             </div>
         </div>

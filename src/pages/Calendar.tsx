@@ -252,18 +252,18 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           <div className="sm:hidden flex justify-around items-center gap-1 py-2">
             <Link to="/">
               <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center relative hover-scale">
-                <Home className="w-6 h-6" />
+                <span className="text-xl">🏠</span>
                 <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] text-[10px] px-1 bg-primary text-primary-foreground">
                   {totalCleaningTasks}
                 </Badge>
               </Button>
             </Link>
             <Button variant="default" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center">
-              <CalendarIcon className="w-6 h-6" />
+              <span className="text-xl">📅</span>
             </Button>
             <Link to="/putzkraefte">
               <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale">
-                <Users className="w-6 h-6" />
+                <span className="text-xl">👥</span>
               </Button>
             </Link>
             <Button 
@@ -272,7 +272,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
               className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale"
               onClick={() => setShowNotificationSettings(!showNotificationSettings)}
             >
-              <Bell className="w-6 h-6" />
+              <span className="text-xl">🔔</span>
             </Button>
           </div>
         </div>
