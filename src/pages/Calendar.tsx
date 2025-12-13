@@ -41,6 +41,16 @@ const getHouseColor = (houseId: string) => {
   return HOUSE_COLORS[hash % HOUSE_COLORS.length];
 };
 
+// Haus-Kürzel generieren (z.B. "Venedigersiedlung Chalet" → "VC")
+const getHouseAbbreviation = (houseName: string): string => {
+  if (!houseName) return '';
+  const words = houseName.split(' ').filter(w => w.length > 0);
+  if (words.length >= 2) {
+    return words.map(w => w.charAt(0).toUpperCase()).join('');
+  }
+  return houseName.substring(0, 3).toUpperCase();
+};
+
 interface CalendarProps {
   chatProps: {
     isChatOpen: boolean;
@@ -698,30 +708,28 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                           <div className="space-y-1">
                             {dayEvents.slice(0, viewType === 'week' ? 4 : 2).map((event, eventIndex) => {
                               const houseColor = getHouseColor(event.house_id);
+                              const abbr = getHouseAbbreviation(event.house);
                               return (
                                 <div
                                   key={event.id}
                                   className={cn(
-                                    "text-xs px-1 py-0.5 rounded truncate flex items-center gap-1",
+                                    "text-xs px-2 py-1 rounded truncate",
                                     houseColor.bg, houseColor.text
                                   )}
                                   title={`${event.title} - ${event.house}`}
                                 >
-                                  <span className="shrink-0">
-                                    {event.type === 'checkin' && '✓'}
-                                    {event.type === 'checkout' && '✗'}
-                                    {event.type === 'cleaning' && '🧽'}
-                                    {event.type === 'laundry-pickup' && '🧺↑'}
-                                    {event.type === 'laundry-delivery' && '🧺↓'}
-                                    {event.type === 'occupied' && ''}
-                                  </span>
-                                  <span className="truncate">{event.house.split(' ')[0]}</span>
+                                  {event.type === 'checkin' && `Check-in • ${abbr}`}
+                                  {event.type === 'checkout' && `Check-out • ${abbr}`}
+                                  {event.type === 'cleaning' && `Reinigung • ${abbr}`}
+                                  {event.type === 'laundry-pickup' && `Wäsche • ${abbr}`}
+                                  {event.type === 'laundry-delivery' && `Wäsche • ${abbr}`}
+                                  {event.type === 'occupied' && event.house}
                                 </div>
                               );
                             })}
                             {dayEvents.length > (viewType === 'week' ? 4 : 2) && (
                               <div className="text-xs text-muted-foreground">
-                                +{dayEvents.length - (viewType === 'week' ? 4 : 2)} mehr
+                                +{dayEvents.length - (viewType === 'week' ? 4 : 2)} weitere
                               </div>
                             )}
                           </div>
@@ -784,27 +792,25 @@ const Calendar = ({ chatProps }: CalendarProps) => {
               {/* Legend */}
               <Card>
                 <CardContent className="p-4">
-                  <h4 className="text-xs font-medium text-muted-foreground mb-2">Event-Typen</h4>
+                  <h3 className="font-semibold mb-3">Legende</h3>
+                  
+                  {/* Event-Typen */}
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm">✓</span>
+                      <div className="w-3 h-3 rounded-full bg-green-500 shrink-0" />
                       <span className="text-sm">Check-in</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm">✗</span>
+                      <div className="w-3 h-3 rounded-full bg-red-500 shrink-0" />
                       <span className="text-sm">Check-out</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm">🧽</span>
+                      <div className="w-3 h-3 rounded-full bg-blue-500 shrink-0" />
                       <span className="text-sm">Reinigung</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm">🧺↑</span>
-                      <span className="text-sm">Wäsche Abholung</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm">🧺↓</span>
-                      <span className="text-sm">Wäsche Lieferung</span>
+                      <div className="w-3 h-3 rounded-full bg-violet-500 shrink-0" />
+                      <span className="text-sm">Wäsche</span>
                     </div>
                   </div>
 
