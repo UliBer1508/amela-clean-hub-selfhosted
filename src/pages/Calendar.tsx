@@ -87,6 +87,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
       type: 'checkin' | 'checkout' | 'cleaning' | 'occupied';
       title: string;
       house: string;
+      house_id: string;
       status?: string;
       guestName?: string;
       bookingId?: string;
@@ -103,6 +104,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
         type: 'checkin',
         title: `Check-in: ${booking.guest_name}`,
         house: booking.houses?.name || 'Unbekannt',
+        house_id: booking.house_id,
         guestName: booking.guest_name,
         bookingId: booking.id
       });
@@ -114,6 +116,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
         type: 'checkout',
         title: `Check-out: ${booking.guest_name}`,
         house: booking.houses?.name || 'Unbekannt',
+        house_id: booking.house_id,
         guestName: booking.guest_name,
         bookingId: booking.id
       });
@@ -129,6 +132,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           type: 'occupied',
           title: `Belegt: ${booking.guest_name}`,
           house: booking.houses?.name || 'Unbekannt',
+          house_id: booking.house_id,
           guestName: booking.guest_name,
           bookingId: booking.id
         });
@@ -144,6 +148,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
             type: 'cleaning',
             title: `Reinigung: ${booking.houses?.name}`,
             house: booking.houses?.name || 'Unbekannt',
+            house_id: booking.house_id,
             status: task.status,
             guestName: booking.guest_name,
             bookingId: booking.id
@@ -645,18 +650,27 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                           
                           {/* Events */}
                           <div className="space-y-1">
-                            {dayEvents.slice(0, viewType === 'week' ? 4 : 2).map((event, eventIndex) => (
-                              <div
-                                key={event.id}
-                                className={`text-xs px-1 py-0.5 rounded text-white ${getEventColor(event.type)} truncate`}
-                                title={event.title}
-                              >
-                                {event.type === 'checkin' && '✓ Check-in'}
-                                {event.type === 'checkout' && '✗ Check-out'}
-                                {event.type === 'cleaning' && '🧽 Reinigung'}
-                                {event.type === 'occupied' && '🏠 Belegt'}
-                              </div>
-                            ))}
+                            {dayEvents.slice(0, viewType === 'week' ? 4 : 2).map((event, eventIndex) => {
+                              const houseColor = getHouseColor(event.house_id);
+                              return (
+                                <div
+                                  key={event.id}
+                                  className={cn(
+                                    "text-xs px-1 py-0.5 rounded truncate flex items-center gap-1",
+                                    houseColor.bg, houseColor.text
+                                  )}
+                                  title={`${event.title} - ${event.house}`}
+                                >
+                                  <span className="shrink-0">
+                                    {event.type === 'checkin' && '✓'}
+                                    {event.type === 'checkout' && '✗'}
+                                    {event.type === 'cleaning' && '🧽'}
+                                    {event.type === 'occupied' && ''}
+                                  </span>
+                                  <span className="truncate">{event.house.split(' ')[0]}</span>
+                                </div>
+                              );
+                            })}
                             {dayEvents.length > (viewType === 'week' ? 4 : 2) && (
                               <div className="text-xs text-muted-foreground">
                                 +{dayEvents.length - (viewType === 'week' ? 4 : 2)} mehr
@@ -688,17 +702,23 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                   {selectedDate ? (
                     selectedDateEvents.length > 0 ? (
                       <div className="space-y-2">
-                        {selectedDateEvents.map(event => (
-                          <div key={event.id} className="p-2 rounded border">
-                            <div className="font-medium text-sm">{event.title}</div>
-                            <div className="text-xs text-muted-foreground">{event.house}</div>
-                            {event.status && (
-                              <Badge variant="secondary" className="text-xs mt-1">
-                                {event.status}
-                              </Badge>
-                            )}
-                          </div>
-                        ))}
+                        {selectedDateEvents.map(event => {
+                          const houseColor = getHouseColor(event.house_id);
+                          return (
+                            <div key={event.id} className="p-2 rounded border flex items-start gap-2">
+                              <div className={cn("w-3 h-3 rounded-full mt-1 shrink-0", houseColor.bg)} />
+                              <div className="min-w-0 flex-1">
+                                <div className="font-medium text-sm">{event.title}</div>
+                                <div className="text-xs text-muted-foreground">{event.house}</div>
+                                {event.status && (
+                                  <Badge variant="secondary" className="text-xs mt-1">
+                                    {event.status}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     ) : (
                       <p className="text-sm text-muted-foreground">
@@ -716,28 +736,33 @@ const Calendar = ({ chatProps }: CalendarProps) => {
               {/* Legend */}
               <Card>
                 <CardContent className="p-4">
-                  <h3 className="font-semibold mb-3">Legende</h3>
-                  <div className="space-y-2">
+                  <h4 className="text-xs font-medium text-muted-foreground mb-2">Event-Typen</h4>
+                  <div className="space-y-2 mb-4">
                     <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded bg-green-500"></div>
+                      <span className="text-sm">✓</span>
                       <span className="text-sm">Check-in</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded bg-red-500"></div>
+                      <span className="text-sm">✗</span>
                       <span className="text-sm">Check-out</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded bg-orange-500"></div>
-                      <span className="text-sm">Belegt</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded bg-blue-500"></div>
+                      <span className="text-sm">🧽</span>
                       <span className="text-sm">Reinigung</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded bg-purple-500"></div>
-                      <span className="text-sm">Wäsche</span>
-                    </div>
+                  </div>
+
+                  <h4 className="text-xs font-medium text-muted-foreground mb-2">Unterkünfte</h4>
+                  <div className="space-y-2">
+                    {houses.map(house => {
+                      const houseColor = getHouseColor(house.id);
+                      return (
+                        <div key={house.id} className="flex items-center space-x-2">
+                          <div className={cn("w-3 h-3 rounded-full shrink-0", houseColor.bg)} />
+                          <span className="text-sm truncate">{house.name}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>
