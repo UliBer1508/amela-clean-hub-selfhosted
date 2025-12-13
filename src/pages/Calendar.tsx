@@ -51,7 +51,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const { unreadCount } = usePortalMessages();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [viewType, setViewType] = useState<ViewType>('month');
+  const [viewType, setViewType] = useState<ViewType>('gantt');
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
