@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Link } from 'react-router-dom';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
@@ -12,12 +13,32 @@ import NotificationSettings from '@/components/NotificationSettings';
 import BookingCardSettings, { useBookingCardConfig } from '@/components/BookingCardSettings';
 import PullToRefresh from '@/components/PullToRefresh';
 import { formatGermanDate } from '@/utils/date';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, addWeeks, subWeeks } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, addWeeks, subWeeks, differenceInDays } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { ChatButton } from '@/components/PortalChat';
 import { usePortalMessages } from '@/hooks/usePortalMessages';
+import { cn } from '@/lib/utils';
 
-type ViewType = 'month' | 'week';
+type ViewType = 'month' | 'week' | 'gantt';
+
+// Haus-Farben für visuelle Unterscheidung im Gantt-Chart
+const HOUSE_COLORS = [
+  { bg: 'bg-blue-500', text: 'text-white', hex: '#3b82f6' },
+  { bg: 'bg-purple-500', text: 'text-white', hex: '#a855f7' },
+  { bg: 'bg-emerald-500', text: 'text-white', hex: '#10b981' },
+  { bg: 'bg-amber-500', text: 'text-white', hex: '#f59e0b' },
+  { bg: 'bg-rose-500', text: 'text-white', hex: '#f43f5e' },
+  { bg: 'bg-cyan-500', text: 'text-white', hex: '#06b6d4' },
+  { bg: 'bg-indigo-500', text: 'text-white', hex: '#6366f1' },
+  { bg: 'bg-pink-500', text: 'text-white', hex: '#ec4899' },
+];
+
+// Konsistente Farbzuweisung pro Haus (via Hash)
+const getHouseColor = (houseId: string) => {
+  if (!houseId) return HOUSE_COLORS[0];
+  const hash = houseId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return HOUSE_COLORS[hash % HOUSE_COLORS.length];
+};
 
 interface CalendarProps {
   chatProps: {
@@ -153,6 +174,67 @@ const Calendar = ({ chatProps }: CalendarProps) => {
 
   const getDayEvents = (day: Date) => {
     return monthEvents.filter(event => isSameDay(event.date, day));
+  };
+
+  // Gantt-Chart: Tage für aktuellen Monat
+  const ganttDays = useMemo(() => {
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    return eachDayOfInterval({ start: monthStart, end: monthEnd });
+  }, [currentDate]);
+
+  // Gantt-Chart: Buchungen nach Haus gruppieren
+  const bookingsByHouse = useMemo(() => {
+    const grouped = new Map<string, Array<{
+      id: string;
+      guest_name: string;
+      check_in: Date;
+      check_out: Date;
+      house_id: string;
+      house_name: string;
+    }>>();
+    
+    allBookings.forEach(booking => {
+      const houseId = booking.house_id;
+      const houseName = booking.houses?.name || 'Unbekannt';
+      
+      if (!grouped.has(houseId)) {
+        grouped.set(houseId, []);
+      }
+      
+      grouped.get(houseId)!.push({
+        id: booking.id,
+        guest_name: booking.guest_name,
+        check_in: new Date(booking.check_in),
+        check_out: new Date(booking.check_out),
+        house_id: houseId,
+        house_name: houseName,
+      });
+    });
+    
+    return grouped;
+  }, [allBookings]);
+
+  // Gantt-Chart: Balken-Position berechnen (Mitte Check-in bis Mitte Check-out)
+  const getGanttBarStyle = (checkIn: Date, checkOut: Date) => {
+    const monthStart = startOfMonth(currentDate);
+    const totalDays = ganttDays.length;
+    const dayWidth = 100 / totalDays;
+    
+    // Check-in: Balken beginnt ab MITTE des Check-in-Tages
+    const startDay = Math.max(0, differenceInDays(checkIn, monthStart));
+    const left = (startDay * dayWidth) + (dayWidth / 2);
+    
+    // Check-out: Balken endet in der MITTE des Check-out-Tages
+    const endDay = Math.min(totalDays, differenceInDays(checkOut, monthStart));
+    const right = (endDay * dayWidth) + (dayWidth / 2);
+    
+    const width = Math.max(dayWidth, right - left);
+    
+    return { 
+      left: `${Math.max(0, left)}%`, 
+      width: `${Math.min(width, 100 - Math.max(0, left))}%` 
+    };
   };
 
   const goToToday = () => {
@@ -338,6 +420,13 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                     >
                       Woche
                     </Button>
+                    <Button
+                      variant={viewType === 'gantt' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setViewType('gantt')}
+                    >
+                      Gantt
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -379,17 +468,24 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                   >
                     Woche
                   </Button>
+                  <Button
+                    variant={viewType === 'gantt' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewType('gantt')}
+                  >
+                    Gantt
+                  </Button>
                 </div>
               </div>
             </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Calendar */}
-          <div className="lg:col-span-3">
+        <div className={cn("grid gap-6", viewType === 'gantt' ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-4")}>
+          {/* Calendar / Gantt */}
+          <div className={viewType === 'gantt' ? '' : 'lg:col-span-3'}>
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 md:p-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">
+                  <h2 className="text-lg md:text-xl font-semibold">
                     {viewType === 'week' 
                       ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
                       : format(currentDate, 'MMMM yyyy', { locale: de })
@@ -405,138 +501,248 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                   </div>
                 </div>
 
-                {/* Calendar Grid */}
-                <div className={`grid gap-1 ${viewType === 'week' ? 'grid-cols-7' : 'grid-cols-7'}`}>
-                  {/* Week days header */}
-                  {weekDays.map(day => (
-                    <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
-                      {day}
-                    </div>
-                  ))}
-
-                  {/* Calendar days */}
-                  {calendarDays.map((day, index) => {
-                    const dayEvents = getDayEvents(day);
-                    const isCurrentMonth = viewType === 'week' ? true : isSameMonth(day, currentDate);
-                    const isTodayDate = isToday(day);
-                    const isSelected = selectedDate && isSameDay(day, selectedDate);
-
-                    return (
-                      <div
-                        key={index}
-                        className={`
-                          ${viewType === 'week' ? 'min-h-[120px]' : 'min-h-[100px]'} p-2 border border-border cursor-pointer transition-colors
-                          ${!isCurrentMonth ? 'bg-muted/50 text-muted-foreground' : ''}
-                          ${isTodayDate ? 'bg-primary/10' : ''}
-                          ${isSelected ? 'bg-primary text-primary-foreground' : ''}
-                          hover:bg-accent
-                        `}
-                        onClick={() => setSelectedDate(day)}
-                      >
-                        <div className="text-sm font-medium mb-1">
-                          {viewType === 'week' 
-                            ? format(day, 'd. MMM', { locale: de })
-                            : format(day, 'd')
-                          }
+                {/* Gantt Chart View */}
+                {viewType === 'gantt' ? (
+                  <ScrollArea className="w-full">
+                    <div className="min-w-[800px]">
+                      {/* Header mit Tagen */}
+                      <div className="flex border-b bg-muted/30">
+                        <div className="w-32 md:w-40 shrink-0 p-2 border-r font-medium text-sm">
+                          Unterkunft
                         </div>
-                        
-                        {/* Events */}
-                        <div className="space-y-1">
-                          {dayEvents.slice(0, viewType === 'week' ? 4 : 2).map((event, eventIndex) => (
+                        <div 
+                          className="flex-1 grid" 
+                          style={{ gridTemplateColumns: `repeat(${ganttDays.length}, minmax(28px, 1fr))` }}
+                        >
+                          {ganttDays.map((day) => (
                             <div
-                              key={event.id}
-                              className={`text-xs px-1 py-0.5 rounded text-white ${getEventColor(event.type)} truncate`}
-                              title={event.title}
+                              key={day.toISOString()}
+                              className={cn(
+                                "p-1 text-center text-xs border-r last:border-r-0",
+                                isToday(day) && "bg-primary/20 font-bold",
+                                (day.getDay() === 0 || day.getDay() === 6) && "bg-muted/30"
+                              )}
                             >
-                              {event.type === 'checkin' && '✓ Check-in'}
-                              {event.type === 'checkout' && '✗ Check-out'}
-                              {event.type === 'cleaning' && '🧽 Reinigung'}
-                              {event.type === 'occupied' && '🏠 Belegt'}
+                              <div>{format(day, 'd')}</div>
+                              <div className="text-muted-foreground text-[10px]">
+                                {format(day, 'EEE', { locale: de })}
+                              </div>
                             </div>
                           ))}
-                          {dayEvents.length > (viewType === 'week' ? 4 : 2) && (
-                            <div className="text-xs text-muted-foreground">
-                              +{dayEvents.length - (viewType === 'week' ? 4 : 2)} mehr
-                            </div>
-                          )}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Selected Date Events */}
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="font-semibold mb-3">
-                  {selectedDate 
-                    ? `Termine für ${format(selectedDate, 'd. MMMM', { locale: de })}`
-                    : 'Datum auswählen'
-                  }
-                </h3>
-                
-                {selectedDate ? (
-                  selectedDateEvents.length > 0 ? (
-                    <div className="space-y-2">
-                      {selectedDateEvents.map(event => (
-                        <div key={event.id} className="p-2 rounded border">
-                          <div className="font-medium text-sm">{event.title}</div>
-                          <div className="text-xs text-muted-foreground">{event.house}</div>
-                          {event.status && (
-                            <Badge variant="secondary" className="text-xs mt-1">
-                              {event.status}
-                            </Badge>
-                          )}
+                      {/* Zeilen pro Haus */}
+                      {houses.map((house) => {
+                        const houseColor = getHouseColor(house.id);
+                        const houseBookings = bookingsByHouse.get(house.id) || [];
+                        
+                        return (
+                          <div key={house.id} className="flex border-b min-h-[50px] md:min-h-[60px]">
+                            {/* Linke Spalte: Haus-Name */}
+                            <div className="w-32 md:w-40 shrink-0 p-2 border-r bg-muted/20 flex items-center">
+                              <div className="flex items-center gap-2">
+                                <div className={cn("w-3 h-3 rounded-full shrink-0", houseColor.bg)} />
+                                <span className="text-xs md:text-sm font-medium truncate">{house.name}</span>
+                              </div>
+                            </div>
+
+                            {/* Rechte Spalte: Timeline mit Balken */}
+                            <div className="flex-1 relative">
+                              {/* Hintergrund-Grid */}
+                              <div 
+                                className="absolute inset-0 grid" 
+                                style={{ gridTemplateColumns: `repeat(${ganttDays.length}, minmax(28px, 1fr))` }}
+                              >
+                                {ganttDays.map((day) => (
+                                  <div
+                                    key={day.toISOString()}
+                                    className={cn(
+                                      "border-r last:border-r-0 h-full",
+                                      isToday(day) && "bg-primary/10",
+                                      (day.getDay() === 0 || day.getDay() === 6) && "bg-muted/20"
+                                    )}
+                                  />
+                                ))}
+                              </div>
+
+                              {/* Buchungsbalken */}
+                              <div className="relative h-full py-2 px-1">
+                                {houseBookings.map((booking) => {
+                                  const style = getGanttBarStyle(booking.check_in, booking.check_out);
+                                  return (
+                                    <div
+                                      key={booking.id}
+                                      className={cn(
+                                        "absolute top-1/2 -translate-y-1/2 h-7 md:h-8 rounded-md",
+                                        "flex items-center px-1 md:px-2 cursor-pointer",
+                                        "border border-white/40 shadow-md hover:shadow-lg transition-shadow",
+                                        houseColor.bg, houseColor.text
+                                      )}
+                                      style={{ 
+                                        left: style.left, 
+                                        width: `calc(${style.width} - 2px)`,
+                                        minWidth: '24px' 
+                                      }}
+                                      title={`${booking.guest_name}\n${format(booking.check_in, 'd. MMM', { locale: de })} - ${format(booking.check_out, 'd. MMM', { locale: de })}`}
+                                    >
+                                      <span className="text-[10px] md:text-xs font-medium truncate">
+                                        {booking.guest_name}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      {/* Leere Nachricht wenn keine Häuser */}
+                      {houses.length === 0 && (
+                        <div className="p-8 text-center text-muted-foreground">
+                          Keine Unterkünfte gefunden
                         </div>
-                      ))}
+                      )}
                     </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      Keine Termine für diesen Tag
-                    </p>
-                  )
+                    <ScrollBar orientation="horizontal" />
+                  </ScrollArea>
                 ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Wählen Sie ein Datum aus dem Kalender
-                  </p>
+                  /* Month/Week Calendar Grid */
+                  <div className={`grid gap-1 ${viewType === 'week' ? 'grid-cols-7' : 'grid-cols-7'}`}>
+                    {/* Week days header */}
+                    {weekDays.map(day => (
+                      <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
+                        {day}
+                      </div>
+                    ))}
+
+                    {/* Calendar days */}
+                    {calendarDays.map((day, index) => {
+                      const dayEvents = getDayEvents(day);
+                      const isCurrentMonth = viewType === 'week' ? true : isSameMonth(day, currentDate);
+                      const isTodayDate = isToday(day);
+                      const isSelected = selectedDate && isSameDay(day, selectedDate);
+
+                      return (
+                        <div
+                          key={index}
+                          className={`
+                            ${viewType === 'week' ? 'min-h-[120px]' : 'min-h-[100px]'} p-2 border border-border cursor-pointer transition-colors
+                            ${!isCurrentMonth ? 'bg-muted/50 text-muted-foreground' : ''}
+                            ${isTodayDate ? 'bg-primary/10' : ''}
+                            ${isSelected ? 'bg-primary text-primary-foreground' : ''}
+                            hover:bg-accent
+                          `}
+                          onClick={() => setSelectedDate(day)}
+                        >
+                          <div className="text-sm font-medium mb-1">
+                            {viewType === 'week' 
+                              ? format(day, 'd. MMM', { locale: de })
+                              : format(day, 'd')
+                            }
+                          </div>
+                          
+                          {/* Events */}
+                          <div className="space-y-1">
+                            {dayEvents.slice(0, viewType === 'week' ? 4 : 2).map((event, eventIndex) => (
+                              <div
+                                key={event.id}
+                                className={`text-xs px-1 py-0.5 rounded text-white ${getEventColor(event.type)} truncate`}
+                                title={event.title}
+                              >
+                                {event.type === 'checkin' && '✓ Check-in'}
+                                {event.type === 'checkout' && '✗ Check-out'}
+                                {event.type === 'cleaning' && '🧽 Reinigung'}
+                                {event.type === 'occupied' && '🏠 Belegt'}
+                              </div>
+                            ))}
+                            {dayEvents.length > (viewType === 'week' ? 4 : 2) && (
+                              <div className="text-xs text-muted-foreground">
+                                +{dayEvents.length - (viewType === 'week' ? 4 : 2)} mehr
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </CardContent>
             </Card>
-
-            {/* Legend */}
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="font-semibold mb-3">Legende</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded bg-green-500"></div>
-                    <span className="text-sm">Check-in</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded bg-red-500"></div>
-                    <span className="text-sm">Check-out</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded bg-orange-500"></div>
-                    <span className="text-sm">Belegt</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded bg-blue-500"></div>
-                    <span className="text-sm">Reinigung</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded bg-purple-500"></div>
-                    <span className="text-sm">Wäsche</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
+
+          {/* Sidebar - nur bei month/week Ansicht */}
+          {viewType !== 'gantt' && (
+            <div className="space-y-6">
+              {/* Selected Date Events */}
+              <Card>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold mb-3">
+                    {selectedDate 
+                      ? `Termine für ${format(selectedDate, 'd. MMMM', { locale: de })}`
+                      : 'Datum auswählen'
+                    }
+                  </h3>
+                  
+                  {selectedDate ? (
+                    selectedDateEvents.length > 0 ? (
+                      <div className="space-y-2">
+                        {selectedDateEvents.map(event => (
+                          <div key={event.id} className="p-2 rounded border">
+                            <div className="font-medium text-sm">{event.title}</div>
+                            <div className="text-xs text-muted-foreground">{event.house}</div>
+                            {event.status && (
+                              <Badge variant="secondary" className="text-xs mt-1">
+                                {event.status}
+                              </Badge>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Keine Termine für diesen Tag
+                      </p>
+                    )
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Wählen Sie ein Datum aus dem Kalender
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Legend */}
+              <Card>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold mb-3">Legende</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 rounded bg-green-500"></div>
+                      <span className="text-sm">Check-in</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 rounded bg-red-500"></div>
+                      <span className="text-sm">Check-out</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 rounded bg-orange-500"></div>
+                      <span className="text-sm">Belegt</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 rounded bg-blue-500"></div>
+                      <span className="text-sm">Reinigung</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 rounded bg-purple-500"></div>
+                      <span className="text-sm">Wäsche</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
         </>
         )}
