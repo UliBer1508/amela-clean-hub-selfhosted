@@ -22,6 +22,7 @@ export const useHouses = () => {
         const { data, error: fetchError } = await supabase
           .from('houses')
           .select('id, name, address, rental_type')
+          .eq('rental_type', 'tourist')
           .order('name');
 
         if (fetchError) throw fetchError;
