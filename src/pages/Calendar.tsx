@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Home, Calendar as CalendarIcon, Users, Bell, RefreshCw } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ import { de } from 'date-fns/locale';
 import { ChatButton } from '@/components/PortalChat';
 import { usePortalMessages } from '@/hooks/usePortalMessages';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 type ViewType = 'month' | 'week' | 'gantt';
 
@@ -77,6 +78,23 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     }
   }, [currentDate, viewType]);
 
+  // State für Wäsche-Aufträge
+  const [laundryOrders, setLaundryOrders] = useState<any[]>([]);
+
+  // Wäsche-Daten laden
+  useEffect(() => {
+    const fetchLaundryOrders = async () => {
+      const { data } = await supabase
+        .from('laundry_orders')
+        .select(`
+          id, pickup_date, delivery_date, status,
+          service_tasks!service_task_id ( house_id, houses (id, name) )
+        `);
+      setLaundryOrders(data || []);
+    };
+    fetchLaundryOrders();
+  }, []);
+
   // Filter bookings and tasks for current month
   const monthEvents = useMemo(() => {
     if (!allBookings) return [];
@@ -84,7 +102,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     const events: Array<{
       id: string;
       date: Date;
-      type: 'checkin' | 'checkout' | 'cleaning' | 'occupied';
+      type: 'checkin' | 'checkout' | 'cleaning' | 'occupied' | 'laundry-pickup' | 'laundry-delivery';
       title: string;
       house: string;
       house_id: string;
@@ -157,8 +175,35 @@ const Calendar = ({ chatProps }: CalendarProps) => {
       });
     });
 
+    // Wäsche-Events aus laundry_orders hinzufügen
+    laundryOrders.forEach(order => {
+      const house = order.service_tasks?.houses;
+      if (order.pickup_date && house) {
+        events.push({
+          id: `laundry-pickup-${order.id}`,
+          date: new Date(order.pickup_date),
+          type: 'laundry-pickup',
+          title: `Wäsche Abholung: ${house.name}`,
+          house: house.name,
+          house_id: house.id,
+          status: order.status
+        });
+      }
+      if (order.delivery_date && house) {
+        events.push({
+          id: `laundry-delivery-${order.id}`,
+          date: new Date(order.delivery_date),
+          type: 'laundry-delivery',
+          title: `Wäsche Lieferung: ${house.name}`,
+          house: house.name,
+          house_id: house.id,
+          status: order.status
+        });
+      }
+    });
+
      return events;
-  }, [allBookings]);
+  }, [allBookings, laundryOrders]);
 
   // Get events for selected date
   const selectedDateEvents = useMemo(() => {
@@ -172,7 +217,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
       case 'checkout': return 'bg-red-500';
       case 'occupied': return 'bg-orange-500';
       case 'cleaning': return 'bg-blue-500';
-      case 'laundry': return 'bg-purple-500';
+      case 'laundry-pickup': return 'bg-violet-400';
+      case 'laundry-delivery': return 'bg-violet-600';
       default: return 'bg-gray-500';
     }
   };
@@ -665,6 +711,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                     {event.type === 'checkin' && '✓'}
                                     {event.type === 'checkout' && '✗'}
                                     {event.type === 'cleaning' && '🧽'}
+                                    {event.type === 'laundry-pickup' && '🧺↑'}
+                                    {event.type === 'laundry-delivery' && '🧺↓'}
                                     {event.type === 'occupied' && ''}
                                   </span>
                                   <span className="truncate">{event.house.split(' ')[0]}</span>
@@ -749,6 +797,14 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                     <div className="flex items-center space-x-2">
                       <span className="text-sm">🧽</span>
                       <span className="text-sm">Reinigung</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm">🧺↑</span>
+                      <span className="text-sm">Wäsche Abholung</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm">🧺↓</span>
+                      <span className="text-sm">Wäsche Lieferung</span>
                     </div>
                   </div>
 
