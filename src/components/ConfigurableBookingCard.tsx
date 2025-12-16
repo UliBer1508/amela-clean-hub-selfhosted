@@ -26,6 +26,7 @@ import { cn, getColorFromString } from '@/lib/utils';
 import { format } from 'date-fns';
 
 import type { BookingCardConfig } from './BookingCardSettings';
+import BeforeYouGoChecklist from './BeforeYouGoChecklist';
 
 const STATUS_FILTERS = {
   all: 'Alle Status',
@@ -66,6 +67,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
   const [editingTaskNotes, setEditingTaskNotes] = useState<string | null>(null);
   const [bookingNotesValue, setBookingNotesValue] = useState(booking.notes || '');
   const [taskNotesValue, setTaskNotesValue] = useState<{[key: string]: string}>({});
+  const [showChecklist, setShowChecklist] = useState(false);
 
   const handleEditDateTime = (task: any) => {
     setEditingTask(task);
@@ -477,6 +479,19 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
             </div>
           )}
         </div>
+
+        {/* "Bevor du gehst!" Button */}
+        <div className="p-3 md:p-4 border-t border-border">
+          <Button 
+            variant="outline"
+            onClick={() => setShowChecklist(true)}
+            className="w-full bg-gradient-to-r from-emerald-50 to-green-50 hover:from-emerald-100 hover:to-green-100 border-emerald-200 text-emerald-700 dark:from-emerald-950/30 dark:to-green-950/30 dark:border-emerald-800 dark:text-emerald-300 dark:hover:from-emerald-950/50 dark:hover:to-green-950/50"
+          >
+            ❗ Bevor du gehst!
+          </Button>
+        </div>
+
+        <BeforeYouGoChecklist open={showChecklist} onOpenChange={setShowChecklist} />
       </CardContent>
     </Card>
   );
