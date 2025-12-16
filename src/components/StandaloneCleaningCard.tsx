@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { StandaloneCleaningTask } from '@/types/booking';
 import type { BookingCardConfig } from './BookingCardSettings';
+import BeforeYouGoChecklist from './BeforeYouGoChecklist';
 
 const STATUS_FILTERS = {
   scheduled: '📅 Geplant',
@@ -49,6 +50,7 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
   const [editingNotes, setEditingNotes] = useState(false);
   const [notesValue, setNotesValue] = useState(cleaning.notes || '');
   const [isEditingDateTime, setIsEditingDateTime] = useState(false);
+  const [showChecklist, setShowChecklist] = useState(false);
 
   const handleEditDateTime = () => {
     setSelectedDate(new Date(cleaning.scheduled_date));
@@ -240,6 +242,19 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
             )}
           </div>
         </div>
+
+        {/* "Bevor du gehst!" Button */}
+        <div className="p-3 md:p-4 border-t border-border">
+          <Button 
+            variant="outline"
+            onClick={() => setShowChecklist(true)}
+            className="w-full bg-gradient-to-r from-emerald-50 to-green-50 hover:from-emerald-100 hover:to-green-100 border-emerald-200 text-emerald-700 dark:from-emerald-950/30 dark:to-green-950/30 dark:border-emerald-800 dark:text-emerald-300 dark:hover:from-emerald-950/50 dark:hover:to-green-950/50"
+          >
+            ❗ Bevor du gehst!
+          </Button>
+        </div>
+
+        <BeforeYouGoChecklist open={showChecklist} onOpenChange={setShowChecklist} />
       </CardContent>
     </Card>
   );

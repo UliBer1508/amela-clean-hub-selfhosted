@@ -894,15 +894,23 @@ export type Database = {
           currency: string | null
           external_booking_id: string | null
           external_id: string | null
+          guest_birth_date: string | null
+          guest_city: string | null
           guest_contact_status: string | null
           guest_email: string | null
           guest_name: string
+          guest_notes: string | null
           guest_phone: string | null
+          guest_postal_code: string | null
+          guest_street: string | null
+          guest_travel_document: string | null
           house_id: string
           id: string
           import_platform: string | null
           nationality: string | null
           notes: string | null
+          number_of_adults: number | null
+          number_of_children: number | null
           number_of_guests: number
           payment_status: string | null
           platform: string | null
@@ -922,15 +930,23 @@ export type Database = {
           currency?: string | null
           external_booking_id?: string | null
           external_id?: string | null
+          guest_birth_date?: string | null
+          guest_city?: string | null
           guest_contact_status?: string | null
           guest_email?: string | null
           guest_name: string
+          guest_notes?: string | null
           guest_phone?: string | null
+          guest_postal_code?: string | null
+          guest_street?: string | null
+          guest_travel_document?: string | null
           house_id: string
           id?: string
           import_platform?: string | null
           nationality?: string | null
           notes?: string | null
+          number_of_adults?: number | null
+          number_of_children?: number | null
           number_of_guests: number
           payment_status?: string | null
           platform?: string | null
@@ -950,15 +966,23 @@ export type Database = {
           currency?: string | null
           external_booking_id?: string | null
           external_id?: string | null
+          guest_birth_date?: string | null
+          guest_city?: string | null
           guest_contact_status?: string | null
           guest_email?: string | null
           guest_name?: string
+          guest_notes?: string | null
           guest_phone?: string | null
+          guest_postal_code?: string | null
+          guest_street?: string | null
+          guest_travel_document?: string | null
           house_id?: string
           id?: string
           import_platform?: string | null
           nationality?: string | null
           notes?: string | null
+          number_of_adults?: number | null
+          number_of_children?: number | null
           number_of_guests?: number
           payment_status?: string | null
           platform?: string | null
