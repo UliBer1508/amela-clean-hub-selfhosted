@@ -38,12 +38,12 @@ export const useBookings = () => {
           number_of_guests,
           status,
           house_id,
-          houses (
+          houses!bookings_house_id_fkey (
             name,
             address
           ),
-          guests (*),
-          service_tasks!inner (
+          guests!fk_bookings_guest (*),
+          service_tasks!service_tasks_booking_id_fkey!inner (
             id,
             service_type,
             scheduled_date,
@@ -74,12 +74,12 @@ export const useBookings = () => {
           number_of_guests,
           status,
           house_id,
-          houses (
+          houses!bookings_house_id_fkey (
             name,
             address
           ),
-          guests (*),
-          service_tasks (
+          guests!fk_bookings_guest (*),
+          service_tasks!service_tasks_booking_id_fkey (
             id,
             service_type,
             scheduled_date,
@@ -130,7 +130,7 @@ export const useBookings = () => {
           provider_id,
           notes,
           payment_status,
-          houses (
+          houses!service_tasks_house_id_fkey (
             name,
             address
           ),
