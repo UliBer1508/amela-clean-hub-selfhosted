@@ -39,12 +39,12 @@ export const useBookings = () => {
           number_of_guests,
           status,
           house_id,
-          houses!bookings_house_id_fkey (
+          houses (
             name,
             address
           ),
-          guests!fk_bookings_guest (*),
-          service_tasks!service_tasks_booking_id_fkey!inner (
+          guests (*),
+          service_tasks!inner (
             id,
             service_type,
             scheduled_date,
@@ -55,9 +55,9 @@ export const useBookings = () => {
             completed_at,
             notes,
             payment_status,
-          service_providers!service_tasks_provider_id_fkey (
-            name
-          )
+            service_providers (
+              name
+            )
           )
         `)
         .eq('service_tasks.service_type', 'cleaning')
@@ -75,12 +75,12 @@ export const useBookings = () => {
           number_of_guests,
           status,
           house_id,
-          houses!bookings_house_id_fkey (
+          houses (
             name,
             address
           ),
-          guests!fk_bookings_guest (*),
-          service_tasks!service_tasks_booking_id_fkey (
+          guests (*),
+          service_tasks (
             id,
             service_type,
             scheduled_date,
@@ -91,7 +91,7 @@ export const useBookings = () => {
             completed_at,
             notes,
             payment_status,
-            service_providers!service_tasks_provider_id_fkey (
+            service_providers (
               name
             )
           )
@@ -131,11 +131,11 @@ export const useBookings = () => {
           provider_id,
           notes,
           payment_status,
-          houses!service_tasks_house_id_fkey (
+          houses (
             name,
             address
           ),
-          service_providers!service_tasks_provider_id_fkey (
+          service_providers (
             name
           )
         `)
