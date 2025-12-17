@@ -4,6 +4,7 @@ import { Booking, StatusFilter, TimeFilter, StaffFilter, HouseFilter, ProviderFi
 import { APP_CONFIG } from '@/constants/app';
 import { isWithinTimeRange } from '@/utils/date';
 import { sanitizeSearchTerm } from '@/utils/validation';
+import { getGuestName } from '@/lib/guestHelpers';
 
 export const useBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -307,7 +308,7 @@ export const useBookings = () => {
       if (entry.type === 'booking') {
         const booking = entry.data;
         const matchesSearch = !sanitizedSearch || 
-          booking.guest_name?.toLowerCase().includes(sanitizedSearch) ||
+          getGuestName(booking).toLowerCase().includes(sanitizedSearch) ||
           booking.houses?.name?.toLowerCase().includes(sanitizedSearch) ||
           booking.houses?.address?.toLowerCase().includes(sanitizedSearch);
 
