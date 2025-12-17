@@ -1090,13 +1090,6 @@ export type Database = {
             referencedRelation: "houses"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "fk_bookings_house"
-            columns: ["house_id"]
-            isOneToOne: false
-            referencedRelation: "houses"
-            referencedColumns: ["id"]
-          },
         ]
       }
       boris_card_config: {
@@ -3872,27 +3865,6 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "fk_service_tasks_booking"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_service_tasks_house"
-            columns: ["house_id"]
-            isOneToOne: false
-            referencedRelation: "houses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_service_tasks_provider"
-            columns: ["provider_id"]
-            isOneToOne: false
-            referencedRelation: "service_providers"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "service_tasks_booking_id_fkey"
             columns: ["booking_id"]
