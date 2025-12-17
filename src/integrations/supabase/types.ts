@@ -700,6 +700,65 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_action_tracking: {
+        Row: {
+          action_applied: boolean
+          action_id: string
+          applied_at: string | null
+          booking_id: string
+          created_at: string
+          id: string
+          notes: string | null
+        }
+        Insert: {
+          action_applied?: boolean
+          action_id: string
+          applied_at?: string | null
+          booking_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+        }
+        Update: {
+          action_applied?: boolean
+          action_id?: string
+          applied_at?: string | null
+          booking_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_action_tracking_action_id_fkey"
+            columns: ["action_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_actions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_action_tracking_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_booking_action_action"
+            columns: ["action_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_actions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_booking_action_booking"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booking_activities: {
         Row: {
           activity_id: string
@@ -841,6 +900,13 @@ export type Database = {
             referencedRelation: "houses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_booking_inquiries_house"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
         ]
       }
       booking_linen_config: {
@@ -879,6 +945,13 @@ export type Database = {
             referencedRelation: "houses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_booking_linen_config_house"
+            columns: ["house_id"]
+            isOneToOne: true
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
         ]
       }
       bookings: {
@@ -894,10 +967,12 @@ export type Database = {
           currency: string | null
           external_booking_id: string | null
           external_id: string | null
+          external_rating: number | null
           guest_birth_date: string | null
           guest_city: string | null
           guest_contact_status: string | null
           guest_email: string | null
+          guest_id: string | null
           guest_name: string
           guest_notes: string | null
           guest_phone: string | null
@@ -908,12 +983,14 @@ export type Database = {
           id: string
           import_platform: string | null
           nationality: string | null
+          normalized_rating: number | null
           notes: string | null
           number_of_adults: number | null
           number_of_children: number | null
           number_of_guests: number
           payment_status: string | null
           platform: string | null
+          rating_not_expected: boolean | null
           source: string | null
           status: Database["public"]["Enums"]["booking_status"] | null
           updated_at: string | null
@@ -930,10 +1007,12 @@ export type Database = {
           currency?: string | null
           external_booking_id?: string | null
           external_id?: string | null
+          external_rating?: number | null
           guest_birth_date?: string | null
           guest_city?: string | null
           guest_contact_status?: string | null
           guest_email?: string | null
+          guest_id?: string | null
           guest_name: string
           guest_notes?: string | null
           guest_phone?: string | null
@@ -944,12 +1023,14 @@ export type Database = {
           id?: string
           import_platform?: string | null
           nationality?: string | null
+          normalized_rating?: number | null
           notes?: string | null
           number_of_adults?: number | null
           number_of_children?: number | null
           number_of_guests: number
           payment_status?: string | null
           platform?: string | null
+          rating_not_expected?: boolean | null
           source?: string | null
           status?: Database["public"]["Enums"]["booking_status"] | null
           updated_at?: string | null
@@ -966,10 +1047,12 @@ export type Database = {
           currency?: string | null
           external_booking_id?: string | null
           external_id?: string | null
+          external_rating?: number | null
           guest_birth_date?: string | null
           guest_city?: string | null
           guest_contact_status?: string | null
           guest_email?: string | null
+          guest_id?: string | null
           guest_name?: string
           guest_notes?: string | null
           guest_phone?: string | null
@@ -980,19 +1063,35 @@ export type Database = {
           id?: string
           import_platform?: string | null
           nationality?: string | null
+          normalized_rating?: number | null
           notes?: string | null
           number_of_adults?: number | null
           number_of_children?: number | null
           number_of_guests?: number
           payment_status?: string | null
           platform?: string | null
+          rating_not_expected?: boolean | null
           source?: string | null
           status?: Database["public"]["Enums"]["booking_status"] | null
           updated_at?: string | null
         }
         Relationships: [
           {
+            foreignKeyName: "bookings_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "bookings_house_id_fkey"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_bookings_house"
             columns: ["house_id"]
             isOneToOne: false
             referencedRelation: "houses"
@@ -1120,38 +1219,6 @@ export type Database = {
         }
         Relationships: []
       }
-      buffer_settings: {
-        Row: {
-          created_at: string
-          house_id: string
-          id: string
-          min_buffer_stock: Json
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          house_id: string
-          id?: string
-          min_buffer_stock?: Json
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          house_id?: string
-          id?: string
-          min_buffer_stock?: Json
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "buffer_settings_house_id_fkey"
-            columns: ["house_id"]
-            isOneToOne: true
-            referencedRelation: "houses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       cleaning_assignments: {
         Row: {
           actual_duration: number | null
@@ -1216,6 +1283,20 @@ export type Database = {
             referencedRelation: "service_tasks"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_assignments_staff"
+            columns: ["cleaning_staff_id"]
+            isOneToOne: false
+            referencedRelation: "cleaning_staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_assignments_task"
+            columns: ["service_task_id"]
+            isOneToOne: false
+            referencedRelation: "service_tasks"
+            referencedColumns: ["id"]
+          },
         ]
       }
       cleaning_automation_settings: {
@@ -1254,6 +1335,13 @@ export type Database = {
             referencedRelation: "service_providers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_cleaning_automation_provider"
+            columns: ["default_provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
         ]
       }
       cleaning_confirmations: {
@@ -1287,6 +1375,13 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "cleaning_confirmations_cleaning_assignment_id_fkey"
+            columns: ["cleaning_assignment_id"]
+            isOneToOne: false
+            referencedRelation: "cleaning_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_confirmations_assignment"
             columns: ["cleaning_assignment_id"]
             isOneToOne: false
             referencedRelation: "cleaning_assignments"
@@ -1375,6 +1470,13 @@ export type Database = {
             referencedRelation: "service_providers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_cleaning_staff_provider"
+            columns: ["service_provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
         ]
       }
       competitor_properties: {
@@ -1444,6 +1546,13 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "competitor_properties_house_id_fkey"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_competitor_properties_house"
             columns: ["house_id"]
             isOneToOne: false
             referencedRelation: "houses"
@@ -1549,6 +1658,20 @@ export type Database = {
           },
           {
             foreignKeyName: "daily_pricing_house_id_fkey"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_daily_pricing_competitor"
+            columns: ["competitor_property_id"]
+            isOneToOne: false
+            referencedRelation: "competitor_properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_daily_pricing_house"
             columns: ["house_id"]
             isOneToOne: false
             referencedRelation: "houses"
@@ -1764,42 +1887,6 @@ export type Database = {
         }
         Relationships: []
       }
-      guest_behavior_patterns: {
-        Row: {
-          avg_linen_usage: Json
-          confidence_level: number | null
-          created_at: string | null
-          guest_type: string
-          id: string
-          nationality: string | null
-          sample_size: number | null
-          updated_at: string | null
-          usage_multiplier: number | null
-        }
-        Insert: {
-          avg_linen_usage?: Json
-          confidence_level?: number | null
-          created_at?: string | null
-          guest_type: string
-          id?: string
-          nationality?: string | null
-          sample_size?: number | null
-          updated_at?: string | null
-          usage_multiplier?: number | null
-        }
-        Update: {
-          avg_linen_usage?: Json
-          confidence_level?: number | null
-          created_at?: string | null
-          guest_type?: string
-          id?: string
-          nationality?: string | null
-          sample_size?: number | null
-          updated_at?: string | null
-          usage_multiplier?: number | null
-        }
-        Relationships: []
-      }
       guest_preference_responses: {
         Row: {
           booking_id: string | null
@@ -1835,6 +1922,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_guest_preference_responses_booking"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "guest_preference_responses_booking_id_fkey"
             columns: ["booking_id"]
@@ -1900,6 +1994,20 @@ export type Database = {
           weather_preference?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_guest_preferences_booking"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_guest_preferences_house"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "guest_preferences_booking_id_fkey"
             columns: ["booking_id"]
@@ -1989,6 +2097,139 @@ export type Database = {
           },
         ]
       }
+      guests: {
+        Row: {
+          birth_date: string | null
+          city: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          nationality: string | null
+          notes: string | null
+          phone: string | null
+          postal_code: string | null
+          street: string | null
+          travel_document: string | null
+          updated_at: string
+        }
+        Insert: {
+          birth_date?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          nationality?: string | null
+          notes?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          street?: string | null
+          travel_document?: string | null
+          updated_at?: string
+        }
+        Update: {
+          birth_date?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          nationality?: string | null
+          notes?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          street?: string | null
+          travel_document?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      house_additional_fees: {
+        Row: {
+          cleaning_fee_per_stay: number | null
+          created_at: string | null
+          electricity_fee_per_stay: number | null
+          house_id: string
+          id: string
+          linen_fee_per_stay: number | null
+          platform: string
+          service_fee_per_stay: number | null
+          tourist_tax_per_night: number | null
+          updated_at: string | null
+          vat_percentage: number | null
+        }
+        Insert: {
+          cleaning_fee_per_stay?: number | null
+          created_at?: string | null
+          electricity_fee_per_stay?: number | null
+          house_id: string
+          id?: string
+          linen_fee_per_stay?: number | null
+          platform?: string
+          service_fee_per_stay?: number | null
+          tourist_tax_per_night?: number | null
+          updated_at?: string | null
+          vat_percentage?: number | null
+        }
+        Update: {
+          cleaning_fee_per_stay?: number | null
+          created_at?: string | null
+          electricity_fee_per_stay?: number | null
+          house_id?: string
+          id?: string
+          linen_fee_per_stay?: number | null
+          platform?: string
+          service_fee_per_stay?: number | null
+          tourist_tax_per_night?: number | null
+          updated_at?: string | null
+          vat_percentage?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "house_additional_fees_house_id_fkey"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      house_amenities: {
+        Row: {
+          amenity_key: string
+          created_at: string | null
+          house_id: string
+          id: string
+          value_boolean: boolean | null
+          value_integer: number | null
+        }
+        Insert: {
+          amenity_key: string
+          created_at?: string | null
+          house_id: string
+          id?: string
+          value_boolean?: boolean | null
+          value_integer?: number | null
+        }
+        Update: {
+          amenity_key?: string
+          created_at?: string | null
+          house_id?: string
+          id?: string
+          value_boolean?: boolean | null
+          value_integer?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "house_amenities_house_id_fkey"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       house_cleaning_instructions: {
         Row: {
           created_at: string | null
@@ -2021,6 +2262,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_house_cleaning_instructions_house"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "house_cleaning_instructions_house_id_fkey"
             columns: ["house_id"]
@@ -2071,6 +2319,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_house_ical_sources_house"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "house_ical_sources_house_id_fkey"
             columns: ["house_id"]
@@ -2128,7 +2383,52 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_house_inventory_house"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "house_inventory_house_id_fkey"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      house_linen_inventory: {
+        Row: {
+          created_at: string | null
+          house_id: string
+          id: string
+          item_key: string
+          quantity: number
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          house_id: string
+          id?: string
+          item_key: string
+          quantity?: number
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          house_id?: string
+          id?: string
+          item_key?: string
+          quantity?: number
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "house_linen_inventory_house_id_fkey"
             columns: ["house_id"]
             isOneToOne: false
             referencedRelation: "houses"
@@ -2291,44 +2591,6 @@ export type Database = {
           },
         ]
       }
-      laundry_confirmations: {
-        Row: {
-          completion_notes: string | null
-          created_at: string | null
-          id: string
-          issues_reported: string | null
-          laundry_order_id: string | null
-          photo_urls: string[] | null
-          quality_rating: number | null
-        }
-        Insert: {
-          completion_notes?: string | null
-          created_at?: string | null
-          id?: string
-          issues_reported?: string | null
-          laundry_order_id?: string | null
-          photo_urls?: string[] | null
-          quality_rating?: number | null
-        }
-        Update: {
-          completion_notes?: string | null
-          created_at?: string | null
-          id?: string
-          issues_reported?: string | null
-          laundry_order_id?: string | null
-          photo_urls?: string[] | null
-          quality_rating?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "laundry_confirmations_laundry_order_id_fkey"
-            columns: ["laundry_order_id"]
-            isOneToOne: false
-            referencedRelation: "laundry_orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       laundry_invoices: {
         Row: {
           bearbeitungsgebuehr: number | null
@@ -2412,131 +2674,6 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
-      }
-      laundry_order_items: {
-        Row: {
-          color: string | null
-          created_at: string | null
-          id: string
-          item_name: string
-          item_type: string
-          laundry_order_id: string
-          material: string | null
-          quantity: number
-          size: string | null
-          special_instructions: string | null
-          status: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          color?: string | null
-          created_at?: string | null
-          id?: string
-          item_name: string
-          item_type: string
-          laundry_order_id: string
-          material?: string | null
-          quantity?: number
-          size?: string | null
-          special_instructions?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          color?: string | null
-          created_at?: string | null
-          id?: string
-          item_name?: string
-          item_type?: string
-          laundry_order_id?: string
-          material?: string | null
-          quantity?: number
-          size?: string | null
-          special_instructions?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "laundry_order_items_laundry_order_id_fkey"
-            columns: ["laundry_order_id"]
-            isOneToOne: false
-            referencedRelation: "laundry_orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      laundry_orders: {
-        Row: {
-          actual_duration: number | null
-          assigned_at: string | null
-          completed_at: string | null
-          confirmation_token: string | null
-          confirmed_at: string | null
-          created_at: string | null
-          delivery_date: string | null
-          estimated_duration: number | null
-          id: string
-          laundry_staff_id: string | null
-          pickup_date: string | null
-          service_task_id: string | null
-          special_instructions: string | null
-          started_at: string | null
-          status: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          actual_duration?: number | null
-          assigned_at?: string | null
-          completed_at?: string | null
-          confirmation_token?: string | null
-          confirmed_at?: string | null
-          created_at?: string | null
-          delivery_date?: string | null
-          estimated_duration?: number | null
-          id?: string
-          laundry_staff_id?: string | null
-          pickup_date?: string | null
-          service_task_id?: string | null
-          special_instructions?: string | null
-          started_at?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          actual_duration?: number | null
-          assigned_at?: string | null
-          completed_at?: string | null
-          confirmation_token?: string | null
-          confirmed_at?: string | null
-          created_at?: string | null
-          delivery_date?: string | null
-          estimated_duration?: number | null
-          id?: string
-          laundry_staff_id?: string | null
-          pickup_date?: string | null
-          service_task_id?: string | null
-          special_instructions?: string | null
-          started_at?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "laundry_orders_laundry_staff_id_fkey"
-            columns: ["laundry_staff_id"]
-            isOneToOne: false
-            referencedRelation: "laundry_staff"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "laundry_orders_service_task_id_fkey"
-            columns: ["service_task_id"]
-            isOneToOne: false
-            referencedRelation: "service_tasks"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       laundry_staff: {
         Row: {
@@ -2645,6 +2782,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_linen_automation_provider"
+            columns: ["default_provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "linen_automation_settings_default_provider_id_fkey"
             columns: ["default_provider_id"]
             isOneToOne: false
@@ -2728,6 +2872,27 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_linen_orders_booking"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_linen_orders_house"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_linen_orders_provider"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "linen_orders_assigned_staff_id_fkey"
             columns: ["assigned_staff_id"]
             isOneToOne: false
@@ -2753,78 +2918,6 @@ export type Database = {
             columns: ["provider_id"]
             isOneToOne: false
             referencedRelation: "service_providers"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      linen_requirements: {
-        Row: {
-          bath_mats: number | null
-          bedding: number | null
-          blankets: number | null
-          booking_id: string
-          created_at: string | null
-          custom_categories: Json | null
-          house_id: string
-          id: string
-          kitchen_towels: number | null
-          large_towels: number | null
-          pillow_cases: number | null
-          sauna_towels: number | null
-          sink_towels: number | null
-          small_towels: number | null
-          table_linens: number | null
-          updated_at: string | null
-        }
-        Insert: {
-          bath_mats?: number | null
-          bedding?: number | null
-          blankets?: number | null
-          booking_id: string
-          created_at?: string | null
-          custom_categories?: Json | null
-          house_id: string
-          id?: string
-          kitchen_towels?: number | null
-          large_towels?: number | null
-          pillow_cases?: number | null
-          sauna_towels?: number | null
-          sink_towels?: number | null
-          small_towels?: number | null
-          table_linens?: number | null
-          updated_at?: string | null
-        }
-        Update: {
-          bath_mats?: number | null
-          bedding?: number | null
-          blankets?: number | null
-          booking_id?: string
-          created_at?: string | null
-          custom_categories?: Json | null
-          house_id?: string
-          id?: string
-          kitchen_towels?: number | null
-          large_towels?: number | null
-          pillow_cases?: number | null
-          sauna_towels?: number | null
-          sink_towels?: number | null
-          small_towels?: number | null
-          table_linens?: number | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "linen_requirements_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "linen_requirements_house_id_fkey"
-            columns: ["house_id"]
-            isOneToOne: false
-            referencedRelation: "houses"
             referencedColumns: ["id"]
           },
         ]
@@ -2883,6 +2976,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_linen_defs_house"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "linen_set_definitions_house_id_fkey"
             columns: ["house_id"]
             isOneToOne: false
@@ -2891,175 +2991,41 @@ export type Database = {
           },
         ]
       }
-      linen_transactions: {
+      marketing_actions: {
         Row: {
-          booking_id: string | null
-          created_at: string | null
-          house_id: string
+          created_at: string
+          description: string | null
+          end_date: string | null
           id: string
-          linen_items: Json
-          new_stock: Json | null
-          notes: string | null
-          previous_stock: Json | null
-          transaction_type: string
-          updated_at: string | null
+          name: string
+          start_date: string
+          status: string
+          target_criteria: Json
+          updated_at: string
         }
         Insert: {
-          booking_id?: string | null
-          created_at?: string | null
-          house_id: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
           id?: string
-          linen_items?: Json
-          new_stock?: Json | null
-          notes?: string | null
-          previous_stock?: Json | null
-          transaction_type: string
-          updated_at?: string | null
+          name: string
+          start_date?: string
+          status?: string
+          target_criteria?: Json
+          updated_at?: string
         }
         Update: {
-          booking_id?: string | null
-          created_at?: string | null
-          house_id?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
           id?: string
-          linen_items?: Json
-          new_stock?: Json | null
-          notes?: string | null
-          previous_stock?: Json | null
-          transaction_type?: string
-          updated_at?: string | null
+          name?: string
+          start_date?: string
+          status?: string
+          target_criteria?: Json
+          updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "linen_transactions_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "linen_transactions_house_id_fkey"
-            columns: ["house_id"]
-            isOneToOne: false
-            referencedRelation: "houses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      linen_usage_history: {
-        Row: {
-          actual_usage: Json
-          booking_id: string | null
-          created_at: string | null
-          date: string
-          duration_days: number
-          guest_type: string | null
-          house_id: string
-          id: string
-          number_of_guests: number
-          predicted_usage: Json | null
-          season: string | null
-          weather_condition: string | null
-        }
-        Insert: {
-          actual_usage?: Json
-          booking_id?: string | null
-          created_at?: string | null
-          date: string
-          duration_days: number
-          guest_type?: string | null
-          house_id: string
-          id?: string
-          number_of_guests: number
-          predicted_usage?: Json | null
-          season?: string | null
-          weather_condition?: string | null
-        }
-        Update: {
-          actual_usage?: Json
-          booking_id?: string | null
-          created_at?: string | null
-          date?: string
-          duration_days?: number
-          guest_type?: string | null
-          house_id?: string
-          id?: string
-          number_of_guests?: number
-          predicted_usage?: Json | null
-          season?: string | null
-          weather_condition?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "linen_usage_history_booking_id_fkey"
-            columns: ["booking_id"]
-            isOneToOne: false
-            referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "linen_usage_history_house_id_fkey"
-            columns: ["house_id"]
-            isOneToOne: false
-            referencedRelation: "houses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      model_parameters: {
-        Row: {
-          booking_pattern_influence: number | null
-          created_at: string | null
-          guest_type_multipliers: Json | null
-          house_id: string | null
-          id: string
-          is_active: boolean | null
-          learning_rate: number | null
-          parameter_set_name: string
-          parameters: Json
-          performance_score: number | null
-          seasonal_weights: Json | null
-          updated_at: string | null
-          weather_impact_factor: number | null
-        }
-        Insert: {
-          booking_pattern_influence?: number | null
-          created_at?: string | null
-          guest_type_multipliers?: Json | null
-          house_id?: string | null
-          id?: string
-          is_active?: boolean | null
-          learning_rate?: number | null
-          parameter_set_name: string
-          parameters?: Json
-          performance_score?: number | null
-          seasonal_weights?: Json | null
-          updated_at?: string | null
-          weather_impact_factor?: number | null
-        }
-        Update: {
-          booking_pattern_influence?: number | null
-          created_at?: string | null
-          guest_type_multipliers?: Json | null
-          house_id?: string | null
-          id?: string
-          is_active?: boolean | null
-          learning_rate?: number | null
-          parameter_set_name?: string
-          parameters?: Json
-          performance_score?: number | null
-          seasonal_weights?: Json | null
-          updated_at?: string | null
-          weather_impact_factor?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "model_parameters_house_id_fkey"
-            columns: ["house_id"]
-            isOneToOne: false
-            referencedRelation: "houses"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       monthly_pricing: {
         Row: {
@@ -3219,59 +3185,6 @@ export type Database = {
             columns: ["optimization_result_id"]
             isOneToOne: false
             referencedRelation: "ai_optimization_results"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      prediction_accuracy: {
-        Row: {
-          accuracy_score: number | null
-          actual_date: string | null
-          actual_values: Json | null
-          created_at: string | null
-          house_id: string
-          id: string
-          mae: number | null
-          model_version: string | null
-          parameters_used: Json | null
-          predicted_values: Json
-          prediction_date: string
-          rmse: number | null
-        }
-        Insert: {
-          accuracy_score?: number | null
-          actual_date?: string | null
-          actual_values?: Json | null
-          created_at?: string | null
-          house_id: string
-          id?: string
-          mae?: number | null
-          model_version?: string | null
-          parameters_used?: Json | null
-          predicted_values: Json
-          prediction_date: string
-          rmse?: number | null
-        }
-        Update: {
-          accuracy_score?: number | null
-          actual_date?: string | null
-          actual_values?: Json | null
-          created_at?: string | null
-          house_id?: string
-          id?: string
-          mae?: number | null
-          model_version?: string | null
-          parameters_used?: Json | null
-          predicted_values?: Json
-          prediction_date?: string
-          rmse?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "prediction_accuracy_house_id_fkey"
-            columns: ["house_id"]
-            isOneToOne: false
-            referencedRelation: "houses"
             referencedColumns: ["id"]
           },
         ]
@@ -3530,6 +3443,27 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_provider_messages_order"
+            columns: ["related_linen_order_id"]
+            isOneToOne: false
+            referencedRelation: "linen_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_provider_messages_provider"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_provider_messages_task"
+            columns: ["related_task_id"]
+            isOneToOne: false
+            referencedRelation: "service_tasks"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "provider_messages_provider_id_fkey"
             columns: ["provider_id"]
             isOneToOne: false
@@ -3548,59 +3482,6 @@ export type Database = {
             columns: ["related_task_id"]
             isOneToOne: false
             referencedRelation: "service_tasks"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      provider_tokens: {
-        Row: {
-          created_at: string | null
-          created_by: string | null
-          expires_at: string | null
-          id: string
-          is_active: boolean | null
-          last_used_at: string | null
-          notes: string | null
-          provider_id: string
-          token_hash: string
-          token_preview: string
-          updated_at: string | null
-          usage_count: number | null
-        }
-        Insert: {
-          created_at?: string | null
-          created_by?: string | null
-          expires_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          last_used_at?: string | null
-          notes?: string | null
-          provider_id: string
-          token_hash: string
-          token_preview: string
-          updated_at?: string | null
-          usage_count?: number | null
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string | null
-          expires_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          last_used_at?: string | null
-          notes?: string | null
-          provider_id?: string
-          token_hash?: string
-          token_preview?: string
-          updated_at?: string | null
-          usage_count?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "provider_tokens_provider_id_fkey"
-            columns: ["provider_id"]
-            isOneToOne: false
-            referencedRelation: "service_providers"
             referencedColumns: ["id"]
           },
         ]
@@ -3878,53 +3759,6 @@ export type Database = {
         }
         Relationships: []
       }
-      seasonal_adjustments: {
-        Row: {
-          adjustment_factors: Json
-          based_on_samples: number | null
-          confidence_score: number | null
-          created_at: string | null
-          house_id: string | null
-          id: string
-          last_calculated: string | null
-          month: number | null
-          season: string
-          updated_at: string | null
-        }
-        Insert: {
-          adjustment_factors?: Json
-          based_on_samples?: number | null
-          confidence_score?: number | null
-          created_at?: string | null
-          house_id?: string | null
-          id?: string
-          last_calculated?: string | null
-          month?: number | null
-          season: string
-          updated_at?: string | null
-        }
-        Update: {
-          adjustment_factors?: Json
-          based_on_samples?: number | null
-          confidence_score?: number | null
-          created_at?: string | null
-          house_id?: string | null
-          id?: string
-          last_calculated?: string | null
-          month?: number | null
-          season?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "seasonal_adjustments_house_id_fkey"
-            columns: ["house_id"]
-            isOneToOne: false
-            referencedRelation: "houses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       service_providers: {
         Row: {
           alias: string | null
@@ -4039,6 +3873,27 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_service_tasks_booking"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_service_tasks_house"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_service_tasks_provider"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "service_providers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "service_tasks_booking_id_fkey"
             columns: ["booking_id"]
             isOneToOne: false
@@ -4129,6 +3984,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_payments_house"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tenant_payments_house_id_fkey"
             columns: ["house_id"]

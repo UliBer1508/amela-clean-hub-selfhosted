@@ -18,6 +18,7 @@ import { de } from 'date-fns/locale';
 import { ChatButton } from '@/components/PortalChat';
 import { usePortalMessages } from '@/hooks/usePortalMessages';
 import { cn } from '@/lib/utils';
+import { getGuestName } from '@/lib/guestHelpers';
 import { supabase } from '@/integrations/supabase/client';
 
 type ViewType = 'month' | 'week' | 'gantt';
@@ -94,7 +95,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   // Wäsche-Daten laden
   useEffect(() => {
     const fetchLaundryOrders = async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from('laundry_orders')
         .select(`
           id, pickup_date, delivery_date, status,
@@ -124,16 +125,17 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     allBookings.forEach(booking => {
       const checkinDate = new Date(booking.check_in);
       const checkoutDate = new Date(booking.check_out);
+      const guestName = getGuestName(booking);
       
       // Add check-in event
       events.push({
         id: `checkin-${booking.id}`,
         date: checkinDate,
         type: 'checkin',
-        title: `Check-in: ${booking.guest_name}`,
+        title: `Check-in: ${guestName}`,
         house: booking.houses?.name || 'Unbekannt',
         house_id: booking.house_id,
-        guestName: booking.guest_name,
+        guestName: guestName,
         bookingId: booking.id
       });
 
@@ -142,10 +144,10 @@ const Calendar = ({ chatProps }: CalendarProps) => {
         id: `checkout-${booking.id}`,
         date: checkoutDate,
         type: 'checkout',
-        title: `Check-out: ${booking.guest_name}`,
+        title: `Check-out: ${guestName}`,
         house: booking.houses?.name || 'Unbekannt',
         house_id: booking.house_id,
-        guestName: booking.guest_name,
+        guestName: guestName,
         bookingId: booking.id
       });
 
@@ -158,10 +160,10 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           id: `occupied-${booking.id}-${currentDate.toISOString().split('T')[0]}`,
           date: new Date(currentDate),
           type: 'occupied',
-          title: `Belegt: ${booking.guest_name}`,
+          title: `Belegt: ${guestName}`,
           house: booking.houses?.name || 'Unbekannt',
           house_id: booking.house_id,
-          guestName: booking.guest_name,
+          guestName: guestName,
           bookingId: booking.id
         });
         currentDate.setDate(currentDate.getDate() + 1);
@@ -178,7 +180,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
             house: booking.houses?.name || 'Unbekannt',
             house_id: booking.house_id,
             status: task.status,
-            guestName: booking.guest_name,
+            guestName: guestName,
             bookingId: booking.id
           });
         }
@@ -265,7 +267,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
       
       grouped.get(houseId)!.push({
         id: booking.id,
-        guest_name: booking.guest_name,
+        guest_name: getGuestName(booking),
         check_in: new Date(booking.check_in),
         check_out: new Date(booking.check_out),
         house_id: houseId,
