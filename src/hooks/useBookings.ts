@@ -42,6 +42,7 @@ export const useBookings = () => {
             name,
             address
           ),
+          guests (*),
           service_tasks!inner (
             id,
             service_type,
@@ -77,6 +78,7 @@ export const useBookings = () => {
             name,
             address
           ),
+          guests (*),
           service_tasks (
             id,
             service_type,

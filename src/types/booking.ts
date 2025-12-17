@@ -1,3 +1,17 @@
+export interface Guest {
+  id?: string;
+  name?: string;
+  email?: string | null;
+  phone?: string | null;
+  nationality?: string | null;
+  street?: string | null;
+  city?: string | null;
+  postal_code?: string | null;
+  birth_date?: string | null;
+  travel_document?: string | null;
+  notes?: string | null;
+}
+
 export interface ServiceTask {
   id: string;
   service_type: string;
@@ -30,6 +44,7 @@ export interface Booking {
   status: string;
   house_id: string;
   houses?: House;
+  guests?: Guest | null;
   service_tasks?: ServiceTask[];
 }
 

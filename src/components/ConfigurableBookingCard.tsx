@@ -23,6 +23,7 @@ import {
   Calendar as CalendarIcon
 } from 'lucide-react';
 import { cn, getColorFromString } from '@/lib/utils';
+import { getGuestName, getGuestEmail, getGuestPhone, getGuestNationality } from '@/lib/guestHelpers';
 import { format } from 'date-fns';
 
 import type { BookingCardConfig } from './BookingCardSettings';
@@ -121,7 +122,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
           <div className="space-y-2 md:space-y-3">
             {config.showGuestName && (
               <div className="flex items-center space-x-2">
-                <span className="text-xs md:text-sm font-medium">👤 Gast: {booking.guest_name}</span>
+                <span className="text-xs md:text-sm font-medium">👤 Gast: {getGuestName(booking)}</span>
               </div>
             )}
             
@@ -131,21 +132,21 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
               </div>
             )}
 
-            {config.showGuestEmail && booking.guest_email && (
+            {config.showGuestEmail && getGuestEmail(booking) && (
               <div className="flex items-center space-x-2">
-                <span className="text-xs md:text-sm">📧 E-Mail: {booking.guest_email}</span>
+                <span className="text-xs md:text-sm">📧 E-Mail: {getGuestEmail(booking)}</span>
               </div>
             )}
 
-            {config.showGuestPhone && booking.guest_phone && (
+            {config.showGuestPhone && getGuestPhone(booking) && (
               <div className="flex items-center space-x-2">
-                <span className="text-xs md:text-sm">📞 Telefon: {booking.guest_phone}</span>
+                <span className="text-xs md:text-sm">📞 Telefon: {getGuestPhone(booking)}</span>
               </div>
             )}
 
-            {config.showNationality && booking.nationality && (
+            {config.showNationality && getGuestNationality(booking) && (
               <div className="flex items-center space-x-2">
-                <span className="text-xs md:text-sm">🌍 Nationalität: {booking.nationality}</span>
+                <span className="text-xs md:text-sm">🌍 Nationalität: {getGuestNationality(booking)}</span>
               </div>
             )}
 
