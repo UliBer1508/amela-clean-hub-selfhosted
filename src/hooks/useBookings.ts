@@ -55,9 +55,9 @@ export const useBookings = () => {
             completed_at,
             notes,
             payment_status,
-            service_providers (
-              name
-            )
+          service_providers!service_tasks_provider_id_fkey (
+            name
+          )
           )
         `)
         .eq('service_tasks.service_type', 'cleaning')
@@ -91,7 +91,7 @@ export const useBookings = () => {
             completed_at,
             notes,
             payment_status,
-            service_providers (
+            service_providers!service_tasks_provider_id_fkey (
               name
             )
           )
@@ -135,7 +135,7 @@ export const useBookings = () => {
             name,
             address
           ),
-          service_providers!provider_id (
+          service_providers!service_tasks_provider_id_fkey (
             name
           )
         `)
