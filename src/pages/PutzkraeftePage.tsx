@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -289,6 +290,7 @@ const PutzkraeftePage = ({ chatProps }: PutzkraeftePageProps) => {
             onCancel={handleCancelForm}
           />
         </main>
+        <Footer />
       </div>
     );
   }
@@ -680,6 +682,7 @@ const PutzkraeftePage = ({ chatProps }: PutzkraeftePageProps) => {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 };
