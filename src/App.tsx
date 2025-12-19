@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import PutzkraeftePage from "./pages/PutzkraeftePage";
 import Calendar from "./pages/Calendar";
+import Footer from "./components/Footer";
 import NotFound from "./pages/NotFound";
 import Offline from "./pages/Offline";
 import PWAUpdateNotification from "./components/PWAUpdateNotification";
@@ -33,6 +34,7 @@ const AppContent = () => {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Footer />
     </>
   );
 };
