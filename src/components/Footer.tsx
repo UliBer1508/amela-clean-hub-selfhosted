@@ -34,7 +34,7 @@ const Footer = () => {
         
         <div className="border-t border-primary-foreground/20 mt-8 pt-8 text-center">
           <p className="text-primary-foreground/60">
-            © 2024 Amela Reinigungsportal. Alle Rechte vorbehalten.
+            © 2025 Steinbock Chalets. Alle Rechte vorbehalten.
           </p>
         </div>
       </div>
