@@ -234,7 +234,9 @@ export const useBookings = () => {
         .from('service_tasks')
         .update({
           status: newStatus,
-          completed_at: newStatus === 'completed' ? new Date().toISOString() : null
+          completed_at: newStatus === 'completed' ? new Date().toISOString() : null,
+          status_changed_by: 'Amela',
+          status_changed_at: new Date().toISOString()
         })
         .eq('id', taskId);
 
