@@ -11,7 +11,7 @@ const Footer = () => {
             backgroundClip: 'text',
           }}
         >
-          Copyright © 2025 Steinbock Chalets
+          © 2025 Copy Right Steinbock Chalets
         </p>
       </div>
     </footer>
