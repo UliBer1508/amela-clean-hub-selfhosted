@@ -568,15 +568,15 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                 {/* Gantt Chart View */}
                 {viewType === 'gantt' ? (
                   <ScrollArea className="w-full">
-                    <div className="min-w-[800px]">
+                    <div className="w-full">
                       {/* Header mit Tagen */}
                       <div className="flex border-b bg-muted/30">
-                        <div className="w-32 md:w-40 shrink-0 p-2 border-r font-medium text-sm">
+                        <div className="w-20 sm:w-28 md:w-40 shrink-0 p-1 sm:p-2 border-r font-medium text-xs sm:text-sm">
                           Unterkunft
                         </div>
                         <div 
                           className="flex-1 grid" 
-                          style={{ gridTemplateColumns: `repeat(${ganttDays.length}, minmax(28px, 1fr))` }}
+                          style={{ gridTemplateColumns: `repeat(${ganttDays.length}, minmax(32px, 1fr))` }}
                         >
                           {ganttDays.map((day) => (
                             <div
@@ -602,12 +602,12 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                         const houseBookings = bookingsByHouse.get(house.id) || [];
                         
                         return (
-                          <div key={house.id} className="flex border-b min-h-[50px] md:min-h-[60px]">
+                          <div key={house.id} className="flex border-b min-h-[44px] sm:min-h-[50px] md:min-h-[60px]">
                             {/* Linke Spalte: Haus-Name */}
-                            <div className="w-32 md:w-40 shrink-0 p-2 border-r bg-muted/20 flex items-center">
-                              <div className="flex items-center gap-2">
-                                <div className={cn("w-3 h-3 rounded-full shrink-0", houseColor.bg)} />
-                                <span className="text-xs md:text-sm font-medium truncate">{house.name}</span>
+                            <div className="w-20 sm:w-28 md:w-40 shrink-0 p-1 sm:p-2 border-r bg-muted/20 flex items-center">
+                              <div className="flex items-center gap-1 sm:gap-2">
+                                <div className={cn("w-2 h-2 sm:w-3 sm:h-3 rounded-full shrink-0", houseColor.bg)} />
+                                <span className="text-[10px] sm:text-xs md:text-sm font-medium truncate">{house.name}</span>
                               </div>
                             </div>
 
@@ -616,7 +616,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                               {/* Hintergrund-Grid */}
                               <div 
                                 className="absolute inset-0 grid" 
-                                style={{ gridTemplateColumns: `repeat(${ganttDays.length}, minmax(28px, 1fr))` }}
+                                style={{ gridTemplateColumns: `repeat(${ganttDays.length}, minmax(32px, 1fr))` }}
                               >
                                 {ganttDays.map((day) => (
                                   <div
