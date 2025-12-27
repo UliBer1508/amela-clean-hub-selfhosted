@@ -640,7 +640,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                       className={cn(
                                         "absolute top-1/2 -translate-y-1/2 h-7 md:h-8 rounded-md",
                                         "flex items-center px-1 md:px-2 cursor-pointer",
-                                        "border border-white/40 shadow-md hover:shadow-lg transition-shadow",
+                                        "border border-white/40",
                                         houseColor.bg, houseColor.text
                                       )}
                                       style={{ 
