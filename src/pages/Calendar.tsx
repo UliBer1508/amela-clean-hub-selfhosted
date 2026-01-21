@@ -240,11 +240,11 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     return monthEvents.filter(event => isSameDay(event.date, day));
   };
 
-  // Gantt-Chart: Tage für aktuelle Woche (Montag bis Sonntag)
+  // Gantt-Chart: Tage für aktuellen Monat
   const ganttDays = useMemo(() => {
-    const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 }); // Montag
-    const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
-    return eachDayOfInterval({ start: weekStart, end: weekEnd });
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    return eachDayOfInterval({ start: monthStart, end: monthEnd });
   }, [currentDate]);
 
   // Gantt-Chart: Buchungen nach Haus gruppieren
@@ -281,16 +281,16 @@ const Calendar = ({ chatProps }: CalendarProps) => {
 
   // Gantt-Chart: Balken-Position berechnen (Mitte Check-in bis Mitte Check-out)
   const getGanttBarStyle = (checkIn: Date, checkOut: Date) => {
-    const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 }); // Montag
-    const totalDays = ganttDays.length; // 7 Tage
+    const monthStart = startOfMonth(currentDate);
+    const totalDays = ganttDays.length;
     const dayWidth = 100 / totalDays;
     
     // Check-in: Balken beginnt ab MITTE des Check-in-Tages
-    const startDay = Math.max(0, differenceInDays(checkIn, weekStart));
+    const startDay = Math.max(0, differenceInDays(checkIn, monthStart));
     const left = (startDay * dayWidth) + (dayWidth / 2);
     
     // Check-out: Balken endet in der MITTE des Check-out-Tages
-    const endDay = Math.min(totalDays, differenceInDays(checkOut, weekStart));
+    const endDay = Math.min(totalDays, differenceInDays(checkOut, monthStart));
     const right = (endDay * dayWidth) + (dayWidth / 2);
     
     const width = Math.max(dayWidth, right - left);
@@ -308,7 +308,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   };
 
   const previousPeriod = () => {
-    if (viewType === 'week' || viewType === 'gantt') {
+    if (viewType === 'week') {
       setCurrentDate(prev => subWeeks(prev, 1));
     } else {
       setCurrentDate(prev => subMonths(prev, 1));
@@ -316,7 +316,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   };
 
   const nextPeriod = () => {
-    if (viewType === 'week' || viewType === 'gantt') {
+    if (viewType === 'week') {
       setCurrentDate(prev => addWeeks(prev, 1));
     } else {
       setCurrentDate(prev => addMonths(prev, 1));

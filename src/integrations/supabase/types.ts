@@ -840,12 +840,15 @@ export type Database = {
           check_in: string
           check_out: string
           created_at: string | null
+          estimated_amount: number | null
           guest_email: string
           guest_name: string
           guest_phone: string
           house_id: string
           id: string
           message: string | null
+          number_of_adults: number | null
+          number_of_children: number | null
           number_of_guests: number
           status: string | null
           updated_at: string | null
@@ -854,12 +857,15 @@ export type Database = {
           check_in: string
           check_out: string
           created_at?: string | null
+          estimated_amount?: number | null
           guest_email: string
           guest_name: string
           guest_phone: string
           house_id: string
           id?: string
           message?: string | null
+          number_of_adults?: number | null
+          number_of_children?: number | null
           number_of_guests: number
           status?: string | null
           updated_at?: string | null
@@ -868,12 +874,15 @@ export type Database = {
           check_in?: string
           check_out?: string
           created_at?: string | null
+          estimated_amount?: number | null
           guest_email?: string
           guest_name?: string
           guest_phone?: string
           house_id?: string
           id?: string
           message?: string | null
+          number_of_adults?: number | null
+          number_of_children?: number | null
           number_of_guests?: number
           status?: string | null
           updated_at?: string | null
@@ -3732,6 +3741,60 @@ export type Database = {
           key?: string
           updated_at?: string | null
           value?: Json
+        }
+        Relationships: []
+      }
+      system_status_config: {
+        Row: {
+          color_bg: string | null
+          color_border: string | null
+          color_hex: string | null
+          color_text: string | null
+          created_at: string | null
+          description: string | null
+          emoji: string | null
+          id: string
+          is_active: boolean | null
+          is_default: boolean | null
+          label: string
+          sort_order: number | null
+          status_key: string
+          status_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          color_bg?: string | null
+          color_border?: string | null
+          color_hex?: string | null
+          color_text?: string | null
+          created_at?: string | null
+          description?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          label: string
+          sort_order?: number | null
+          status_key: string
+          status_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          color_bg?: string | null
+          color_border?: string | null
+          color_hex?: string | null
+          color_text?: string | null
+          created_at?: string | null
+          description?: string | null
+          emoji?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          label?: string
+          sort_order?: number | null
+          status_key?: string
+          status_type?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
