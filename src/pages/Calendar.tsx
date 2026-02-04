@@ -124,6 +124,9 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     }> = [];
 
     allBookings.forEach(booking => {
+      // Stornierte Buchungen nicht anzeigen
+      if (booking.status === 'cancelled') return;
+      
       const checkinDate = new Date(booking.check_in);
       const checkoutDate = new Date(booking.check_out);
       const guestName = getGuestName(booking);
@@ -259,6 +262,9 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     }>>();
     
     allBookings.forEach(booking => {
+      // Stornierte Buchungen nicht anzeigen
+      if (booking.status === 'cancelled') return;
+      
       const houseId = booking.house_id;
       const houseName = booking.houses?.name || 'Unbekannt';
       
