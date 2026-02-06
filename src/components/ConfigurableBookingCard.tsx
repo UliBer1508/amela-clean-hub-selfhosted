@@ -117,6 +117,16 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
           </div>
         )}
 
+        {/* Warnung für eingecheckte Gäste */}
+        {booking.status === 'checked_in' && (
+          <div className="bg-orange-100 dark:bg-orange-900/40 border-b border-orange-200 dark:border-orange-800 p-2 md:p-3">
+            <div className="flex items-center space-x-2 text-orange-800 dark:text-orange-200">
+              <span className="text-lg">⚠️</span>
+              <span className="font-semibold text-xs md:text-sm">GAST IST EINGECHECKT - Aktuell vor Ort!</span>
+            </div>
+          </div>
+        )}
+
         <div className="bg-yellow-50 dark:bg-yellow-950/20 p-3 md:p-4 grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
           {/* Guest Information */}
           <div className="space-y-2 md:space-y-3">
@@ -173,8 +183,16 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
 
             {config.showBookingStatus && (
               <div className="flex items-center space-x-2">
-                <Badge variant={booking.status === 'confirmed' ? 'default' : 'secondary'}>
-                  {booking.status === 'confirmed' ? 'Bestätigt' : booking.status}
+                <Badge 
+                  variant={booking.status === 'checked_in' ? 'destructive' : 
+                           booking.status === 'confirmed' ? 'default' : 'secondary'}
+                  className={booking.status === 'checked_in' ? 'animate-pulse' : ''}
+                >
+                  {booking.status === 'confirmed' && '✅ Bestätigt'}
+                  {booking.status === 'checked_in' && '⚠️ Eingecheckt'}
+                  {booking.status === 'checked_out' && '✔️ Ausgecheckt'}
+                  {booking.status === 'cancelled' && '❌ Storniert'}
+                  {!['confirmed', 'checked_in', 'checked_out', 'cancelled'].includes(booking.status) && booking.status}
                 </Badge>
               </div>
             )}
