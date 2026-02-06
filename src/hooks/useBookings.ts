@@ -322,7 +322,9 @@ export const useBookings = () => {
           booking.houses?.name?.toLowerCase().includes(sanitizedSearch) ||
           booking.houses?.address?.toLowerCase().includes(sanitizedSearch);
 
+        // Bei eingecheckten Buchungen (wenn Checkbox aktiv) den Status-Filter ignorieren
         const matchesStatus = statusFilter === 'all' || 
+          (isCheckedIn && includeCheckedIn) ||
           booking.service_tasks?.some(task => task.status === statusFilter);
         
         const matchesStaff = !staffFilter || staffFilter === 'all' || 
