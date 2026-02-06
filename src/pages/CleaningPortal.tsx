@@ -93,7 +93,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [newTaskCount, setNewTaskCount] = useState(0);
-  const [showCheckedIn, setShowCheckedIn] = useState(false);
+  const [showCheckedIn, setShowCheckedIn] = useState(true);
   
   // Booking card configuration
   const { config: cardConfig, updateConfig: updateCardConfig, loading: configLoading } = useBookingCardConfig();
