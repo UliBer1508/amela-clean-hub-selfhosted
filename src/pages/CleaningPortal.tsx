@@ -16,6 +16,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import BookingCardSettings, { useBookingCardConfig } from "@/components/BookingCardSettings";
 import ConfigurableBookingCard from "@/components/ConfigurableBookingCard";
 import StandaloneCleaningCard from "@/components/StandaloneCleaningCard";
@@ -91,6 +93,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [newTaskCount, setNewTaskCount] = useState(0);
+  const [showCheckedIn, setShowCheckedIn] = useState(false);
   
   // Booking card configuration
   const { config: cardConfig, updateConfig: updateCardConfig, loading: configLoading } = useBookingCardConfig();
@@ -211,7 +214,8 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     staffFilter,
     timeFilter,
     houseFilter,
-    providerFilter
+    providerFilter,
+    showCheckedIn
   );
 
   const totalCleaningTasks = hookTotalCleaningTasks;
@@ -596,14 +600,27 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
                     <span className="font-medium text-foreground text-xs md:text-sm">🔍 Suche</span>
                   </div>
                   
-                  <div className="relative">
-                    <Input
-                      placeholder="Nach Gast, Haus oder Adresse suchen..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 min-h-[44px]"
-                    />
-                    <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-3" />
+                  <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                    <div className="relative flex-1">
+                      <Input
+                        placeholder="Nach Gast, Haus oder Adresse suchen..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10 min-h-[44px]"
+                      />
+                      <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-3" />
+                    </div>
+                    
+                    <div className="flex items-center space-x-2 shrink-0">
+                      <Checkbox 
+                        id="showCheckedIn"
+                        checked={showCheckedIn}
+                        onCheckedChange={(checked) => setShowCheckedIn(checked === true)}
+                      />
+                      <Label htmlFor="showCheckedIn" className="text-xs md:text-sm cursor-pointer whitespace-nowrap">
+                        ⚠️ Auch eingecheckt
+                      </Label>
+                    </div>
                   </div>
 
                   <div className="flex items-center space-x-2">

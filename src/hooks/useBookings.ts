@@ -302,13 +302,21 @@ export const useBookings = () => {
     staffFilter: StaffFilter,
     timeFilter: TimeFilter,
     houseFilter: HouseFilter,
-    providerFilter: ProviderFilter
+    providerFilter: ProviderFilter,
+    includeCheckedIn: boolean = false
   ): CleaningEntry[] => {
     const sanitizedSearch = sanitizeSearchTerm(searchTerm.toLowerCase());
     
     return combinedEntries.filter(entry => {
       if (entry.type === 'booking') {
         const booking = entry.data;
+        
+        // Prüfe ob Buchung eingecheckt ist - nur anzeigen wenn Checkbox aktiv
+        const isCheckedIn = booking.status === 'checked_in';
+        if (isCheckedIn && !includeCheckedIn) {
+          return false;
+        }
+        
         const matchesSearch = !sanitizedSearch || 
           getGuestName(booking).toLowerCase().includes(sanitizedSearch) ||
           booking.houses?.name?.toLowerCase().includes(sanitizedSearch) ||
