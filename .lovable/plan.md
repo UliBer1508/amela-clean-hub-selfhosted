@@ -1,67 +1,89 @@
 
-## Plan: Stornierte Buchungen im Kalender ausblenden
 
-### Problem
-Im Gantt-Chart werden **alle Buchungen** angezeigt, unabhängig vom Status. Die Datenbank zeigt, dass folgende stornierte Buchungen fälschlicherweise angezeigt werden:
-- **Nicolas Krieg** (7.-14. Feb) - Status: `cancelled`
-- **Ruud van Deuren** (14.-22. Feb) - Status: `cancelled`
+## Plan: Checkbox "Auch eingecheckte Gäste" rechts neben der Suche
 
-### Ursache
-In `src/pages/Calendar.tsx` gibt es zwei Stellen, die Buchungen verarbeiten, ohne den Status zu prüfen:
+### Layout-Änderung
 
-1. **`bookingsByHouse`** (Zeile 261): Gruppiert alle Buchungen für das Gantt-Chart ohne Filterung
-2. **`monthEvents`** (Zeile 126): Erstellt Events für Monat/Wochen-Ansicht ohne Filterung
+Die Checkbox wird **rechts neben dem Suchfeld** in derselben Zeile platziert:
 
-### Lösung
+```
++------------------------------------------------------------------------+
+| 🔍 Suche                                                               |
++------------------------------------------------------------------------+
+| [🔍 Nach Gast, Haus oder Adresse suchen...     ]   [✓] Auch eingecheckt |
++------------------------------------------------------------------------+
+| 🔧 Filter                                                              |
++------------------------------------------------------------------------+
+```
 
-#### Änderung 1: Gantt-Chart Filterung (Zeile 261)
+### Änderungen
+
+**Datei:** `src/pages/CleaningPortal.tsx`
+
+#### 1. Imports hinzufügen (am Anfang der Datei)
+```tsx
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+```
+
+#### 2. State hinzufügen (bei den anderen States, ca. Zeile 91)
+```tsx
+const [showCheckedIn, setShowCheckedIn] = useState(false);
+```
+
+#### 3. Layout ändern (Zeile 599-607)
 
 **Vorher:**
 ```tsx
-allBookings.forEach(booking => {
-  const houseId = booking.house_id;
-  // ... ohne Filterung
-});
+<div className="relative">
+  <Input
+    placeholder="Nach Gast, Haus oder Adresse suchen..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="pl-10 min-h-[44px]"
+  />
+  <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-3" />
+</div>
 ```
 
 **Nachher:**
 ```tsx
-allBookings.forEach(booking => {
-  // Stornierte Buchungen nicht anzeigen
-  if (booking.status === 'cancelled') return;
+<div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+  <div className="relative flex-1">
+    <Input
+      placeholder="Nach Gast, Haus oder Adresse suchen..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      className="pl-10 min-h-[44px]"
+    />
+    <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-3" />
+  </div>
   
-  const houseId = booking.house_id;
-  // ...
-});
+  <div className="flex items-center space-x-2 shrink-0">
+    <Checkbox 
+      id="showCheckedIn"
+      checked={showCheckedIn}
+      onCheckedChange={(checked) => setShowCheckedIn(checked === true)}
+    />
+    <Label htmlFor="showCheckedIn" className="text-xs md:text-sm cursor-pointer whitespace-nowrap">
+      ⚠️ Auch eingecheckt
+    </Label>
+  </div>
+</div>
 ```
 
-#### Änderung 2: Monats/Wochen-Events Filterung (Zeile 126)
+#### 4. Filterlogik erweitern
 
-**Vorher:**
-```tsx
-allBookings.forEach(booking => {
-  const checkinDate = new Date(booking.check_in);
-  // ... ohne Filterung
-});
-```
+**Datei:** `src/hooks/useBookings.ts` - `filteredEntries` Funktion erweitern um `includeCheckedIn` Parameter
 
-**Nachher:**
-```tsx
-allBookings.forEach(booking => {
-  // Stornierte Buchungen nicht anzeigen
-  if (booking.status === 'cancelled') return;
-  
-  const checkinDate = new Date(booking.check_in);
-  // ...
-});
-```
+#### 5. Filter-Aufruf aktualisieren
+
+**Datei:** `src/pages/CleaningPortal.tsx` - `showCheckedIn` an `filteredEntries` übergeben
+
+### Responsives Verhalten
+- **Desktop (sm+):** Suchfeld und Checkbox nebeneinander in einer Zeile
+- **Mobil:** Suchfeld oben, Checkbox darunter (gestapelt)
 
 ### Ergebnis
-- Stornierte Buchungen werden in **allen Kalenderansichten** (Gantt, Monat, Woche) ausgeblendet
-- Nur bestätigte, eingecheckte oder abgeschlossene Buchungen werden angezeigt
-- Die stornierten Buchungen "Nicolas Krieg" und "Ruud van Deuren" verschwinden aus dem Gantt-Chart
+Die Putzfrau sieht die Checkbox direkt neben dem Suchfeld und kann mit einem Klick auch Buchungen anzeigen, bei denen der Gast bereits eingecheckt ist.
 
-### Technische Details
-- Geänderte Datei: `src/pages/Calendar.tsx`
-- Betroffene Zeilen: 126 und 261
-- Filterkriterium: `booking.status !== 'cancelled'`
