@@ -97,13 +97,18 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   // Wäsche-Daten laden
   useEffect(() => {
     const fetchLaundryOrders = async () => {
-      const { data } = await (supabase as any)
-        .from('laundry_orders')
-        .select(`
-          id, pickup_date, delivery_date, status,
-          service_tasks!service_task_id ( house_id, houses (id, name) )
-        `);
-      setLaundryOrders(data || []);
+      try {
+        const { data, error } = await supabase
+          .from('linen_orders')
+          .select(`
+            id, delivery_date, status,
+            house_id,
+            houses!linen_orders_house_id_fkey (id, name)
+          `);
+        if (!error && data) setLaundryOrders(data);
+      } catch (e) {
+        console.log('Linen orders not available');
+      }
     };
     fetchLaundryOrders();
   }, []);
