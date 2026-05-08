@@ -470,6 +470,50 @@ export type Database = {
           },
         ]
       }
+      airdna_listings: {
+        Row: {
+          airdna_market_id: string | null
+          airdna_property_id: string | null
+          created_at: string
+          house_id: string
+          id: string
+          last_synced_at: string | null
+          location_normalized: string | null
+          raw: Json | null
+          updated_at: string
+        }
+        Insert: {
+          airdna_market_id?: string | null
+          airdna_property_id?: string | null
+          created_at?: string
+          house_id: string
+          id?: string
+          last_synced_at?: string | null
+          location_normalized?: string | null
+          raw?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          airdna_market_id?: string | null
+          airdna_property_id?: string | null
+          created_at?: string
+          house_id?: string
+          id?: string
+          last_synced_at?: string | null
+          location_normalized?: string | null
+          raw?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "airdna_listings_house_id_fkey"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alpine_activities: {
         Row: {
           address: string
@@ -1524,14 +1568,28 @@ export type Database = {
       }
       daily_pricing: {
         Row: {
+          booked_at: string | null
           competitor_property_id: string | null
           created_at: string | null
           currency: string | null
           date: string
+          dynamic_price: number | null
+          factor_dow: number | null
+          factor_event: number | null
+          factor_gap: number | null
+          factor_leadtime: number | null
+          factor_occupancy: number | null
+          factor_season: number | null
+          final_price: number | null
           house_id: string | null
           id: string
           is_available: boolean | null
+          is_blocked: boolean | null
+          is_booked: boolean | null
           is_expanded: boolean | null
+          market_avg_price: number | null
+          market_occupancy: number | null
+          market_source: string | null
           min_stay: number | null
           period_check_in: string | null
           period_check_out: string | null
@@ -1543,14 +1601,28 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          booked_at?: string | null
           competitor_property_id?: string | null
           created_at?: string | null
           currency?: string | null
           date: string
+          dynamic_price?: number | null
+          factor_dow?: number | null
+          factor_event?: number | null
+          factor_gap?: number | null
+          factor_leadtime?: number | null
+          factor_occupancy?: number | null
+          factor_season?: number | null
+          final_price?: number | null
           house_id?: string | null
           id?: string
           is_available?: boolean | null
+          is_blocked?: boolean | null
+          is_booked?: boolean | null
           is_expanded?: boolean | null
+          market_avg_price?: number | null
+          market_occupancy?: number | null
+          market_source?: string | null
           min_stay?: number | null
           period_check_in?: string | null
           period_check_out?: string | null
@@ -1562,14 +1634,28 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          booked_at?: string | null
           competitor_property_id?: string | null
           created_at?: string | null
           currency?: string | null
           date?: string
+          dynamic_price?: number | null
+          factor_dow?: number | null
+          factor_event?: number | null
+          factor_gap?: number | null
+          factor_leadtime?: number | null
+          factor_occupancy?: number | null
+          factor_season?: number | null
+          final_price?: number | null
           house_id?: string | null
           id?: string
           is_available?: boolean | null
+          is_blocked?: boolean | null
+          is_booked?: boolean | null
           is_expanded?: boolean | null
+          market_avg_price?: number | null
+          market_occupancy?: number | null
+          market_source?: string | null
           min_stay?: number | null
           period_check_in?: string | null
           period_check_out?: string | null
@@ -1668,11 +1754,11 @@ export type Database = {
           id: string
           image_url: string | null
           last_data_refresh: string | null
-          planned_duration: unknown
+          planned_duration: string | null
           rating: number | null
           route_cache_id: string | null
-          travel_time_from: unknown
-          travel_time_to: unknown
+          travel_time_from: string | null
+          travel_time_to: string | null
           trip_date: string
           trip_plan_id: string | null
           updated_at: string | null
@@ -1688,11 +1774,11 @@ export type Database = {
           id?: string
           image_url?: string | null
           last_data_refresh?: string | null
-          planned_duration?: unknown
+          planned_duration?: string | null
           rating?: number | null
           route_cache_id?: string | null
-          travel_time_from?: unknown
-          travel_time_to?: unknown
+          travel_time_from?: string | null
+          travel_time_to?: string | null
           trip_date: string
           trip_plan_id?: string | null
           updated_at?: string | null
@@ -1708,11 +1794,11 @@ export type Database = {
           id?: string
           image_url?: string | null
           last_data_refresh?: string | null
-          planned_duration?: unknown
+          planned_duration?: string | null
           rating?: number | null
           route_cache_id?: string | null
-          travel_time_from?: unknown
-          travel_time_to?: unknown
+          travel_time_from?: string | null
+          travel_time_to?: string | null
           trip_date?: string
           trip_plan_id?: string | null
           updated_at?: string | null
@@ -2107,6 +2193,7 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
+          is_flagged: boolean | null
           name: string
           nationality: string | null
           notes: string | null
@@ -2122,6 +2209,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          is_flagged?: boolean | null
           name: string
           nationality?: string | null
           notes?: string | null
@@ -2137,6 +2225,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          is_flagged?: boolean | null
           name?: string
           nationality?: string | null
           notes?: string | null
@@ -2448,6 +2537,7 @@ export type Database = {
           pricing_config: Json | null
           property_type: string | null
           rental_type: string | null
+          scrape_search_params: Json | null
           tenant_info: Json | null
           updated_at: string | null
         }
@@ -2480,6 +2570,7 @@ export type Database = {
           pricing_config?: Json | null
           property_type?: string | null
           rental_type?: string | null
+          scrape_search_params?: Json | null
           tenant_info?: Json | null
           updated_at?: string | null
         }
@@ -2512,6 +2603,7 @@ export type Database = {
           pricing_config?: Json | null
           property_type?: string | null
           rental_type?: string | null
+          scrape_search_params?: Json | null
           tenant_info?: Json | null
           updated_at?: string | null
         }
@@ -2787,6 +2879,7 @@ export type Database = {
           id: string
           item_variants: Json | null
           items: Json
+          laundry_invoice_id: string | null
           linen_color: string | null
           notes: string | null
           order_date: string
@@ -2813,6 +2906,7 @@ export type Database = {
           id?: string
           item_variants?: Json | null
           items: Json
+          laundry_invoice_id?: string | null
           linen_color?: string | null
           notes?: string | null
           order_date?: string
@@ -2839,6 +2933,7 @@ export type Database = {
           id?: string
           item_variants?: Json | null
           items?: Json
+          laundry_invoice_id?: string | null
           linen_color?: string | null
           notes?: string | null
           order_date?: string
@@ -2871,6 +2966,13 @@ export type Database = {
             columns: ["house_id"]
             isOneToOne: false
             referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "linen_orders_laundry_invoice_id_fkey"
+            columns: ["laundry_invoice_id"]
+            isOneToOne: false
+            referencedRelation: "laundry_invoices"
             referencedColumns: ["id"]
           },
           {
@@ -2944,6 +3046,66 @@ export type Database = {
           },
         ]
       }
+      local_events: {
+        Row: {
+          created_at: string | null
+          date_end: string
+          date_start: string
+          event_size: string | null
+          id: string
+          location: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          date_end: string
+          date_start: string
+          event_size?: string | null
+          id?: string
+          location?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          date_end?: string
+          date_start?: string
+          event_size?: string | null
+          id?: string
+          location?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      market_data_cache: {
+        Row: {
+          avg_price: number | null
+          date: string
+          fetched_at: string | null
+          id: string
+          location: string
+          occupancy_rate: number | null
+          source: string | null
+        }
+        Insert: {
+          avg_price?: number | null
+          date: string
+          fetched_at?: string | null
+          id?: string
+          location: string
+          occupancy_rate?: number | null
+          source?: string | null
+        }
+        Update: {
+          avg_price?: number | null
+          date?: string
+          fetched_at?: string | null
+          id?: string
+          location?: string
+          occupancy_rate?: number | null
+          source?: string | null
+        }
+        Relationships: []
+      }
       marketing_actions: {
         Row: {
           created_at: string
@@ -2989,9 +3151,13 @@ export type Database = {
           created_at: string
           currency: string
           final_price_7nights: number | null
+          guests_adults: number | null
+          guests_children: number | null
           house_id: string | null
           id: string
           markup_percentage: number | null
+          nights: number | null
+          platform_source: string | null
           scraped_at: string | null
           source: string
           updated_at: string
@@ -3004,9 +3170,13 @@ export type Database = {
           created_at?: string
           currency?: string
           final_price_7nights?: number | null
+          guests_adults?: number | null
+          guests_children?: number | null
           house_id?: string | null
           id?: string
           markup_percentage?: number | null
+          nights?: number | null
+          platform_source?: string | null
           scraped_at?: string | null
           source?: string
           updated_at?: string
@@ -3019,9 +3189,13 @@ export type Database = {
           created_at?: string
           currency?: string
           final_price_7nights?: number | null
+          guests_adults?: number | null
+          guests_children?: number | null
           house_id?: string | null
           id?: string
           markup_percentage?: number | null
+          nights?: number | null
+          platform_source?: string | null
           scraped_at?: string | null
           source?: string
           updated_at?: string
@@ -3328,6 +3502,138 @@ export type Database = {
           },
         ]
       }
+      pricelabs_listings: {
+        Row: {
+          base_price: number | null
+          created_at: string
+          health_score: string | null
+          house_id: string
+          id: string
+          last_synced_at: string | null
+          listing_name: string | null
+          max_price: number | null
+          min_price: number | null
+          pms_name: string | null
+          pricelabs_listing_id: string
+          updated_at: string
+        }
+        Insert: {
+          base_price?: number | null
+          created_at?: string
+          health_score?: string | null
+          house_id: string
+          id?: string
+          last_synced_at?: string | null
+          listing_name?: string | null
+          max_price?: number | null
+          min_price?: number | null
+          pms_name?: string | null
+          pricelabs_listing_id: string
+          updated_at?: string
+        }
+        Update: {
+          base_price?: number | null
+          created_at?: string
+          health_score?: string | null
+          house_id?: string
+          id?: string
+          last_synced_at?: string | null
+          listing_name?: string | null
+          max_price?: number | null
+          min_price?: number | null
+          pms_name?: string | null
+          pricelabs_listing_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pricelabs_listings_house_id_fkey"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pricelabs_market_data: {
+        Row: {
+          created_at: string
+          data_date: string
+          fetched_at: string
+          house_id: string
+          id: string
+          neighborhood_data: Json | null
+          pricelabs_listing_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data_date?: string
+          fetched_at?: string
+          house_id: string
+          id?: string
+          neighborhood_data?: Json | null
+          pricelabs_listing_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data_date?: string
+          fetched_at?: string
+          house_id?: string
+          id?: string
+          neighborhood_data?: Json | null
+          pricelabs_listing_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pricelabs_market_data_house_id_fkey"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pricing_logs: {
+        Row: {
+          created_at: string | null
+          date: string
+          house_id: string | null
+          id: string
+          new_price: number | null
+          old_price: number | null
+          trigger: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          house_id?: string | null
+          id?: string
+          new_price?: number | null
+          old_price?: number | null
+          trigger?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          house_id?: string | null
+          id?: string
+          new_price?: number | null
+          old_price?: number | null
+          trigger?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pricing_logs_house_id_fkey"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -3504,6 +3810,59 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      rental_price_analysis: {
+        Row: {
+          analysis_date: string
+          avg_rent: number | null
+          comparable_count: number | null
+          created_at: string
+          house_id: string
+          id: string
+          max_rent: number | null
+          min_rent: number | null
+          price_per_sqm: number | null
+          search_params: Json | null
+          sources: Json | null
+          updated_at: string
+        }
+        Insert: {
+          analysis_date?: string
+          avg_rent?: number | null
+          comparable_count?: number | null
+          created_at?: string
+          house_id: string
+          id?: string
+          max_rent?: number | null
+          min_rent?: number | null
+          price_per_sqm?: number | null
+          search_params?: Json | null
+          sources?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          analysis_date?: string
+          avg_rent?: number | null
+          comparable_count?: number | null
+          created_at?: string
+          house_id?: string
+          id?: string
+          max_rent?: number | null
+          min_rent?: number | null
+          price_per_sqm?: number | null
+          search_params?: Json | null
+          sources?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rental_price_analysis_house_id_fkey"
+            columns: ["house_id"]
+            isOneToOne: false
+            referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       route_cache: {
         Row: {
@@ -4630,6 +4989,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_booking_cascade: {
+        Args: { p_booking_id: string }
+        Returns: undefined
+      }
       get_all_table_rows: {
         Args: never
         Returns: {
@@ -4652,6 +5015,18 @@ export type Database = {
       track_token_usage: {
         Args: { token_hash_param: string }
         Returns: boolean
+      }
+      update_dynamic_price: {
+        Args: {
+          p_date: string
+          p_dynamic_price: number
+          p_factors: Json
+          p_house_id: string
+          p_market_avg_price?: number
+          p_market_occupancy?: number
+          p_source?: string
+        }
+        Returns: undefined
       }
       validate_portal_token: {
         Args: { token: string }
