@@ -434,7 +434,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                     )}
 
                     {config.showTaskDateTime && config.showTaskActions && (
-                      <Dialog>
+                      <Dialog open={isDateDialogOpen} onOpenChange={setIsDateDialogOpen}>
                         <DialogTrigger asChild>
                           <Button
                             variant="outline"
