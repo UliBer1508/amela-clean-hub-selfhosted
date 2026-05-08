@@ -178,22 +178,29 @@ export const useBookings = () => {
     return fetchBookings(true);
   }, [fetchBookings]);
 
+  const fetchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debouncedFetch = useCallback(() => {
+    if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+    fetchTimeoutRef.current = setTimeout(() => {
+      fetchBookings();
+    }, 500);
+  }, [fetchBookings]);
+
   useEffect(() => {
     fetchBookings();
-    
+
     // Realtime-Subscription für bookings
     const bookingsChannel = supabase
       .channel('bookings-changes')
       .on(
         'postgres_changes',
         {
-          event: '*', // INSERT, UPDATE, DELETE
+          event: '*',
           schema: 'public',
           table: 'bookings'
         },
-        (payload) => {
-          console.log('Booking changed:', payload);
-          fetchBookings();
+        () => {
+          debouncedFetch();
         }
       )
       .subscribe();
@@ -208,18 +215,18 @@ export const useBookings = () => {
           schema: 'public',
           table: 'service_tasks'
         },
-        (payload) => {
-          console.log('Service task changed:', payload);
-          fetchBookings();
+        () => {
+          debouncedFetch();
         }
       )
       .subscribe();
 
     return () => {
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
       supabase.removeChannel(bookingsChannel);
       supabase.removeChannel(tasksChannel);
     };
-  }, [fetchBookings]);
+  }, [fetchBookings, debouncedFetch]);
 
   const updateTaskStatus = useCallback(async (
     taskId: string, 
