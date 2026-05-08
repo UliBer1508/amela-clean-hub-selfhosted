@@ -13,7 +13,14 @@ import PWAUpdateNotification from "./components/PWAUpdateNotification";
 import PortalChat from "./components/PortalChat";
 import { usePWAAnalytics } from "./hooks/usePWAAnalytics";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30 * 1000,
+      retry: 2,
+    },
+  },
+});
 
 const AppContent = () => {
   usePWAAnalytics();
@@ -39,9 +46,11 @@ const AppContent = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <TooltipProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 

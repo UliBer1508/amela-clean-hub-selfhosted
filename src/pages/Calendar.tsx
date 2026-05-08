@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import PWAInstallButton from '@/components/PWAInstallButton';
+import PWAStatusBar from '@/components/PWAStatusBar';
 import NotificationSettings from '@/components/NotificationSettings';
 import BookingCardSettings, { useBookingCardConfig } from '@/components/BookingCardSettings';
 import PullToRefresh from '@/components/PullToRefresh';
@@ -96,13 +97,18 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   // Wäsche-Daten laden
   useEffect(() => {
     const fetchLaundryOrders = async () => {
-      const { data } = await (supabase as any)
-        .from('laundry_orders')
-        .select(`
-          id, pickup_date, delivery_date, status,
-          service_tasks!service_task_id ( house_id, houses (id, name) )
-        `);
-      setLaundryOrders(data || []);
+      try {
+        const { data, error } = await supabase
+          .from('linen_orders')
+          .select(`
+            id, delivery_date, status,
+            house_id,
+            houses!linen_orders_house_id_fkey (id, name)
+          `);
+        if (!error && data) setLaundryOrders(data);
+      } catch (e) {
+        console.log('Linen orders not available');
+      }
     };
     fetchLaundryOrders();
   }, []);
@@ -191,20 +197,9 @@ const Calendar = ({ chatProps }: CalendarProps) => {
       });
     });
 
-    // Wäsche-Events aus laundry_orders hinzufügen
+    // Wäsche-Events aus linen_orders hinzufügen
     laundryOrders.forEach(order => {
-      const house = order.service_tasks?.houses;
-      if (order.pickup_date && house) {
-        events.push({
-          id: `laundry-pickup-${order.id}`,
-          date: new Date(order.pickup_date),
-          type: 'laundry-pickup',
-          title: `Wäsche Abholung: ${house.name}`,
-          house: house.name,
-          house_id: house.id,
-          status: order.status
-        });
-      }
+      const house = order.houses;
       if (order.delivery_date && house) {
         events.push({
           id: `laundry-delivery-${order.id}`,
@@ -346,6 +341,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   return (
     <PullToRefresh onRefresh={handleRefresh} disabled={loading}>
     <div className="min-h-screen bg-background">
+      <PWAStatusBar />
+      <div className="pt-12 md:pt-0">
       {/* Header */}
       <header className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -844,6 +841,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
         )}
       </main>
       <Footer />
+      </div>
     </div>
     </PullToRefresh>
   );

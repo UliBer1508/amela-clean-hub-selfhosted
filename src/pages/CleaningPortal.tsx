@@ -8,6 +8,8 @@ import { useCleaningStaff } from '@/hooks/useCleaningStaff';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDateTime } from '@/utils/date';
 import { format } from 'date-fns';
+import { de } from 'date-fns/locale';
+import { AMELA_PROVIDER_ID } from '@/constants/app';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import NotificationSettings from '@/components/NotificationSettings';
 import PWAStatusBar from '@/components/PWAStatusBar';
@@ -85,7 +87,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   const [houseFilter, setHouseFilter] = useState<HouseFilter>('all');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
   // Portal zeigt nur Amela-zugewiesene Reinigungen
-  const [providerFilter, setProviderFilter] = useState<ProviderFilter>('9de6e071-7e89-4d66-9433-a5f01acaa493');
+  const [providerFilter, setProviderFilter] = useState<ProviderFilter>(AMELA_PROVIDER_ID);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState('');
   const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
@@ -125,41 +127,32 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     lastRefresh
   } = useBookings();
 
-  // Realtime-Überwachung für neue Reinigungsaufträge
+  // Realtime-Überwachung NUR für Notifications (Datenrefresh erfolgt in useBookings)
   useEffect(() => {
     const channel = supabase
-      .channel('schema-db-changes')
+      .channel('amela-portal-notifications')
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'service_tasks',
-          filter: `provider_id=eq.9de6e071-7e89-4d66-9433-a5f01acaa493` // Amela's ID
+          filter: `provider_id=eq.${AMELA_PROVIDER_ID}`
         },
         (payload) => {
           console.log('🆕 Neuer Reinigungsauftrag:', payload);
-          
-          // Animation aktivieren
           setHasUnreadNotifications(true);
           setNewTaskCount(prev => prev + 1);
-          
-          // Toast-Benachrichtigung anzeigen
           notify({
             title: "🆕 Neuer Reinigungsauftrag",
             description: "Ein neuer Auftrag wurde zugewiesen.",
             eventType: "new_task",
             duration: 5000,
           });
-          
-          // Optional: Sound abspielen (wenn aktiviert in Einstellungen)
           if (preferences?.sound_notifications) {
             const audio = new Audio('/notification-sound.mp3');
             audio.play().catch(e => console.log('Sound konnte nicht abgespielt werden:', e));
           }
-          
-          // Daten neu laden
-          refetchBookings();
         }
       )
       .on(
@@ -168,24 +161,17 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           event: 'UPDATE',
           schema: 'public',
           table: 'service_tasks',
-          filter: `provider_id=eq.9de6e071-7e89-4d66-9433-a5f01acaa493` // Amela's ID
+          filter: `provider_id=eq.${AMELA_PROVIDER_ID}`
         },
         (payload) => {
           console.log('🔄 Reinigungsauftrag aktualisiert:', payload);
-          
-          // Animation aktivieren (aber keinen Zähler erhöhen, da kein neuer Auftrag)
           setHasUnreadNotifications(true);
-          
-          // Toast-Benachrichtigung anzeigen
           notify({
             title: "🔄 Auftrag aktualisiert",
             description: "Ein Reinigungsauftrag wurde geändert.",
             eventType: "task_change",
             duration: 4000,
           });
-          
-          // Daten neu laden
-          refetchBookings();
         }
       )
       .subscribe();
@@ -193,7 +179,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [notify, preferences, refetchBookings]);
+  }, [notify, preferences]);
 
   const { 
     houses: allHouses = [], 
@@ -326,30 +312,35 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     }
   }, [editingTask, selectedDate, selectedTime, notify, refetchBookings]);
 
-  const handleDateTimeUpdateFromCard = useCallback((taskId: string, date: string, time: string) => {
-    // Find task from combined entries
-    let task = null;
-    for (const entry of combinedEntries) {
-      if (entry.type === 'booking') {
-        task = entry.data.service_tasks?.find(t => t.id === taskId);
-      } else if (entry.data.id === taskId) {
-        task = entry.data;
-      }
-      if (task) break;
-    }
-    
-    if (task) {
-      setEditingTask({
-        id: taskId,
-        scheduled_date: date,
-        scheduled_time: time,
-        status: task.status
+  const handleDateTimeUpdateFromCard = useCallback(async (taskId: string, date: string, time: string) => {
+    try {
+      const { error } = await supabase
+        .from('service_tasks')
+        .update({
+          scheduled_date: date,
+          scheduled_time: time || null
+        })
+        .eq('id', taskId);
+
+      if (error) throw error;
+
+      notify({
+        title: "Termin aktualisiert",
+        description: "Der Termin wurde erfolgreich aktualisiert.",
+        eventType: "task_change"
       });
-      setSelectedDate(new Date(date));
-      setSelectedTime(time);
-      handleDateTimeUpdate();
+
+      refetchBookings();
+    } catch (error) {
+      console.error('Error updating task datetime from card:', error);
+      notify({
+        title: "Fehler",
+        description: "Termin konnte nicht aktualisiert werden.",
+        variant: "destructive",
+        eventType: "info"
+      });
     }
-  }, [combinedEntries, handleDateTimeUpdate]);
+  }, [notify, refetchBookings]);
 
   const handleBookingNotesUpdate = useCallback(async (bookingId: string, notes: string) => {
     try {
@@ -681,24 +672,64 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
                     {/* Das Dropdown wird nicht angezeigt, um Verwirrung zu vermeiden */}
                   </div>
 
-                  <div className="flex justify-center items-center pt-2 border-t border-border">
+                  <div className="flex justify-between items-center pt-2 border-t border-border gap-2 flex-wrap">
                     <span className="text-sm text-muted-foreground">
                       {currentFilteredEntries.length} von {totalCleaningTasks} Aufträgen
                     </span>
+                    {(statusFilter !== 'scheduled' || houseFilter !== 'all' || staffFilter !== 'all' || timeFilter !== 'all' || searchTerm) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setStatusFilter('scheduled');
+                          setHouseFilter('all');
+                          setStaffFilter('all');
+                          setTimeFilter('all');
+                          setSearchTerm('');
+                        }}
+                      >
+                        Filter zurücksetzen
+                      </Button>
+                    )}
                   </div>
                 </div>
               )}
             </CardContent>
           </Card>
 
+          {lastRefresh && (
+            <p className="text-xs text-muted-foreground text-center">
+              Zuletzt aktualisiert: {format(lastRefresh, 'HH:mm:ss', { locale: de })}
+            </p>
+          )}
+
           {/* Booking and Standalone Cleaning Cards */}
           <div className="space-y-3 md:space-y-4">
             {currentFilteredEntries.length === 0 ? (
               <Card>
-                <CardContent className="p-6 md:p-8 text-center">
-                  <p className="text-sm md:text-base text-muted-foreground">
-                    Kein Reinigungsauftrag gefunden. Versuchen Sie andere Filter.
+                <CardContent className="p-8 md:p-12 text-center space-y-3">
+                  <div className="text-5xl">🔍</div>
+                  <h3 className="text-lg font-semibold">Keine Reinigungsaufträge gefunden</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {debouncedSearchTerm
+                      ? `Keine Ergebnisse für "${debouncedSearchTerm}"`
+                      : 'Versuche andere Filter oder prüfe ob Aufträge vorhanden sind.'}
                   </p>
+                  {(statusFilter !== 'scheduled' || houseFilter !== 'all' || staffFilter !== 'all' || timeFilter !== 'all' || searchTerm) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setStatusFilter('scheduled');
+                        setHouseFilter('all');
+                        setStaffFilter('all');
+                        setTimeFilter('all');
+                        setSearchTerm('');
+                      }}
+                    >
+                      Filter zurücksetzen
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ) : (

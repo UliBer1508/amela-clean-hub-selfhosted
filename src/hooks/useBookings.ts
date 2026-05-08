@@ -20,16 +20,9 @@ export const useBookings = () => {
       setLoading(true);
       setError(null);
       
-      // Add cache-busting parameters for force refresh
-      const cacheBuster = forceRefresh ? `?t=${Date.now()}` : '';
-      
-      // Create a new Supabase client instance for force refresh
-      const clientToUse = forceRefresh ? 
-        supabase.from('bookings') : 
-        supabase.from('bookings');
-      
       // Fetch bookings with cleaning tasks (for main cleaning portal)
-      const { data: cleaningData, error: cleaningError } = await clientToUse
+      const { data: cleaningData, error: cleaningError } = await supabase
+        .from('bookings')
         .select(`
           id,
           guest_name,
