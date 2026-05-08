@@ -841,6 +841,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
         )}
       </main>
       <Footer />
+      </div>
     </div>
     </PullToRefresh>
   );
