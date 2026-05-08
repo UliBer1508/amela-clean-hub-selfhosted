@@ -2,8 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect } from 'react';
-
-const AMELA_PROVIDER_ID = '9de6e071-7e89-4d66-9433-a5f01acaa493';
+import { AMELA_PROVIDER_ID } from '@/constants/app';
 
 export interface PortalMessage {
   id: string;
