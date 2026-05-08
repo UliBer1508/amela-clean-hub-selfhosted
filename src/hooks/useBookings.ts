@@ -310,7 +310,7 @@ export const useBookings = () => {
   ): CleaningEntry[] => {
     const sanitizedSearch = sanitizeSearchTerm(searchTerm.toLowerCase());
     
-    return combinedEntries.filter(entry => {
+    const filtered = combinedEntries.filter(entry => {
       if (entry.type === 'booking') {
         const booking = entry.data;
         
@@ -367,6 +367,34 @@ export const useBookings = () => {
         
         return matchesSearch && matchesStatus && matchesStaff && matchesTime && matchesHouse && matchesProvider;
       }
+    });
+
+    const isCompleted = statusFilter === 'completed';
+
+    const getSortDate = (entry: CleaningEntry): number => {
+      if (entry.type === 'booking') {
+        const tasks = entry.data.service_tasks || [];
+        if (isCompleted) {
+          // Neuester abgeschlossener Task
+          const completed = tasks
+            .filter((t: any) => t.status === 'completed')
+            .map((t: any) => t.completed_at || t.scheduled_date)
+            .filter(Boolean) as string[];
+          const dates = completed.length ? completed : tasks.map((t: any) => t.scheduled_date).filter(Boolean);
+          return dates.length ? Math.max(...dates.map(d => new Date(d).getTime())) : 0;
+        }
+        const dates = tasks.map((t: any) => t.scheduled_date).filter(Boolean) as string[];
+        return dates.length ? Math.min(...dates.map(d => new Date(d).getTime())) : 0;
+      }
+      const c: any = entry.data;
+      const d = isCompleted ? (c.completed_at || c.scheduled_date) : c.scheduled_date;
+      return d ? new Date(d).getTime() : 0;
+    };
+
+    return filtered.sort((a, b) => {
+      const aT = getSortDate(a);
+      const bT = getSortDate(b);
+      return isCompleted ? bT - aT : aT - bT;
     });
   }, [combinedEntries]);
 
