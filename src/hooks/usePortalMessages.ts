@@ -101,7 +101,7 @@ export const usePortalMessages = () => {
   // Realtime Subscription
   useEffect(() => {
     const channel = supabase
-      .channel('amela-portal-messages')
+      .channel(`amela-portal-messages-${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         {
