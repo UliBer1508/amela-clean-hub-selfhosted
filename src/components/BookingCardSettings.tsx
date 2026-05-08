@@ -227,6 +227,7 @@ const BookingCardSettings: React.FC<BookingCardSettingsProps> = ({
 // Hook for managing booking card configuration
 export const useBookingCardConfig = () => {
   const [config, setConfig] = useState<BookingCardConfig>(DEFAULT_CONFIG);
+  const [configId, setConfigId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -234,7 +235,7 @@ export const useBookingCardConfig = () => {
       try {
         const { data, error } = await supabase
           .from('booking_card_config')
-          .select('config')
+          .select('id, config')
           .order('created_at', { ascending: false })
           .limit(1)
           .single();
@@ -242,8 +243,11 @@ export const useBookingCardConfig = () => {
         if (error && error.code !== 'PGRST116') {
           console.error('Error loading booking card config:', error);
           setConfig(DEFAULT_CONFIG);
-        } else if (data && data.config) {
-          setConfig({ ...DEFAULT_CONFIG, ...(data.config as unknown as BookingCardConfig) });
+        } else if (data) {
+          setConfigId(data.id);
+          if (data.config) {
+            setConfig({ ...DEFAULT_CONFIG, ...(data.config as unknown as BookingCardConfig) });
+          }
         }
       } catch (error) {
         console.error('Error loading booking card config:', error);
@@ -258,37 +262,23 @@ export const useBookingCardConfig = () => {
 
   const updateConfig = async (newConfig: BookingCardConfig) => {
     try {
-      // Check if there's an existing config
-      const { data: existingConfig } = await supabase
+      const payload: any = {
+        config: newConfig as any,
+        updated_at: new Date().toISOString(),
+      };
+      if (configId) payload.id = configId;
+
+      const { data, error } = await supabase
         .from('booking_card_config')
+        .upsert(payload, { onConflict: 'id' })
         .select('id')
-        .order('created_at', { ascending: false })
-        .limit(1)
         .single();
 
-      if (existingConfig) {
-        // Update existing config
-        const { error } = await supabase
-          .from('booking_card_config')
-          .update({ config: newConfig as any })
-          .eq('id', existingConfig.id);
-
-        if (error) {
-          console.error('Error updating booking card config:', error);
-          return;
-        }
-      } else {
-        // Create new config
-        const { error } = await supabase
-          .from('booking_card_config')
-          .insert([{ config: newConfig as any }]);
-
-        if (error) {
-          console.error('Error creating booking card config:', error);
-          return;
-        }
+      if (error) {
+        console.error('Error saving booking card config:', error);
+        return;
       }
-
+      if (data?.id) setConfigId(data.id);
       setConfig(newConfig);
     } catch (error) {
       console.error('Error updating booking card config:', error);
