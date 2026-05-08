@@ -87,7 +87,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   const [houseFilter, setHouseFilter] = useState<HouseFilter>('all');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
   // Portal zeigt nur Amela-zugewiesene Reinigungen
-  const [providerFilter, setProviderFilter] = useState<ProviderFilter>('9de6e071-7e89-4d66-9433-a5f01acaa493');
+  const [providerFilter, setProviderFilter] = useState<ProviderFilter>(AMELA_PROVIDER_ID);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState('');
   const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
