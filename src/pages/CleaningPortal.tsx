@@ -127,41 +127,32 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     lastRefresh
   } = useBookings();
 
-  // Realtime-Überwachung für neue Reinigungsaufträge
+  // Realtime-Überwachung NUR für Notifications (Datenrefresh erfolgt in useBookings)
   useEffect(() => {
     const channel = supabase
-      .channel('schema-db-changes')
+      .channel('amela-portal-notifications')
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'service_tasks',
-          filter: `provider_id=eq.9de6e071-7e89-4d66-9433-a5f01acaa493` // Amela's ID
+          filter: `provider_id=eq.${AMELA_PROVIDER_ID}`
         },
         (payload) => {
           console.log('🆕 Neuer Reinigungsauftrag:', payload);
-          
-          // Animation aktivieren
           setHasUnreadNotifications(true);
           setNewTaskCount(prev => prev + 1);
-          
-          // Toast-Benachrichtigung anzeigen
           notify({
             title: "🆕 Neuer Reinigungsauftrag",
             description: "Ein neuer Auftrag wurde zugewiesen.",
             eventType: "new_task",
             duration: 5000,
           });
-          
-          // Optional: Sound abspielen (wenn aktiviert in Einstellungen)
           if (preferences?.sound_notifications) {
             const audio = new Audio('/notification-sound.mp3');
             audio.play().catch(e => console.log('Sound konnte nicht abgespielt werden:', e));
           }
-          
-          // Daten neu laden
-          refetchBookings();
         }
       )
       .on(
@@ -170,24 +161,17 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           event: 'UPDATE',
           schema: 'public',
           table: 'service_tasks',
-          filter: `provider_id=eq.9de6e071-7e89-4d66-9433-a5f01acaa493` // Amela's ID
+          filter: `provider_id=eq.${AMELA_PROVIDER_ID}`
         },
         (payload) => {
           console.log('🔄 Reinigungsauftrag aktualisiert:', payload);
-          
-          // Animation aktivieren (aber keinen Zähler erhöhen, da kein neuer Auftrag)
           setHasUnreadNotifications(true);
-          
-          // Toast-Benachrichtigung anzeigen
           notify({
             title: "🔄 Auftrag aktualisiert",
             description: "Ein Reinigungsauftrag wurde geändert.",
             eventType: "task_change",
             duration: 4000,
           });
-          
-          // Daten neu laden
-          refetchBookings();
         }
       )
       .subscribe();
@@ -195,7 +179,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [notify, preferences, refetchBookings]);
+  }, [notify, preferences]);
 
   const { 
     houses: allHouses = [], 
