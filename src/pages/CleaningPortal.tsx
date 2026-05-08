@@ -712,7 +712,18 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
 
           {/* Booking and Standalone Cleaning Cards */}
           <div className="space-y-3 md:space-y-4">
-            {currentFilteredEntries.length === 0 ? (
+            {bookingsLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <Card key={`skeleton-${i}`}>
+                  <CardContent className="p-4 space-y-3">
+                    <div className="h-4 w-1/3 bg-muted rounded animate-pulse" />
+                    <div className="h-3 w-2/3 bg-muted rounded animate-pulse" />
+                    <div className="h-3 w-1/2 bg-muted rounded animate-pulse" />
+                    <div className="h-8 w-24 bg-muted rounded animate-pulse" />
+                  </CardContent>
+                </Card>
+              ))
+            ) : currentFilteredEntries.length === 0 ? (
               <Card>
                 <CardContent className="p-8 md:p-12 text-center space-y-3">
                   <div className="text-5xl">🔍</div>
