@@ -423,7 +423,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     }
   }, [notify, refetchBookings]);
 
-  if (bookingsLoading || housesLoading || staffLoading || configLoading) {
+  if (housesLoading || staffLoading || configLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -436,10 +436,17 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
 
   if (bookingsError) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500">Fehler beim Laden der Buchungen: {bookingsError}</p>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="p-6 text-center space-y-4">
+            <div className="text-5xl">⚠️</div>
+            <h2 className="text-xl font-semibold">Verbindungsfehler</h2>
+            <p className="text-sm text-muted-foreground break-words">{bookingsError}</p>
+            <Button onClick={() => forceRefresh()} className="hover-scale">
+              🔄 Erneut versuchen
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -705,7 +712,18 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
 
           {/* Booking and Standalone Cleaning Cards */}
           <div className="space-y-3 md:space-y-4">
-            {currentFilteredEntries.length === 0 ? (
+            {bookingsLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <Card key={`skeleton-${i}`}>
+                  <CardContent className="p-4 space-y-3">
+                    <div className="h-4 w-1/3 bg-muted rounded animate-pulse" />
+                    <div className="h-3 w-2/3 bg-muted rounded animate-pulse" />
+                    <div className="h-3 w-1/2 bg-muted rounded animate-pulse" />
+                    <div className="h-8 w-24 bg-muted rounded animate-pulse" />
+                  </CardContent>
+                </Card>
+              ))
+            ) : currentFilteredEntries.length === 0 ? (
               <Card>
                 <CardContent className="p-8 md:p-12 text-center space-y-3">
                   <div className="text-5xl">🔍</div>

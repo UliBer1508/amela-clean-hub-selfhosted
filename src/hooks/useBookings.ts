@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Booking, StatusFilter, TimeFilter, StaffFilter, HouseFilter, ProviderFilter, StandaloneCleaningTask, CleaningEntry } from '@/types/booking';
 import { APP_CONFIG } from '@/constants/app';
@@ -20,76 +20,79 @@ export const useBookings = () => {
       setLoading(true);
       setError(null);
       
-      // Fetch bookings with cleaning tasks (for main cleaning portal)
-      const { data: cleaningData, error: cleaningError } = await supabase
-        .from('bookings')
-        .select(`
-          id,
-          guest_name,
-          guest_email,
-          check_in,
-          check_out,
-          number_of_guests,
-          status,
-          house_id,
-          houses!bookings_house_id_fkey (
-            name,
-            address
-          ),
-          guests (*),
-          service_tasks!service_tasks_booking_id_fkey!inner (
+      // Fetch bookings (cleaning + all) in parallel
+      const [
+        { data: cleaningData, error: cleaningError },
+        { data: allData, error: allError },
+      ] = await Promise.all([
+        supabase
+          .from('bookings')
+          .select(`
             id,
-            service_type,
-            scheduled_date,
-            scheduled_time,
+            guest_name,
+            guest_email,
+            check_in,
+            check_out,
+            number_of_guests,
             status,
-            assigned_staff_id,
-            provider_id,
-            completed_at,
-            notes,
-            payment_status,
-            service_providers!service_tasks_provider_id_fkey (
-              name
+            house_id,
+            houses!bookings_house_id_fkey (
+              name,
+              address
+            ),
+            guests (*),
+            service_tasks!service_tasks_booking_id_fkey!inner (
+              id,
+              service_type,
+              scheduled_date,
+              scheduled_time,
+              status,
+              assigned_staff_id,
+              provider_id,
+              completed_at,
+              notes,
+              payment_status,
+              service_providers!service_tasks_provider_id_fkey (
+                name
+              )
             )
-          )
-        `)
-        .eq('service_tasks.service_type', 'cleaning')
-        .limit(APP_CONFIG.ITEMS_PER_PAGE);
-
-      // Fetch all bookings (for calendar view)
-      const { data: allData, error: allError } = await supabase
-        .from('bookings')
-        .select(`
-          id,
-          guest_name,
-          guest_email,
-          check_in,
-          check_out,
-          number_of_guests,
-          status,
-          house_id,
-          houses!bookings_house_id_fkey (
-            name,
-            address
-          ),
-          guests (*),
-          service_tasks!service_tasks_booking_id_fkey (
+          `)
+          .eq('service_tasks.service_type', 'cleaning')
+          .limit(APP_CONFIG.ITEMS_PER_PAGE),
+        supabase
+          .from('bookings')
+          .select(`
             id,
-            service_type,
-            scheduled_date,
-            scheduled_time,
+            guest_name,
+            guest_email,
+            check_in,
+            check_out,
+            number_of_guests,
             status,
-            assigned_staff_id,
-            provider_id,
-            completed_at,
-            notes,
-            payment_status,
-            service_providers!service_tasks_provider_id_fkey (
-              name
+            house_id,
+            houses!bookings_house_id_fkey (
+              name,
+              address
+            ),
+            guests (*),
+            service_tasks!service_tasks_booking_id_fkey (
+              id,
+              service_type,
+              scheduled_date,
+              scheduled_time,
+              status,
+              assigned_staff_id,
+              provider_id,
+              completed_at,
+              notes,
+              payment_status,
+              service_providers!service_tasks_provider_id_fkey (
+                name
+              )
             )
-          )
-        `)
-        .order('check_in', { ascending: true });
+          `)
+          .order('check_in', { ascending: true }),
+      ]);
 
       if (cleaningError) throw cleaningError;
       if (allError) throw allError;
@@ -175,22 +178,29 @@ export const useBookings = () => {
     return fetchBookings(true);
   }, [fetchBookings]);
 
+  const fetchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debouncedFetch = useCallback(() => {
+    if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+    fetchTimeoutRef.current = setTimeout(() => {
+      fetchBookings();
+    }, 500);
+  }, [fetchBookings]);
+
   useEffect(() => {
     fetchBookings();
-    
+
     // Realtime-Subscription für bookings
     const bookingsChannel = supabase
       .channel('bookings-changes')
       .on(
         'postgres_changes',
         {
-          event: '*', // INSERT, UPDATE, DELETE
+          event: '*',
           schema: 'public',
           table: 'bookings'
         },
-        (payload) => {
-          console.log('Booking changed:', payload);
-          fetchBookings();
+        () => {
+          debouncedFetch();
         }
       )
       .subscribe();
@@ -205,18 +215,18 @@ export const useBookings = () => {
           schema: 'public',
           table: 'service_tasks'
         },
-        (payload) => {
-          console.log('Service task changed:', payload);
-          fetchBookings();
+        () => {
+          debouncedFetch();
         }
       )
       .subscribe();
 
     return () => {
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
       supabase.removeChannel(bookingsChannel);
       supabase.removeChannel(tasksChannel);
     };
-  }, [fetchBookings]);
+  }, [fetchBookings, debouncedFetch]);
 
   const updateTaskStatus = useCallback(async (
     taskId: string, 
