@@ -20,76 +20,79 @@ export const useBookings = () => {
       setLoading(true);
       setError(null);
       
-      // Fetch bookings with cleaning tasks (for main cleaning portal)
-      const { data: cleaningData, error: cleaningError } = await supabase
-        .from('bookings')
-        .select(`
-          id,
-          guest_name,
-          guest_email,
-          check_in,
-          check_out,
-          number_of_guests,
-          status,
-          house_id,
-          houses!bookings_house_id_fkey (
-            name,
-            address
-          ),
-          guests (*),
-          service_tasks!service_tasks_booking_id_fkey!inner (
+      // Fetch bookings (cleaning + all) in parallel
+      const [
+        { data: cleaningData, error: cleaningError },
+        { data: allData, error: allError },
+      ] = await Promise.all([
+        supabase
+          .from('bookings')
+          .select(`
             id,
-            service_type,
-            scheduled_date,
-            scheduled_time,
+            guest_name,
+            guest_email,
+            check_in,
+            check_out,
+            number_of_guests,
             status,
-            assigned_staff_id,
-            provider_id,
-            completed_at,
-            notes,
-            payment_status,
-            service_providers!service_tasks_provider_id_fkey (
-              name
+            house_id,
+            houses!bookings_house_id_fkey (
+              name,
+              address
+            ),
+            guests (*),
+            service_tasks!service_tasks_booking_id_fkey!inner (
+              id,
+              service_type,
+              scheduled_date,
+              scheduled_time,
+              status,
+              assigned_staff_id,
+              provider_id,
+              completed_at,
+              notes,
+              payment_status,
+              service_providers!service_tasks_provider_id_fkey (
+                name
+              )
             )
-          )
-        `)
-        .eq('service_tasks.service_type', 'cleaning')
-        .limit(APP_CONFIG.ITEMS_PER_PAGE);
-
-      // Fetch all bookings (for calendar view)
-      const { data: allData, error: allError } = await supabase
-        .from('bookings')
-        .select(`
-          id,
-          guest_name,
-          guest_email,
-          check_in,
-          check_out,
-          number_of_guests,
-          status,
-          house_id,
-          houses!bookings_house_id_fkey (
-            name,
-            address
-          ),
-          guests (*),
-          service_tasks!service_tasks_booking_id_fkey (
+          `)
+          .eq('service_tasks.service_type', 'cleaning')
+          .limit(APP_CONFIG.ITEMS_PER_PAGE),
+        supabase
+          .from('bookings')
+          .select(`
             id,
-            service_type,
-            scheduled_date,
-            scheduled_time,
+            guest_name,
+            guest_email,
+            check_in,
+            check_out,
+            number_of_guests,
             status,
-            assigned_staff_id,
-            provider_id,
-            completed_at,
-            notes,
-            payment_status,
-            service_providers!service_tasks_provider_id_fkey (
-              name
+            house_id,
+            houses!bookings_house_id_fkey (
+              name,
+              address
+            ),
+            guests (*),
+            service_tasks!service_tasks_booking_id_fkey (
+              id,
+              service_type,
+              scheduled_date,
+              scheduled_time,
+              status,
+              assigned_staff_id,
+              provider_id,
+              completed_at,
+              notes,
+              payment_status,
+              service_providers!service_tasks_provider_id_fkey (
+                name
+              )
             )
-          )
-        `)
-        .order('check_in', { ascending: true });
+          `)
+          .order('check_in', { ascending: true }),
+      ]);
 
       if (cleaningError) throw cleaningError;
       if (allError) throw allError;
