@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import PWAInstallButton from '@/components/PWAInstallButton';
+import PWAStatusBar from '@/components/PWAStatusBar';
 import NotificationSettings from '@/components/NotificationSettings';
 import BookingCardSettings, { useBookingCardConfig } from '@/components/BookingCardSettings';
 import PullToRefresh from '@/components/PullToRefresh';
