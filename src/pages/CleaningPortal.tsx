@@ -312,30 +312,35 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     }
   }, [editingTask, selectedDate, selectedTime, notify, refetchBookings]);
 
-  const handleDateTimeUpdateFromCard = useCallback((taskId: string, date: string, time: string) => {
-    // Find task from combined entries
-    let task = null;
-    for (const entry of combinedEntries) {
-      if (entry.type === 'booking') {
-        task = entry.data.service_tasks?.find(t => t.id === taskId);
-      } else if (entry.data.id === taskId) {
-        task = entry.data;
-      }
-      if (task) break;
-    }
-    
-    if (task) {
-      setEditingTask({
-        id: taskId,
-        scheduled_date: date,
-        scheduled_time: time,
-        status: task.status
+  const handleDateTimeUpdateFromCard = useCallback(async (taskId: string, date: string, time: string) => {
+    try {
+      const { error } = await supabase
+        .from('service_tasks')
+        .update({
+          scheduled_date: date,
+          scheduled_time: time || null
+        })
+        .eq('id', taskId);
+
+      if (error) throw error;
+
+      notify({
+        title: "Termin aktualisiert",
+        description: "Der Termin wurde erfolgreich aktualisiert.",
+        eventType: "task_change"
       });
-      setSelectedDate(new Date(date));
-      setSelectedTime(time);
-      handleDateTimeUpdate();
+
+      refetchBookings();
+    } catch (error) {
+      console.error('Error updating task datetime from card:', error);
+      notify({
+        title: "Fehler",
+        description: "Termin konnte nicht aktualisiert werden.",
+        variant: "destructive",
+        eventType: "info"
+      });
     }
-  }, [combinedEntries, handleDateTimeUpdate]);
+  }, [notify, refetchBookings]);
 
   const handleBookingNotesUpdate = useCallback(async (bookingId: string, notes: string) => {
     try {
