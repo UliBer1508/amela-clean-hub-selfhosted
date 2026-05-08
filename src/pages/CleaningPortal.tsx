@@ -672,24 +672,64 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
                     {/* Das Dropdown wird nicht angezeigt, um Verwirrung zu vermeiden */}
                   </div>
 
-                  <div className="flex justify-center items-center pt-2 border-t border-border">
+                  <div className="flex justify-between items-center pt-2 border-t border-border gap-2 flex-wrap">
                     <span className="text-sm text-muted-foreground">
                       {currentFilteredEntries.length} von {totalCleaningTasks} Aufträgen
                     </span>
+                    {(statusFilter !== 'scheduled' || houseFilter !== 'all' || staffFilter !== 'all' || timeFilter !== 'all' || searchTerm) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setStatusFilter('scheduled');
+                          setHouseFilter('all');
+                          setStaffFilter('all');
+                          setTimeFilter('all');
+                          setSearchTerm('');
+                        }}
+                      >
+                        Filter zurücksetzen
+                      </Button>
+                    )}
                   </div>
                 </div>
               )}
             </CardContent>
           </Card>
 
+          {lastRefresh && (
+            <p className="text-xs text-muted-foreground text-center">
+              Zuletzt aktualisiert: {format(lastRefresh, 'HH:mm:ss', { locale: de })}
+            </p>
+          )}
+
           {/* Booking and Standalone Cleaning Cards */}
           <div className="space-y-3 md:space-y-4">
             {currentFilteredEntries.length === 0 ? (
               <Card>
-                <CardContent className="p-6 md:p-8 text-center">
-                  <p className="text-sm md:text-base text-muted-foreground">
-                    Kein Reinigungsauftrag gefunden. Versuchen Sie andere Filter.
+                <CardContent className="p-8 md:p-12 text-center space-y-3">
+                  <div className="text-5xl">🔍</div>
+                  <h3 className="text-lg font-semibold">Keine Reinigungsaufträge gefunden</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {debouncedSearchTerm
+                      ? `Keine Ergebnisse für "${debouncedSearchTerm}"`
+                      : 'Versuche andere Filter oder prüfe ob Aufträge vorhanden sind.'}
                   </p>
+                  {(statusFilter !== 'scheduled' || houseFilter !== 'all' || staffFilter !== 'all' || timeFilter !== 'all' || searchTerm) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setStatusFilter('scheduled');
+                        setHouseFilter('all');
+                        setStaffFilter('all');
+                        setTimeFilter('all');
+                        setSearchTerm('');
+                      }}
+                    >
+                      Filter zurücksetzen
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ) : (
