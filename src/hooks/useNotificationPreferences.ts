@@ -65,7 +65,7 @@ export function useNotificationPreferences() {
 
     // Subscribe to real-time updates
     const channel = supabase
-      .channel('notification_preferences_changes')
+      .channel(`notification_preferences_changes_${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         {
