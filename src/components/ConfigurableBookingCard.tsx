@@ -69,11 +69,13 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
   const [bookingNotesValue, setBookingNotesValue] = useState(booking.notes || '');
   const [taskNotesValue, setTaskNotesValue] = useState<{[key: string]: string}>({});
   const [showChecklist, setShowChecklist] = useState(false);
+  const [isDateDialogOpen, setIsDateDialogOpen] = useState(false);
 
   const handleEditDateTime = (task: any) => {
     setEditingTask(task);
     setSelectedDate(new Date(task.scheduled_date));
     setSelectedTime(task.scheduled_time || '');
+    setIsDateDialogOpen(true);
   };
 
   const handleDateTimeUpdateInternal = () => {
@@ -81,6 +83,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
       const dateStr = selectedDate.toISOString().split('T')[0];
       onDateTimeUpdate(editingTask.id, dateStr, selectedTime);
       setEditingTask(null);
+      setIsDateDialogOpen(false);
     }
   };
 
