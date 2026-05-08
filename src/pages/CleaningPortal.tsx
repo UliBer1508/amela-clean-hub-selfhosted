@@ -8,6 +8,8 @@ import { useCleaningStaff } from '@/hooks/useCleaningStaff';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDateTime } from '@/utils/date';
 import { format } from 'date-fns';
+import { de } from 'date-fns/locale';
+import { AMELA_PROVIDER_ID } from '@/constants/app';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import NotificationSettings from '@/components/NotificationSettings';
 import PWAStatusBar from '@/components/PWAStatusBar';
