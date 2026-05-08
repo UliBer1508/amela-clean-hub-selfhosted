@@ -197,20 +197,9 @@ const Calendar = ({ chatProps }: CalendarProps) => {
       });
     });
 
-    // Wäsche-Events aus laundry_orders hinzufügen
+    // Wäsche-Events aus linen_orders hinzufügen
     laundryOrders.forEach(order => {
-      const house = order.service_tasks?.houses;
-      if (order.pickup_date && house) {
-        events.push({
-          id: `laundry-pickup-${order.id}`,
-          date: new Date(order.pickup_date),
-          type: 'laundry-pickup',
-          title: `Wäsche Abholung: ${house.name}`,
-          house: house.name,
-          house_id: house.id,
-          status: order.status
-        });
-      }
+      const house = order.houses;
       if (order.delivery_date && house) {
         events.push({
           id: `laundry-delivery-${order.id}`,
