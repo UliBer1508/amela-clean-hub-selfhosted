@@ -423,7 +423,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     }
   }, [notify, refetchBookings]);
 
-  if (bookingsLoading || housesLoading || staffLoading || configLoading) {
+  if (housesLoading || staffLoading || configLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -436,10 +436,17 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
 
   if (bookingsError) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500">Fehler beim Laden der Buchungen: {bookingsError}</p>
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="p-6 text-center space-y-4">
+            <div className="text-5xl">⚠️</div>
+            <h2 className="text-xl font-semibold">Verbindungsfehler</h2>
+            <p className="text-sm text-muted-foreground break-words">{bookingsError}</p>
+            <Button onClick={() => forceRefresh()} className="hover-scale">
+              🔄 Erneut versuchen
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
