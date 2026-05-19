@@ -130,28 +130,8 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           </Select>
         </div>
 
-        {/* Putzkraft */}
-        <div className="flex items-center gap-2">
-          <Label className="text-xs text-muted-foreground w-20 shrink-0">Putzkraft</Label>
-          <Select
-            value={task.assigned_staff_id || 'unassigned'}
-            onValueChange={(v) => onStaffUpdate(task.id, v === 'unassigned' ? null : v)}
-          >
-            <SelectTrigger className="min-h-[44px] flex-1">
-              <SelectValue>
-                {task.assigned_staff_id
-                  ? staff.find((s) => s.id === task.assigned_staff_id)?.name || 'Nicht zugewiesen'
-                  : 'Nicht zugewiesen'}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="unassigned">Nicht zugewiesen</SelectItem>
-              {staff.filter((s) => s.is_active).map((s) => (
-                <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+
+
 
         {/* Notizen (kompakt) */}
         {onNotesUpdate && (
