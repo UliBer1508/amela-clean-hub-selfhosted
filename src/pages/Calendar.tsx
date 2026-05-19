@@ -654,6 +654,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                       const isCurrentMonth = viewType === 'week' ? true : isSameMonth(day, currentDate);
                       const isTodayDate = isToday(day);
                       const isSelected = selectedDate && isSameDay(day, selectedDate);
+                      const occupied = isDayOccupied(day);
 
                       return (
                         <div
@@ -661,8 +662,12 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                           className={cn(
                             viewType === 'week' ? 'min-h-[120px]' : 'min-h-[88px] sm:min-h-[100px]',
                             'p-1.5 sm:p-2 border border-border cursor-pointer transition-colors rounded-sm',
-                            !isCurrentMonth && 'bg-muted/50 text-muted-foreground',
-                            isTodayDate && !isSelected && 'bg-primary/10',
+                            isCurrentMonth
+                              ? occupied
+                                ? 'bg-sky-100 dark:bg-sky-900/40'
+                                : 'bg-sky-50 dark:bg-sky-950/30'
+                              : 'bg-muted/50 text-muted-foreground',
+                            isTodayDate && !isSelected && 'ring-2 ring-primary/60 ring-inset',
                             isSelected && 'ring-2 ring-primary ring-inset',
                             'hover:bg-accent active:bg-accent'
                           )}
