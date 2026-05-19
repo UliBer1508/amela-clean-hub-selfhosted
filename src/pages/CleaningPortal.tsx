@@ -93,6 +93,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   const [selectedTime, setSelectedTime] = useState('');
   const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const [showReminderPopup, setShowReminderPopup] = useState(false);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [newTaskCount, setNewTaskCount] = useState(0);
