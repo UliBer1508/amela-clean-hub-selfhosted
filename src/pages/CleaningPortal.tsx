@@ -6,62 +6,37 @@ import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import { useCleaningStaff } from '@/hooks/useCleaningStaff';
 import { supabase } from '@/integrations/supabase/client';
-import { formatDateTime } from '@/utils/date';
-import { format } from 'date-fns';
-import { de } from 'date-fns/locale';
 import { AMELA_PROVIDER_ID } from '@/constants/app';
 import PWAInstallButton from '@/components/PWAInstallButton';
-import NotificationSettings from '@/components/NotificationSettings';
 import PWAStatusBar from '@/components/PWAStatusBar';
 import { usePWA } from '@/hooks/usePWA';
 import PullToRefresh from '@/components/PullToRefresh';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import BookingCardSettings, { useBookingCardConfig } from "@/components/BookingCardSettings";
 import AmelaEntryRow from "@/components/amela/AmelaEntryRow";
 import CleaningReminderBanner from "@/components/amela/CleaningReminderBanner";
 import ReminderSettingsPopover from "@/components/amela/ReminderSettingsPopover";
-import AddStandaloneCleaningDialog from "@/components/AddStandaloneCleaningDialog";
 import { ChatButton } from '@/components/PortalChat';
 import { usePortalMessages } from '@/hooks/usePortalMessages';
 import {
   Home,
   Search,
-  Filter,
   Bell,
   Calendar,
-  Users,
-  ArrowLeft,
-  UserPlus,
-  RefreshCw,
-  ChevronDown,
-  ChevronUp,
   Clock,
   CheckCircle2,
   XCircle,
   AlertTriangle,
   MessageCircle,
-  CalendarRange,
-  CalendarDays,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 type StatusFilter = 'all' | 'scheduled' | 'in_progress' | 'completed' | 'delayed' | 'cancelled';
-type StaffFilter = 'all' | 'assigned' | 'unassigned';
 type HouseFilter = 'all' | string;
 type TimeFilter = 'all' | 'week' | 'thisWeek' | 'nextWeek' | 'month' | '3months';
 type ProviderFilter = 'all' | 'unassigned' | string;
-
-interface TaskEditingState {
-  id: string;
-  scheduled_date: string;
-  scheduled_time: string | null;
-  status: string;
-}
 
 const STATUS_FILTERS = {
   all: 'Alle Status',
