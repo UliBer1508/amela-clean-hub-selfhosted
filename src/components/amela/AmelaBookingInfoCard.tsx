@@ -7,9 +7,10 @@ import { formatDateTime } from '@/utils/date';
 
 interface AmelaBookingInfoCardProps {
   booking: any;
+  accentColor?: string;
 }
 
-const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking }) => {
+const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking, accentColor }) => {
   const isCheckedIn = booking.status === 'checked_in';
 
   return (
