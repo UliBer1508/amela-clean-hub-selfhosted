@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import { useAllBookings } from '@/hooks/useAllBookings';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
+import { useCleaningStaff } from '@/hooks/useCleaningStaff';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import PWAStatusBar from '@/components/PWAStatusBar';
 import { usePWA } from '@/hooks/usePWA';
