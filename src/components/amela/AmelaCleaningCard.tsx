@@ -9,7 +9,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, Clock, CalendarIcon, Pencil, ClipboardCheck, ChevronDown } from 'lucide-react';
+import { Sparkles, Clock, CalendarIcon, Pencil, ClipboardCheck, ChevronDown, CheckCircle2, XCircle, AlertTriangle, PlayCircle, StickyNote } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { formatDateTime } from '@/utils/date';
@@ -26,12 +26,12 @@ interface AmelaCleaningCardProps {
   accentColor?: string;
 }
 
-const STATUS_OPTIONS: Array<{ value: string; label: string }> = [
-  { value: 'scheduled', label: '📅 Geplant' },
-  { value: 'in_progress', label: '⏳ In Bearbeitung' },
-  { value: 'completed', label: '✅ Abgeschlossen' },
-  { value: 'delayed', label: '⚠️ Verzögert' },
-  { value: 'cancelled', label: '❌ Storniert' },
+const STATUS_OPTIONS: Array<{ value: string; label: string; Icon: typeof CheckCircle2 }> = [
+  { value: 'scheduled', label: 'Geplant', Icon: CalendarIcon },
+  { value: 'in_progress', label: 'In Bearbeitung', Icon: PlayCircle },
+  { value: 'completed', label: 'Abgeschlossen', Icon: CheckCircle2 },
+  { value: 'delayed', label: 'Verzögert', Icon: AlertTriangle },
+  { value: 'cancelled', label: 'Storniert', Icon: XCircle },
 ];
 
 const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
@@ -68,11 +68,11 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
   const paymentStatus = task.payment_status as string | undefined;
   const paymentBadge =
     paymentStatus === 'paid'
-      ? { variant: 'default' as const, label: '✅ Bezahlt', className: '' }
+      ? { variant: 'default' as const, label: 'Bezahlt', Icon: CheckCircle2, className: '' }
       : paymentStatus === 'pending'
-      ? { variant: 'secondary' as const, label: '⏳ Ausstehend', className: '' }
+      ? { variant: 'secondary' as const, label: 'Ausstehend', Icon: Clock, className: '' }
       : paymentStatus === 'unpaid'
-      ? { variant: 'outline' as const, label: '❌ Unbezahlt', className: 'bg-green-100 text-green-800 border-green-300 dark:bg-green-950/40 dark:text-green-300 dark:border-green-800' }
+      ? { variant: 'outline' as const, label: 'Unbezahlt', Icon: XCircle, className: 'bg-green-100 text-green-800 border-green-300 dark:bg-green-950/40 dark:text-green-300 dark:border-green-800' }
       : null;
 
   return (
@@ -106,7 +106,8 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {paymentBadge && (
-              <Badge variant={paymentBadge.variant} className={cn("text-[10px]", paymentBadge.className)}>
+              <Badge variant={paymentBadge.variant} className={cn("text-[10px] gap-1", paymentBadge.className)}>
+                <paymentBadge.Icon className="w-3 h-3" />
                 {paymentBadge.label}
               </Badge>
             )}
@@ -150,7 +151,12 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
             </SelectTrigger>
             <SelectContent>
               {STATUS_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                <SelectItem key={opt.value} value={opt.value}>
+                  <span className="inline-flex items-center gap-2">
+                    <opt.Icon className="w-4 h-4" />
+                    {opt.label}
+                  </span>
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -165,12 +171,12 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
             {editingNotes ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground text-sm font-bold">📝 Notizen</span>
+                  <span className="text-muted-foreground text-sm font-bold"><StickyNote className="w-4 h-4 inline mr-1.5" />Notizen</span>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setEditingNotes(false)}
-                    className="h-7 px-2 text-xs"
+                    className="min-h-[44px] px-3 text-xs"
                   >
                     Abbrechen
                   </Button>
@@ -185,7 +191,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
                 />
                 <Button
                   size="sm"
-                  className="h-8 text-xs"
+                  className="min-h-[44px] text-xs"
                   onClick={() => {
                     onNotesUpdate(task.id, notesValue);
                     setEditingNotes(false);
@@ -203,7 +209,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
                 }}
                 className="w-full text-left min-h-[44px] rounded-md hover:bg-muted/40 transition-colors p-1"
               >
-                <span className="text-muted-foreground text-sm font-bold">📝 Notizen</span>
+                <span className="text-muted-foreground text-sm font-bold"><StickyNote className="w-4 h-4 inline mr-1.5" />Notizen</span>
                 <p className="text-sm text-foreground whitespace-pre-wrap mt-1">
                   {task.notes || <span className="text-muted-foreground">Keine Notizen – tippen zum Hinzufügen</span>}
                 </p>
@@ -220,7 +226,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           className="w-full min-h-[44px] bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50 dark:border-emerald-800 dark:text-emerald-300"
         >
           <ClipboardCheck className="w-4 h-4 mr-2" />
-          ❗ Checkliste
+          Checkliste
         </Button>
           </>
         )}
