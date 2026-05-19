@@ -1,20 +1,25 @@
 ## Ziel
 
-Die Vor/Zurück-Pfeile neben "Heute" im Kalender sollen auf dem Handy klar als tippbare Buttons erkennbar sein.
+Das Tages-Detail-Sheet auf Mobile durch ein zentriertes Dialog-Popup ersetzen — wie ein iOS-Alert: schwebt in der Bildschirmmitte, Abstand zu allen Seiten, dunkler Hintergrund-Overlay, alle 4 Ecken rund.
 
 ## Änderung
 
-`src/pages/Calendar.tsx`, Zeilen 543 + 549:
+Datei: `src/pages/Calendar.tsx`, Zeilen 847–968.
 
-- Variante `ghost` → `outline` (sichtbarer Rand wie der "Heute"-Button).
-- Form `rounded-full` für klare Touch-Affordanz.
-- Größe bleibt `h-11 w-11` (Apple-konformes 44 px Touchtarget).
-- Icon vergrößern: `h-5 w-5` → `h-6 w-6` (besser sichtbar).
-- Aktive Rückmeldung: `active:scale-95` bleibt, zusätzlich `shadow-sm`.
-
-Resultat: drei optisch gleichwertige, klar abgegrenzte Pill-Buttons `‹  Heute  ›`.
+- `<Sheet side="bottom">` durch `<Dialog>` aus `@/components/ui/dialog` ersetzen.
+- `DialogContent` Klassen für Mobile-Popup:
+  - `max-w-[calc(100vw-2rem)]` (16 px Abstand links/rechts)
+  - `max-h-[80vh] overflow-y-auto`
+  - `rounded-3xl p-5`
+  - `sm:hidden` Wrapper bleibt — Desktop nutzt weiter die bestehende Inline-Anzeige.
+- Grab-Handle (Zeile 854) entfällt — bei zentriertem Dialog unnötig.
+- Schliessen-Button (X oben rechts) bleibt mit gleichem Styling.
+- Header (Wochentag + Datum) und Eventliste bleiben inhaltlich identisch.
+- Footer-Schliessen-Button (Zeilen 962–966) bleibt.
+- `DialogPortal` / `DialogOverlay` von shadcn liefert automatisch den dunklen Hintergrund.
 
 ## Nicht betroffen
 
-- Desktop-Variante (Zeilen 477–485) bleibt unverändert.
-- Funktion (`previousPeriod` / `nextPeriod`) unverändert.
+- Desktop-Logik
+- Cleaning-Detail-Sheet (Zeilen 990+) bleibt Bottom-Sheet
+- Daten / Funktionen unverändert
