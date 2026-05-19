@@ -1,0 +1,262 @@
+import React, { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Sparkles, Clock, CalendarIcon, Pencil, ClipboardCheck } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { formatDateTime } from '@/utils/date';
+import BeforeYouGoChecklist from '@/components/BeforeYouGoChecklist';
+
+interface AmelaCleaningCardProps {
+  task: any;
+  staff: any[];
+  onStatusUpdate: (taskId: string, status: string) => void;
+  onStaffUpdate: (taskId: string, staffId: string | null) => void;
+  onDateTimeUpdate: (taskId: string, date: string, time: string) => void;
+  onNotesUpdate?: (taskId: string, notes: string) => void;
+}
+
+const STATUS_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: 'scheduled', label: '📅 Geplant' },
+  { value: 'in_progress', label: '⏳ In Bearbeitung' },
+  { value: 'completed', label: '✅ Abgeschlossen' },
+  { value: 'delayed', label: '⚠️ Verzögert' },
+  { value: 'cancelled', label: '❌ Storniert' },
+];
+
+const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
+  task,
+  staff,
+  onStatusUpdate,
+  onStaffUpdate,
+  onDateTimeUpdate,
+  onNotesUpdate,
+}) => {
+  const [isDateDialogOpen, setIsDateDialogOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedTime, setSelectedTime] = useState('');
+  const [showChecklist, setShowChecklist] = useState(false);
+  const [editingNotes, setEditingNotes] = useState(false);
+  const [notesValue, setNotesValue] = useState(task.notes || '');
+
+  const openDateDialog = () => {
+    setSelectedDate(task.scheduled_date ? new Date(task.scheduled_date) : new Date());
+    setSelectedTime(task.scheduled_time || '');
+    setIsDateDialogOpen(true);
+  };
+
+  const saveDateTime = () => {
+    if (!selectedDate) return;
+    const dateStr = selectedDate.toISOString().split('T')[0];
+    onDateTimeUpdate(task.id, dateStr, selectedTime);
+    setIsDateDialogOpen(false);
+  };
+
+  const paymentStatus = task.payment_status as string | undefined;
+  const paymentBadge =
+    paymentStatus === 'paid'
+      ? { variant: 'default' as const, label: '✅ Bezahlt' }
+      : paymentStatus === 'pending'
+      ? { variant: 'secondary' as const, label: '⏳ Ausstehend' }
+      : paymentStatus === 'unpaid'
+      ? { variant: 'destructive' as const, label: '❌ Unbezahlt' }
+      : null;
+
+  return (
+    <Card className="bg-card hover:shadow-md transition-shadow">
+      <CardContent className="p-4 space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-9 h-9 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-foreground text-sm">Reinigungsauftrag</p>
+              <p className="text-xs text-muted-foreground font-mono">#{task.id.slice(-6)}</p>
+            </div>
+          </div>
+          {paymentBadge && (
+            <Badge variant={paymentBadge.variant} className="text-[10px] shrink-0">
+              {paymentBadge.label}
+            </Badge>
+          )}
+        </div>
+
+        {/* Termin – klickbar */}
+        <button
+          type="button"
+          onClick={openDateDialog}
+          className="w-full flex items-center justify-between gap-2 rounded-lg border border-border bg-muted/30 hover:bg-muted/60 transition-colors p-3 min-h-[44px] text-left"
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <Clock className="w-4 h-4 text-primary shrink-0" />
+            <div className="flex flex-col min-w-0">
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Reinigungstermin</span>
+              <span className="text-sm font-medium truncate">
+                {formatDateTime(task.scheduled_date, task.scheduled_time)}
+              </span>
+            </div>
+          </div>
+          <Pencil className="w-4 h-4 text-muted-foreground shrink-0" />
+        </button>
+
+        {/* Status */}
+        <div className="flex items-center gap-2">
+          <Label className="text-xs text-muted-foreground w-20 shrink-0">Status</Label>
+          <Select value={task.status} onValueChange={(v) => onStatusUpdate(task.id, v)}>
+            <SelectTrigger className="min-h-[44px] flex-1">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUS_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Putzkraft */}
+        <div className="flex items-center gap-2">
+          <Label className="text-xs text-muted-foreground w-20 shrink-0">Putzkraft</Label>
+          <Select
+            value={task.assigned_staff_id || 'unassigned'}
+            onValueChange={(v) => onStaffUpdate(task.id, v === 'unassigned' ? null : v)}
+          >
+            <SelectTrigger className="min-h-[44px] flex-1">
+              <SelectValue>
+                {task.assigned_staff_id
+                  ? staff.find((s) => s.id === task.assigned_staff_id)?.name || 'Nicht zugewiesen'
+                  : 'Nicht zugewiesen'}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="unassigned">Nicht zugewiesen</SelectItem>
+              {staff.filter((s) => s.is_active).map((s) => (
+                <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Notizen (kompakt) */}
+        {onNotesUpdate && (
+          <div className="rounded-lg border border-border bg-muted/20 p-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">📝 Notizen</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setNotesValue(task.notes || '');
+                  setEditingNotes(!editingNotes);
+                }}
+                className="h-7 px-2 text-xs"
+              >
+                {editingNotes ? 'Abbrechen' : 'Bearbeiten'}
+              </Button>
+            </div>
+            {editingNotes ? (
+              <div className="space-y-2 mt-2">
+                <Textarea
+                  value={notesValue}
+                  onChange={(e) => setNotesValue(e.target.value)}
+                  rows={3}
+                  placeholder="Notizen hinzufügen..."
+                  className="text-sm"
+                />
+                <Button
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={() => {
+                    onNotesUpdate(task.id, notesValue);
+                    setEditingNotes(false);
+                  }}
+                >
+                  Speichern
+                </Button>
+              </div>
+            ) : (
+              <p className="text-sm text-foreground whitespace-pre-wrap mt-1">
+                {task.notes || <span className="text-muted-foreground">Keine Notizen</span>}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Checklist Button */}
+        <Button
+          variant="outline"
+          onClick={() => setShowChecklist(true)}
+          className="w-full min-h-[44px] bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50 dark:border-emerald-800 dark:text-emerald-300"
+        >
+          <ClipboardCheck className="w-4 h-4 mr-2" />
+          ❗ Bevor du gehst!
+        </Button>
+
+        <BeforeYouGoChecklist open={showChecklist} onOpenChange={setShowChecklist} />
+
+        {/* Datum/Zeit Dialog */}
+        <Dialog open={isDateDialogOpen} onOpenChange={setIsDateDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Reinigungstermin ändern</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Datum</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        'w-full justify-start text-left font-normal min-h-[44px]',
+                        !selectedDate && 'text-muted-foreground'
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? format(selectedDate, 'dd.MM.yyyy') : 'Datum auswählen'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="space-y-2">
+                <Label>Uhrzeit</Label>
+                <Input
+                  type="time"
+                  value={selectedTime}
+                  onChange={(e) => setSelectedTime(e.target.value)}
+                  className="min-h-[44px]"
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setIsDateDialogOpen(false)}>
+                  Abbrechen
+                </Button>
+                <Button onClick={saveDateTime}>Speichern</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default AmelaCleaningCard;
