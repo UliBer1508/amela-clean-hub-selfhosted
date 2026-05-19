@@ -12,6 +12,7 @@ import { useHouses } from '@/hooks/useHouses';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import PWAStatusBar from '@/components/PWAStatusBar';
 import NotificationSettings from '@/components/NotificationSettings';
+import ReminderSettingsPopover from '@/components/amela/ReminderSettingsPopover';
 import BookingCardSettings, { useBookingCardConfig } from '@/components/BookingCardSettings';
 import PullToRefresh from '@/components/PullToRefresh';
 import { formatGermanDate } from '@/utils/date';
@@ -69,6 +70,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const [showReminderPopup, setShowReminderPopup] = useState(false);
 
   const { allBookings, loading, totalCleaningTasks, forceRefresh, lastRefresh } = useBookings();
   const { config: cardConfig, updateConfig: updateCardConfig, loading: configLoading } = useBookingCardConfig();
@@ -339,96 +341,71 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   };
 
   return (
+    <>
     <PullToRefresh onRefresh={handleRefresh} disabled={loading}>
     <div className="min-h-screen bg-background">
       <PWAStatusBar />
       <div className="pt-12 md:pt-0">
       {/* Header */}
       <header className="bg-card border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <Home className="w-6 h-6 text-primary-foreground" />
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-primary rounded-lg flex items-center justify-center">
+                <Home className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
+                <h1 className="text-lg md:text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
               </div>
             </div>
-              <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 md:space-x-3">
+              <div className="hidden sm:block">
                 <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
-                <div className={cardConfig.showMobileSettingsButton ? '' : 'hidden lg:block'}>
-                  <BookingCardSettings 
-                    config={cardConfig}
-                    onConfigChange={updateCardConfig}
-                  />
-                </div>
-                <PWAInstallButton />
               </div>
+              <div className={cardConfig.showMobileSettingsButton ? 'block' : 'hidden sm:block'}>
+                <BookingCardSettings
+                  config={cardConfig}
+                  onConfigChange={updateCardConfig}
+                />
+              </div>
+              <PWAInstallButton />
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Navigation */}
-      <div className="bg-card border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Desktop Navigation */}
-          <div className="hidden sm:flex space-x-6">
+      {/* Desktop Navigation */}
+      <div className="hidden sm:block bg-card border-b border-border">
+        <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-8">
+          <div className="flex space-x-6">
             <Link to="/">
-              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+              <Button variant="ghost" size="sm" className="my-2 hover-scale min-h-[44px]">
                 🏠 Reinigungen ({totalCleaningTasks})
               </Button>
             </Link>
-            <Button variant="default" size="sm" className="my-2">
+            <Button variant="default" size="sm" className="my-2 min-h-[44px]">
               📅 Kalender
             </Button>
-            <Link to="/putzkraefte">
-              <Button variant="ghost" size="sm" className="my-2 hover-scale">
-                👥 Putzkräfte
-              </Button>
-            </Link>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="my-2 hover-scale"
-              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="my-2 hover-scale min-h-[44px]"
+              onClick={() => setShowReminderPopup(true)}
             >
+              <Bell className="w-4 h-4 mr-2" />
               🔔 Benachrichtigungen
-            </Button>
-          </div>
-          
-          {/* Mobile Navigation - Icon Only */}
-          <div className="sm:hidden flex justify-around items-center gap-1 py-2">
-            <Link to="/">
-              <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center relative hover-scale">
-                <span className="text-xl">🏠</span>
-                <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] text-[10px] px-1 bg-primary text-primary-foreground">
-                  {totalCleaningTasks}
-                </Badge>
-              </Button>
-            </Link>
-            <Button variant="default" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center">
-              <span className="text-xl">📅</span>
-            </Button>
-            <Link to="/putzkraefte">
-              <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale">
-                <span className="text-xl">👥</span>
-              </Button>
-            </Link>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale"
-              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
-            >
-              <span className="text-xl">🔔</span>
             </Button>
           </div>
         </div>
       </div>
 
+      {/* Erinnerungs-Einstellungen Popup */}
+      <ReminderSettingsPopover open={showReminderPopup} onOpenChange={setShowReminderPopup} />
+
+
+
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 sm:pb-8">
         {showNotificationSettings ? (
           <div className="space-y-6 animate-fade-in">
             <div className="flex items-center justify-between">
@@ -844,6 +821,49 @@ const Calendar = ({ chatProps }: CalendarProps) => {
       </div>
     </div>
     </PullToRefresh>
+
+    {/* Mobile Bottom Navigation */}
+    <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-sky-50 dark:bg-sky-950/30 border-t border-sky-200 dark:border-sky-900 pb-[env(safe-area-inset-bottom)] shadow-lg">
+      <div className="flex justify-around items-center h-16">
+        <Link to="/" className="flex-1">
+          <button className="relative w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground">
+            <span className="leading-none text-3xl">🏠</span>
+            <span className="font-medium text-sm">Reinigung</span>
+            {totalCleaningTasks > 0 && (
+              <span className="absolute top-1 right-1/4 bg-primary text-primary-foreground text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
+                {totalCleaningTasks}
+              </span>
+            )}
+          </button>
+        </Link>
+        <Link to="/calendar" className="flex-1">
+          <button className="w-full h-16 flex flex-col items-center justify-center gap-1 text-primary">
+            <span className="leading-none text-3xl">📅</span>
+            <span className="font-medium text-sm">Kalender</span>
+          </button>
+        </Link>
+        <button
+          onClick={() => setShowReminderPopup(true)}
+          className="flex-1 w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground relative"
+        >
+          <span className="leading-none text-3xl">🔔</span>
+          <span className="font-medium text-sm">Hinweise</span>
+        </button>
+        <button
+          onClick={() => chatProps.setIsChatOpen(true)}
+          className="flex-1 w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground relative"
+        >
+          <span className="leading-none text-3xl">💬</span>
+          <span className="font-medium text-sm">Chat</span>
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-1/4 bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
+              {unreadCount}
+            </span>
+          )}
+        </button>
+      </div>
+    </nav>
+    </>
   );
 };
 
