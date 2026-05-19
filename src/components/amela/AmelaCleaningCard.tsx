@@ -203,7 +203,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
                 }}
                 className="w-full text-left min-h-[44px] rounded-md hover:bg-muted/40 transition-colors p-1"
               >
-                <span className="text-xs font-medium text-muted-foreground">📝 Notizen</span>
+                <span className="text-muted-foreground text-sm font-bold">📝 Notizen</span>
                 <p className="text-sm text-foreground whitespace-pre-wrap mt-1">
                   {task.notes || <span className="text-muted-foreground">Keine Notizen – tippen zum Hinzufügen</span>}
                 </p>
