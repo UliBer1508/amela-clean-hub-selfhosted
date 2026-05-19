@@ -17,4 +17,8 @@ export function getBookingColor(bookingId: string): string {
   return PALETTE[Math.abs(h) % PALETTE.length];
 }
 
+export function getBookingColorByIndex(index: number): string {
+  return PALETTE[index % PALETTE.length];
+}
+
 export const STANDALONE_COLOR = '#94a3b8';
