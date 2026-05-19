@@ -106,7 +106,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {paymentBadge && (
-              <Badge variant={paymentBadge.variant} className="text-[10px]">
+              <Badge variant={paymentBadge.variant} className={cn("text-[10px]", paymentBadge.className)}>
                 {paymentBadge.label}
               </Badge>
             )}
