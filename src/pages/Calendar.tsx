@@ -615,7 +615,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                       className={cn(
                                         "border-r last:border-r-0 h-full",
                                         houseOccupied
-                                          ? "bg-sky-100 dark:bg-sky-900/40"
+                                          ? "bg-sky-200 dark:bg-sky-800/50"
                                           : "bg-sky-50 dark:bg-sky-950/30",
                                         isToday(day) && "ring-1 ring-primary/40 ring-inset"
                                       )}
@@ -691,7 +691,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                             'p-1.5 sm:p-2 border border-border cursor-pointer transition-colors rounded-sm',
                             isCurrentMonth
                               ? occupied
-                                ? 'bg-sky-100 dark:bg-sky-900/40'
+                                ? 'bg-sky-200 dark:bg-sky-800/50'
                                 : 'bg-sky-50 dark:bg-sky-950/30'
                               : 'bg-muted/50 text-muted-foreground',
                             isTodayDate && !isSelected && 'ring-2 ring-primary/60 ring-inset',
