@@ -176,7 +176,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
                     variant="ghost"
                     size="sm"
                     onClick={() => setEditingNotes(false)}
-                    className="h-7 px-2 text-xs"
+                    className="min-h-[44px] px-3 text-xs"
                   >
                     Abbrechen
                   </Button>
@@ -191,7 +191,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
                 />
                 <Button
                   size="sm"
-                  className="h-8 text-xs"
+                  className="min-h-[44px] text-xs"
                   onClick={() => {
                     onNotesUpdate(task.id, notesValue);
                     setEditingNotes(false);
