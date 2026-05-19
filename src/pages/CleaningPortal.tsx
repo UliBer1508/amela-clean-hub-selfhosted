@@ -455,7 +455,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   };
 
   return (
+    <>
     <PullToRefresh onRefresh={handleRefresh} disabled={bookingsLoading}>
+
     <div className="min-h-screen bg-background">
       <PWAStatusBar />
       <div className="pt-12 md:pt-0">
