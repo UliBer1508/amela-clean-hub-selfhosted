@@ -696,6 +696,18 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
             </span>
           )}
         </button>
+        <button
+          onClick={() => chatProps.setIsChatOpen(true)}
+          className="flex-1 w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground relative"
+        >
+          <span className="text-2xl leading-none">💬</span>
+          <span className="text-[10px] font-medium">Chat</span>
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-1/4 bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
+              {unreadCount}
+            </span>
+          )}
+        </button>
       </div>
     </nav>
     </>
