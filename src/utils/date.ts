@@ -29,9 +29,17 @@ export const isWithinTimeRange = (date: string, filter: string): boolean => {
   switch (filter) {
     case 'today':
       return taskDate.getTime() === now.getTime();
-    case 'week': {
-      const end = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-      return taskDate >= now && taskDate <= end;
+    case 'week':
+    case 'thisWeek': {
+      const start = startOfWeek(now, { weekStartsOn: 1 });
+      const end = endOfWeek(now, { weekStartsOn: 1 });
+      return taskDate >= start && taskDate <= end;
+    }
+    case 'nextWeek': {
+      const nextWeek = addWeeks(now, 1);
+      const start = startOfWeek(nextWeek, { weekStartsOn: 1 });
+      const end = endOfWeek(nextWeek, { weekStartsOn: 1 });
+      return taskDate >= start && taskDate <= end;
     }
     case 'month': {
       const end = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
