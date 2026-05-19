@@ -65,6 +65,8 @@ interface CalendarProps {
 
 const Calendar = ({ chatProps }: CalendarProps) => {
   const { unreadCount } = usePortalMessages();
+  const { isInstalled, isOnline } = usePWA();
+  const pwaBarVisible = isInstalled || !isOnline;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [viewType, setViewType] = useState<ViewType>('gantt');
