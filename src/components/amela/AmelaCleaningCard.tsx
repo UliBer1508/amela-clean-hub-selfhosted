@@ -132,7 +132,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           <div className="flex items-center gap-2 min-w-0">
             <Clock className="w-4 h-4 text-primary shrink-0" />
             <div className="flex flex-col min-w-0">
-              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Reinigungstermin</span>
+              <span className="uppercase tracking-wide text-muted-foreground font-bold text-xs">Reinigungstermin</span>
               <span className="text-sm font-medium truncate">
                 {formatDateTime(task.scheduled_date, task.scheduled_time)}
               </span>
