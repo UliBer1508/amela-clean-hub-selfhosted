@@ -2817,13 +2817,18 @@ export type Database = {
           default_provider_id: string | null
           delivery_advance_days: number
           delivery_timing: string | null
+          external_abholzeit: string
           external_api_url: string | null
           external_kundennummer: string | null
+          external_lieferzeit: string
           external_sync_enabled: boolean | null
           id: string
           is_enabled: boolean
           lookahead_bookings: number
           min_advance_days: number
+          sync_max_retries: number
+          sync_transport: string
+          teuni_stammdaten_sync_enabled: boolean
           updated_at: string | null
         }
         Insert: {
@@ -2831,13 +2836,18 @@ export type Database = {
           default_provider_id?: string | null
           delivery_advance_days?: number
           delivery_timing?: string | null
+          external_abholzeit?: string
           external_api_url?: string | null
           external_kundennummer?: string | null
+          external_lieferzeit?: string
           external_sync_enabled?: boolean | null
           id?: string
           is_enabled?: boolean
           lookahead_bookings?: number
           min_advance_days?: number
+          sync_max_retries?: number
+          sync_transport?: string
+          teuni_stammdaten_sync_enabled?: boolean
           updated_at?: string | null
         }
         Update: {
@@ -2845,13 +2855,18 @@ export type Database = {
           default_provider_id?: string | null
           delivery_advance_days?: number
           delivery_timing?: string | null
+          external_abholzeit?: string
           external_api_url?: string | null
           external_kundennummer?: string | null
+          external_lieferzeit?: string
           external_sync_enabled?: boolean | null
           id?: string
           is_enabled?: boolean
           lookahead_bookings?: number
           min_advance_days?: number
+          sync_max_retries?: number
+          sync_transport?: string
+          teuni_stammdaten_sync_enabled?: boolean
           updated_at?: string | null
         }
         Relationships: [
@@ -2995,6 +3010,7 @@ export type Database = {
           id: string
           kitchen_towels_per_booking: number | null
           large_towels_per_guest: number | null
+          linen_source: string
           pillow_cases_per_guest: number | null
           sauna_towels_per_guest: number | null
           sink_towels_per_booking: number | null
@@ -3012,6 +3028,7 @@ export type Database = {
           id?: string
           kitchen_towels_per_booking?: number | null
           large_towels_per_guest?: number | null
+          linen_source?: string
           pillow_cases_per_guest?: number | null
           sauna_towels_per_guest?: number | null
           sink_towels_per_booking?: number | null
@@ -3029,6 +3046,7 @@ export type Database = {
           id?: string
           kitchen_towels_per_booking?: number | null
           large_towels_per_guest?: number | null
+          linen_source?: string
           pillow_cases_per_guest?: number | null
           sauna_towels_per_guest?: number | null
           sink_towels_per_booking?: number | null
@@ -3042,6 +3060,53 @@ export type Database = {
             columns: ["house_id"]
             isOneToOne: false
             referencedRelation: "houses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      linen_sync_log: {
+        Row: {
+          attempt: number
+          created_at: string
+          error_message: string | null
+          id: string
+          linen_order_id: string | null
+          request_payload: Json | null
+          response_body: Json | null
+          response_status: number | null
+          success: boolean
+          transport: string
+        }
+        Insert: {
+          attempt?: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          linen_order_id?: string | null
+          request_payload?: Json | null
+          response_body?: Json | null
+          response_status?: number | null
+          success?: boolean
+          transport: string
+        }
+        Update: {
+          attempt?: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          linen_order_id?: string | null
+          request_payload?: Json | null
+          response_body?: Json | null
+          response_status?: number | null
+          success?: boolean
+          transport?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "linen_sync_log_linen_order_id_fkey"
+            columns: ["linen_order_id"]
+            isOneToOne: false
+            referencedRelation: "linen_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -4986,7 +5051,44 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      app_reviews_public: {
+        Row: {
+          booking_id: string | null
+          created_at: string | null
+          feedback_text: string | null
+          id: string | null
+          preferred_language: string | null
+          rating: number | null
+          submitted_from_screen: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string | null
+          feedback_text?: string | null
+          id?: string | null
+          preferred_language?: string | null
+          rating?: number | null
+          submitted_from_screen?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string | null
+          feedback_text?: string | null
+          id?: string | null
+          preferred_language?: string | null
+          rating?: number | null
+          submitted_from_screen?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       delete_booking_cascade: {
