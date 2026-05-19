@@ -68,11 +68,11 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
   const paymentStatus = task.payment_status as string | undefined;
   const paymentBadge =
     paymentStatus === 'paid'
-      ? { variant: 'default' as const, label: '✅ Bezahlt' }
+      ? { variant: 'default' as const, label: '✅ Bezahlt', className: '' }
       : paymentStatus === 'pending'
-      ? { variant: 'secondary' as const, label: '⏳ Ausstehend' }
+      ? { variant: 'secondary' as const, label: '⏳ Ausstehend', className: '' }
       : paymentStatus === 'unpaid'
-      ? { variant: 'destructive' as const, label: '❌ Unbezahlt' }
+      ? { variant: 'outline' as const, label: '❌ Unbezahlt', className: 'bg-green-100 text-green-800 border-green-300 dark:bg-green-950/40 dark:text-green-300 dark:border-green-800' }
       : null;
 
   return (
@@ -106,7 +106,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {paymentBadge && (
-              <Badge variant={paymentBadge.variant} className="text-[10px]">
+              <Badge variant={paymentBadge.variant} className={cn("text-[10px]", paymentBadge.className)}>
                 {paymentBadge.label}
               </Badge>
             )}
