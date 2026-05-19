@@ -70,6 +70,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const [showReminderPopup, setShowReminderPopup] = useState(false);
 
   const { allBookings, loading, totalCleaningTasks, forceRefresh, lastRefresh } = useBookings();
   const { config: cardConfig, updateConfig: updateCardConfig, loading: configLoading } = useBookingCardConfig();
