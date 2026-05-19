@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@/components/ui/sheet';
 import { Link } from 'react-router-dom';
 import { useAllBookings } from '@/hooks/useAllBookings';
 import { useBookings } from '@/hooks/useBookings';
@@ -70,6 +71,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const pwaBarVisible = isInstalled || !isOnline;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [dayDetailOpen, setDayDetailOpen] = useState(false);
   const [viewType, setViewType] = useState<ViewType>('gantt');
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -418,38 +420,38 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                 <h1 className="text-2xl font-bold">{calendarTitle}</h1>
                 
                 {/* Zeile 1: Navigation - zentriert */}
-                <div className="flex items-center justify-center space-x-2">
-                  <Button variant="outline" size="sm" onClick={previousPeriod}>
-                    <ChevronLeft className="h-4 w-4" />
+                <div className="flex items-center justify-center gap-2">
+                  <Button variant="outline" onClick={previousPeriod} className="min-h-[44px] min-w-[44px] active:scale-95">
+                    <ChevronLeft className="h-5 w-5" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={goToToday}>
+                  <Button variant="outline" onClick={goToToday} className="min-h-[44px] px-5 active:scale-95">
                     Heute
                   </Button>
-                  <Button variant="outline" size="sm" onClick={nextPeriod}>
-                    <ChevronRight className="h-4 w-4" />
+                  <Button variant="outline" onClick={nextPeriod} className="min-h-[44px] min-w-[44px] active:scale-95">
+                    <ChevronRight className="h-5 w-5" />
                   </Button>
                 </div>
                 
-                {/* Zeile 2: Ansichtswahl - zentriert */}
-                <div className="flex items-center justify-center space-x-2">
+                {/* Zeile 2: Ansichtswahl - 3-Spalten-Grid */}
+                <div className="grid grid-cols-3 gap-2">
                   <Button
                     variant={viewType === 'month' ? 'default' : 'outline'}
-                    size="sm"
                     onClick={() => setViewType('month')}
+                    className="min-h-[44px] active:scale-95"
                   >
                     Monat
                   </Button>
                   <Button
                     variant={viewType === 'week' ? 'default' : 'outline'}
-                    size="sm"
                     onClick={() => setViewType('week')}
+                    className="min-h-[44px] active:scale-95"
                   >
                     Woche
                   </Button>
                   <Button
                     variant={viewType === 'gantt' ? 'default' : 'outline'}
-                    size="sm"
                     onClick={() => setViewType('gantt')}
+                    className="min-h-[44px] active:scale-95"
                   >
                     Gantt
                   </Button>
@@ -505,13 +507,13 @@ const Calendar = ({ chatProps }: CalendarProps) => {
             <Card>
               <CardContent className="p-4 md:p-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-lg md:text-xl font-semibold">{calendarTitle}</h2>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm" onClick={previousPeriod}>
-                      <ChevronLeft className="h-4 w-4" />
+                  <h2 className="hidden sm:block text-lg md:text-xl font-semibold">{calendarTitle}</h2>
+                  <div className="flex items-center gap-2 ml-auto">
+                    <Button variant="ghost" onClick={previousPeriod} className="h-11 w-11 p-0 active:scale-95">
+                      <ChevronLeft className="h-5 w-5" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={nextPeriod}>
-                      <ChevronRight className="h-4 w-4" />
+                    <Button variant="ghost" onClick={nextPeriod} className="h-11 w-11 p-0 active:scale-95">
+                      <ChevronRight className="h-5 w-5" />
                     </Button>
                   </div>
                 </div>
@@ -642,14 +644,18 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                       return (
                         <div
                           key={index}
-                          className={`
-                            ${viewType === 'week' ? 'min-h-[120px]' : 'min-h-[100px]'} p-2 border border-border cursor-pointer transition-colors
-                            ${!isCurrentMonth ? 'bg-muted/50 text-muted-foreground' : ''}
-                            ${isTodayDate ? 'bg-primary/10' : ''}
-                            ${isSelected ? 'bg-primary text-primary-foreground' : ''}
-                            hover:bg-accent
-                          `}
-                          onClick={() => setSelectedDate(day)}
+                          className={cn(
+                            viewType === 'week' ? 'min-h-[120px]' : 'min-h-[88px] sm:min-h-[100px]',
+                            'p-1.5 sm:p-2 border border-border cursor-pointer transition-colors rounded-sm',
+                            !isCurrentMonth && 'bg-muted/50 text-muted-foreground',
+                            isTodayDate && !isSelected && 'bg-primary/10',
+                            isSelected && 'ring-2 ring-primary ring-inset',
+                            'hover:bg-accent active:bg-accent'
+                          )}
+                          onClick={() => {
+                            setSelectedDate(day);
+                            setDayDetailOpen(true);
+                          }}
                         >
                           <div className="text-sm font-medium mb-1">
                             {viewType === 'week' 
@@ -660,14 +666,14 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                           
                           {/* Events */}
                           <div className="space-y-1">
-                            {dayEvents.slice(0, viewType === 'week' ? 4 : 2).map((event, eventIndex) => {
+                            {dayEvents.slice(0, viewType === 'week' ? 4 : 3).map((event) => {
                               const houseColor = getHouseColor(event.house_id);
                               const abbr = getHouseAbbreviation(event.house);
                               return (
                                 <div
                                   key={event.id}
                                   className={cn(
-                                    "text-xs px-2 py-1 rounded truncate",
+                                    "text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded truncate",
                                     houseColor.bg, houseColor.text
                                   )}
                                   title={`${event.title} - ${event.house}`}
@@ -681,9 +687,9 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                 </div>
                               );
                             })}
-                            {dayEvents.length > (viewType === 'week' ? 4 : 2) && (
-                              <div className="text-xs text-muted-foreground">
-                                +{dayEvents.length - (viewType === 'week' ? 4 : 2)} weitere
+                            {dayEvents.length > (viewType === 'week' ? 4 : 3) && (
+                              <div className="text-[10px] sm:text-xs text-muted-foreground">
+                                +{dayEvents.length - (viewType === 'week' ? 4 : 3)} weitere
                               </div>
                             )}
                           </div>
@@ -696,9 +702,9 @@ const Calendar = ({ chatProps }: CalendarProps) => {
             </Card>
           </div>
 
-          {/* Sidebar - nur bei month/week Ansicht */}
+          {/* Sidebar - nur Desktop bei month/week Ansicht */}
           {viewType !== 'gantt' && (
-            <div className="space-y-6">
+            <div className="hidden lg:block space-y-6">
               {/* Selected Date Events */}
               <Card>
                 <CardContent className="p-4">
@@ -791,6 +797,48 @@ const Calendar = ({ chatProps }: CalendarProps) => {
       </div>
     </div>
     </PullToRefresh>
+
+    {/* Mobile Tag-Detail Sheet */}
+    <Sheet open={dayDetailOpen} onOpenChange={setDayDetailOpen}>
+      <SheetContent side="bottom" className="sm:hidden max-h-[80vh] overflow-y-auto rounded-t-2xl pb-[env(safe-area-inset-bottom)]">
+        <SheetHeader className="text-left">
+          <SheetTitle>
+            {selectedDate ? `Termine für ${format(selectedDate, 'EEEE, d. MMMM', { locale: de })}` : 'Termine'}
+          </SheetTitle>
+        </SheetHeader>
+        <div className="mt-4 space-y-2">
+          {selectedDateEvents.length > 0 ? (
+            selectedDateEvents.map(event => {
+              const houseColor = getHouseColor(event.house_id);
+              return (
+                <div key={event.id} className="p-3 rounded-lg border flex items-start gap-3 min-h-[56px]">
+                  <div className={cn("w-3 h-3 rounded-full mt-1.5 shrink-0", houseColor.bg)} />
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium text-sm">{event.title}</div>
+                    <div className="text-xs text-muted-foreground">{event.house}</div>
+                    {event.status && (
+                      <Badge variant="secondary" className="text-xs mt-1">
+                        {event.status}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-sm text-muted-foreground py-6 text-center">
+              Keine Termine für diesen Tag
+            </p>
+          )}
+        </div>
+        <SheetClose asChild>
+          <Button variant="outline" className="w-full mt-6 min-h-[44px]">
+            Schliessen
+          </Button>
+        </SheetClose>
+      </SheetContent>
+    </Sheet>
+
 
     {/* Mobile Bottom Navigation */}
     <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-sky-50 dark:bg-sky-950/30 border-t border-sky-200 dark:border-sky-900 pb-[env(safe-area-inset-bottom)] shadow-lg">
