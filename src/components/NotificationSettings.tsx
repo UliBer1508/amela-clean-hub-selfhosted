@@ -157,6 +157,61 @@ const NotificationSettings = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 md:space-y-6 p-4 md:p-6">
+        {/* Erinnerungs-Banner */}
+        <div className="space-y-4">
+          <h3 className="text-base md:text-lg font-medium">Erinnerungs-Banner</h3>
+
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-2 md:gap-3 flex-1 min-w-0">
+              <CalendarClock className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-600" />
+              <div className="min-w-0 flex-1">
+                <Label className="text-sm md:text-base font-medium">Nächste Reinigung anzeigen</Label>
+                <p className="text-xs md:text-sm text-muted-foreground">
+                  Banner über der Auftragsliste einblenden
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={reminderSettings.enabled}
+              onCheckedChange={(checked) => updateReminder({ enabled: checked })}
+              className="flex-shrink-0"
+            />
+          </div>
+
+          <div className={`flex items-center justify-between gap-3 ${!reminderSettings.enabled ? 'opacity-50 pointer-events-none' : ''}`}>
+            <div className="min-w-0 flex-1">
+              <Label className="text-sm md:text-base font-medium">Tage im Voraus erinnern</Label>
+              <p className="text-xs md:text-sm text-muted-foreground">
+                Banner erscheint, wenn die Reinigung in höchstens {reminderSettings.daysBefore} {reminderSettings.daysBefore === 1 ? 'Tag' : 'Tagen'} ansteht
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => updateReminder({ daysBefore: Math.max(0, reminderSettings.daysBefore - 1) })}
+                className="w-11 h-11 rounded-md border border-border bg-card flex items-center justify-center active:scale-95 transition disabled:opacity-50"
+                aria-label="Weniger Tage"
+                disabled={reminderSettings.daysBefore <= 0}
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <span className="w-10 text-center text-lg font-bold tabular-nums">{reminderSettings.daysBefore}</span>
+              <button
+                type="button"
+                onClick={() => updateReminder({ daysBefore: Math.min(14, reminderSettings.daysBefore + 1) })}
+                className="w-11 h-11 rounded-md border border-border bg-card flex items-center justify-center active:scale-95 transition disabled:opacity-50"
+                aria-label="Mehr Tage"
+                disabled={reminderSettings.daysBefore >= 14}
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+
         {/* Benachrichtigungsarten */}
         <div className="space-y-4">
           <h3 className="text-base md:text-lg font-medium">Benachrichtigungsarten</h3>
