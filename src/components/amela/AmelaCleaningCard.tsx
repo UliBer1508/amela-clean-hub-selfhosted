@@ -132,7 +132,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           <div className="flex items-center gap-2 min-w-0">
             <Clock className="w-4 h-4 text-primary shrink-0" />
             <div className="flex flex-col min-w-0">
-              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Reinigungstermin</span>
+              <span className="uppercase tracking-wide text-muted-foreground font-bold text-xs">Reinigungstermin</span>
               <span className="text-sm font-medium truncate">
                 {formatDateTime(task.scheduled_date, task.scheduled_time)}
               </span>
@@ -165,7 +165,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
             {editingNotes ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-muted-foreground">📝 Notizen</span>
+                  <span className="text-muted-foreground text-sm font-bold">📝 Notizen</span>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -203,7 +203,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
                 }}
                 className="w-full text-left min-h-[44px] rounded-md hover:bg-muted/40 transition-colors p-1"
               >
-                <span className="text-xs font-medium text-muted-foreground">📝 Notizen</span>
+                <span className="text-muted-foreground text-sm font-bold">📝 Notizen</span>
                 <p className="text-sm text-foreground whitespace-pre-wrap mt-1">
                   {task.notes || <span className="text-muted-foreground">Keine Notizen – tippen zum Hinzufügen</span>}
                 </p>
