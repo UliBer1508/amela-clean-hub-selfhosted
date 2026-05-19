@@ -106,7 +106,8 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {paymentBadge && (
-              <Badge variant={paymentBadge.variant} className={cn("text-[10px]", paymentBadge.className)}>
+              <Badge variant={paymentBadge.variant} className={cn("text-[10px] gap-1", paymentBadge.className)}>
+                <paymentBadge.Icon className="w-3 h-3" />
                 {paymentBadge.label}
               </Badge>
             )}
@@ -150,7 +151,12 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
             </SelectTrigger>
             <SelectContent>
               {STATUS_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                <SelectItem key={opt.value} value={opt.value}>
+                  <span className="inline-flex items-center gap-2">
+                    <opt.Icon className="w-4 h-4" />
+                    {opt.label}
+                  </span>
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -220,7 +226,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           className="w-full min-h-[44px] bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50 dark:border-emerald-800 dark:text-emerald-300"
         >
           <ClipboardCheck className="w-4 h-4 mr-2" />
-          ❗ Checkliste
+          Checkliste
         </Button>
           </>
         )}
