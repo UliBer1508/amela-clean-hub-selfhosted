@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import { useAllBookings } from '@/hooks/useAllBookings';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
+import { useCleaningStaff } from '@/hooks/useCleaningStaff';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import PWAStatusBar from '@/components/PWAStatusBar';
 import { usePWA } from '@/hooks/usePWA';
@@ -72,6 +73,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [dayDetailOpen, setDayDetailOpen] = useState(false);
+  const [cleaningDetailOpen, setCleaningDetailOpen] = useState(false);
+  const [selectedCleaningTaskId, setSelectedCleaningTaskId] = useState<string | null>(null);
   const [viewType, setViewType] = useState<ViewType>('gantt');
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -81,6 +84,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const { totalCleaningTasks } = useBookings();
   const { config: cardConfig, updateConfig: updateCardConfig } = useBookingCardConfig();
   const { houses } = useHouses();
+  const { staff: cleaningStaff } = useCleaningStaff();
 
   // Get calendar days for the current month/week
   const calendarDays = useMemo(() => {
@@ -135,6 +139,11 @@ const Calendar = ({ chatProps }: CalendarProps) => {
       status?: string;
       guestName?: string;
       bookingId?: string;
+      taskId?: string;
+      scheduledTime?: string | null;
+      notes?: string | null;
+      assignedStaffId?: string | null;
+      houseAddress?: string | null;
     }> = [];
 
     allBookings.forEach(booking => {
@@ -199,7 +208,12 @@ const Calendar = ({ chatProps }: CalendarProps) => {
             house_id: booking.house_id,
             status: task.status,
             guestName: guestName,
-            bookingId: booking.id
+            bookingId: booking.id,
+            taskId: task.id,
+            scheduledTime: task.scheduled_time ?? null,
+            notes: task.notes ?? null,
+            assignedStaffId: task.assigned_staff_id ?? null,
+            houseAddress: booking.houses?.address ?? null,
           });
         }
       });
@@ -801,8 +815,21 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           {selectedDateEvents.length > 0 ? (
             selectedDateEvents.map(event => {
               const houseColor = getHouseColor(event.house_id);
+              const isCleaning = event.type === 'cleaning';
               return (
-                <div key={event.id} className="p-3 rounded-lg border flex items-start gap-3 min-h-[56px]">
+                <div
+                  key={event.id}
+                  className={cn(
+                    "p-3 rounded-lg border flex items-start gap-3 min-h-[56px]",
+                    isCleaning && "cursor-pointer hover:bg-accent active:bg-accent transition-colors"
+                  )}
+                  onClick={isCleaning ? () => {
+                    setSelectedCleaningTaskId(event.taskId ?? null);
+                    setDayDetailOpen(false);
+                    setCleaningDetailOpen(true);
+                  } : undefined}
+                  role={isCleaning ? 'button' : undefined}
+                >
                   <div className={cn("w-3 h-3 rounded-full mt-1.5 shrink-0", houseColor.bg)} />
                   <div className="min-w-0 flex-1">
                     <div className="font-medium text-sm">{event.title}</div>
@@ -813,6 +840,9 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                       </Badge>
                     )}
                   </div>
+                  {isCleaning && (
+                    <ChevronRight className="w-4 h-4 text-muted-foreground mt-1 shrink-0" />
+                  )}
                 </div>
               );
             })
@@ -829,6 +859,116 @@ const Calendar = ({ chatProps }: CalendarProps) => {
         </SheetClose>
       </SheetContent>
     </Sheet>
+
+    {/* Mobile Reinigungsauftrag-Detail Sheet */}
+    {(() => {
+      const cleaningEvent = selectedCleaningTaskId
+        ? monthEvents.find(e => e.type === 'cleaning' && e.taskId === selectedCleaningTaskId)
+        : null;
+      const staffMember = cleaningEvent?.assignedStaffId
+        ? cleaningStaff.find(s => s.id === cleaningEvent.assignedStaffId)
+        : null;
+      const houseColor = cleaningEvent ? getHouseColor(cleaningEvent.house_id) : HOUSE_COLORS[0];
+      const statusLabel = (status?: string) => {
+        switch (status) {
+          case 'scheduled': return 'Geplant';
+          case 'in_progress': return 'In Arbeit';
+          case 'completed': return 'Erledigt';
+          case 'cancelled': return 'Abgebrochen';
+          default: return status || '—';
+        }
+      };
+      return (
+        <Sheet open={cleaningDetailOpen} onOpenChange={setCleaningDetailOpen}>
+          <SheetContent
+            side="bottom"
+            className="sm:hidden max-h-[85vh] overflow-y-auto rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
+          >
+            <SheetHeader className="text-left">
+              <SheetTitle className="flex items-center gap-2 text-base">
+                <span className={cn("w-3 h-3 rounded-full shrink-0", houseColor.bg)} />
+                Reinigungsauftrag
+              </SheetTitle>
+            </SheetHeader>
+            {cleaningEvent ? (
+              <div className="mt-4 space-y-4">
+                <div>
+                  <div className="text-xs uppercase tracking-wide text-muted-foreground">Unterkunft</div>
+                  <div className="font-medium text-sm mt-0.5">{cleaningEvent.house}</div>
+                  {cleaningEvent.houseAddress && (
+                    <div className="text-xs text-muted-foreground mt-0.5">{cleaningEvent.houseAddress}</div>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Datum</div>
+                    <div className="text-sm mt-0.5">
+                      {format(cleaningEvent.date, 'EEE, d. MMM yyyy', { locale: de })}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Uhrzeit</div>
+                    <div className="text-sm mt-0.5">
+                      {cleaningEvent.scheduledTime
+                        ? cleaningEvent.scheduledTime.slice(0, 5)
+                        : '—'}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs uppercase tracking-wide text-muted-foreground">Status</div>
+                  <Badge variant="secondary" className="text-xs mt-1">
+                    {statusLabel(cleaningEvent.status)}
+                  </Badge>
+                </div>
+
+                <div>
+                  <div className="text-xs uppercase tracking-wide text-muted-foreground">Putzkraft</div>
+                  <div className="text-sm mt-0.5">
+                    {staffMember ? staffMember.name : 'Nicht zugewiesen'}
+                  </div>
+                </div>
+
+                {cleaningEvent.guestName && (
+                  <div>
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Gast</div>
+                    <div className="text-sm mt-0.5">{cleaningEvent.guestName}</div>
+                  </div>
+                )}
+
+                {cleaningEvent.notes && (
+                  <div>
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Notizen</div>
+                    <div className="text-sm mt-0.5 whitespace-pre-wrap">{cleaningEvent.notes}</div>
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-2 pt-2">
+                  <Link to="/cleaning-portal" className="w-full">
+                    <Button className="w-full min-h-[44px]">
+                      Im Reinigungsportal öffnen
+                    </Button>
+                  </Link>
+                  <SheetClose asChild>
+                    <Button variant="outline" className="w-full min-h-[44px]">
+                      Schliessen
+                    </Button>
+                  </SheetClose>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground py-6 text-center">
+                Reinigungsauftrag nicht gefunden
+              </p>
+            )}
+          </SheetContent>
+        </Sheet>
+      );
+    })()}
+
+
 
 
     {/* Mobile Bottom Navigation */}
