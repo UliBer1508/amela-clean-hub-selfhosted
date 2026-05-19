@@ -65,19 +65,19 @@ interface TaskEditingState {
 
 const STATUS_FILTERS = {
   all: 'Alle Status',
-  scheduled: '📅 Geplant',
-  in_progress: '⏳ In Bearbeitung',
-  completed: '✅ Abgeschlossen', 
-  delayed: '⚠️ Verzögert',
-  cancelled: '❌ Storniert'
+  scheduled: 'Geplant',
+  in_progress: 'In Bearbeitung',
+  completed: 'Abgeschlossen',
+  delayed: 'Verzögert',
+  cancelled: 'Storniert'
 };
 
 
 const TIME_FILTERS = {
-  all: '🕐 Alle Zeiten',
-  week: '📅 n. Woche', 
-  month: '🗓️ n. Monat',
-  '3months': '📆 n. 3 Monate',
+  all: 'Alle Zeiten',
+  week: 'Nächste Woche',
+  month: 'Nächster Monat',
+  '3months': 'Nächste 3 Monate',
 };
 
 interface CleaningPortalProps {
