@@ -644,14 +644,18 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                       return (
                         <div
                           key={index}
-                          className={`
-                            ${viewType === 'week' ? 'min-h-[120px]' : 'min-h-[100px]'} p-2 border border-border cursor-pointer transition-colors
-                            ${!isCurrentMonth ? 'bg-muted/50 text-muted-foreground' : ''}
-                            ${isTodayDate ? 'bg-primary/10' : ''}
-                            ${isSelected ? 'bg-primary text-primary-foreground' : ''}
-                            hover:bg-accent
-                          `}
-                          onClick={() => setSelectedDate(day)}
+                          className={cn(
+                            viewType === 'week' ? 'min-h-[120px]' : 'min-h-[88px] sm:min-h-[100px]',
+                            'p-1.5 sm:p-2 border border-border cursor-pointer transition-colors rounded-sm',
+                            !isCurrentMonth && 'bg-muted/50 text-muted-foreground',
+                            isTodayDate && !isSelected && 'bg-primary/10',
+                            isSelected && 'ring-2 ring-primary ring-inset',
+                            'hover:bg-accent active:bg-accent'
+                          )}
+                          onClick={() => {
+                            setSelectedDate(day);
+                            setDayDetailOpen(true);
+                          }}
                         >
                           <div className="text-sm font-medium mb-1">
                             {viewType === 'week' 
@@ -662,14 +666,14 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                           
                           {/* Events */}
                           <div className="space-y-1">
-                            {dayEvents.slice(0, viewType === 'week' ? 4 : 2).map((event, eventIndex) => {
+                            {dayEvents.slice(0, viewType === 'week' ? 4 : 3).map((event) => {
                               const houseColor = getHouseColor(event.house_id);
                               const abbr = getHouseAbbreviation(event.house);
                               return (
                                 <div
                                   key={event.id}
                                   className={cn(
-                                    "text-xs px-2 py-1 rounded truncate",
+                                    "text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded truncate",
                                     houseColor.bg, houseColor.text
                                   )}
                                   title={`${event.title} - ${event.house}`}
@@ -683,9 +687,9 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                 </div>
                               );
                             })}
-                            {dayEvents.length > (viewType === 'week' ? 4 : 2) && (
-                              <div className="text-xs text-muted-foreground">
-                                +{dayEvents.length - (viewType === 'week' ? 4 : 2)} weitere
+                            {dayEvents.length > (viewType === 'week' ? 4 : 3) && (
+                              <div className="text-[10px] sm:text-xs text-muted-foreground">
+                                +{dayEvents.length - (viewType === 'week' ? 4 : 3)} weitere
                               </div>
                             )}
                           </div>
