@@ -2,7 +2,7 @@ import React from 'react';
 import { Sparkles } from 'lucide-react';
 import AmelaBookingInfoCard from './AmelaBookingInfoCard';
 import AmelaCleaningCard from './AmelaCleaningCard';
-import { getBookingColor, STANDALONE_COLOR } from '@/lib/bookingColors';
+import { getBookingColorByIndex, STANDALONE_COLOR } from '@/lib/bookingColors';
 
 interface AmelaEntryRowProps {
   entry: any;
@@ -11,6 +11,7 @@ interface AmelaEntryRowProps {
   onStaffUpdate: (taskId: string, staffId: string | null) => void;
   onDateTimeUpdate: (taskId: string, date: string, time: string) => void;
   onTaskNotesUpdate?: (taskId: string, notes: string) => void;
+  colorIndex?: number;
 }
 
 const AmelaEntryRow: React.FC<AmelaEntryRowProps> = ({
@@ -20,6 +21,7 @@ const AmelaEntryRow: React.FC<AmelaEntryRowProps> = ({
   onStaffUpdate,
   onDateTimeUpdate,
   onTaskNotesUpdate,
+  colorIndex,
 }) => {
   if (entry.type === 'standalone') {
     const task = entry.data;
@@ -37,7 +39,11 @@ const AmelaEntryRow: React.FC<AmelaEntryRowProps> = ({
   }
 
   const booking = entry.data;
-  const accentColor = getBookingColor(booking.id);
+  // Use index-based color if provided, fallback to hash
+  const accentColor = typeof colorIndex === 'number' 
+    ? getBookingColorByIndex(colorIndex) 
+    : getBookingColorByIndex(0);
+    
   const tasks = (booking.service_tasks || []).filter(
     (t: any) => t.service_type === 'cleaning' || !t.service_type
   );
@@ -52,9 +58,9 @@ const AmelaEntryRow: React.FC<AmelaEntryRowProps> = ({
     <div className="space-y-2.5">
       <AmelaBookingInfoCard booking={booking} accentColor={accentColor} />
       {isMulti && (
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground pl-1">
+        <div className="flex items-center gap-1.5 text-muted-foreground pl-1">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>{tasks.length} Reinigungsaufträge zu dieser Buchung</span>
+          <span className="font-bold text-sm">{tasks.length} Reinigungsaufträge zu dieser Buchung</span>
         </div>
       )}
       {tasks.map((task: any, idx: number) => (
