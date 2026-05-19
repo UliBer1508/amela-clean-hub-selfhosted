@@ -500,6 +500,9 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                     <Button variant="ghost" onClick={previousPeriod} className="h-11 w-11 p-0 active:scale-95">
                       <ChevronLeft className="h-5 w-5" />
                     </Button>
+                    <Button variant="outline" onClick={goToToday} className="h-11 px-4 active:scale-95">
+                      Heute
+                    </Button>
                     <Button variant="ghost" onClick={nextPeriod} className="h-11 w-11 p-0 active:scale-95">
                       <ChevronRight className="h-5 w-5" />
                     </Button>
