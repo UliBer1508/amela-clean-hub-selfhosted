@@ -750,7 +750,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
                 </CardContent>
               </Card>
             ) : (
-              currentFilteredEntries.map((entry) => (
+               currentFilteredEntries.map((entry, idx) => (
                 <AmelaEntryRow
                   key={entry.data.id}
                   entry={entry}
@@ -759,6 +759,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
                   onStaffUpdate={handleStaffUpdate}
                   onDateTimeUpdate={handleDateTimeUpdateFromCard}
                   onTaskNotesUpdate={entry.type === 'booking' ? handleTaskNotesUpdate : handleStandaloneNotesUpdate}
+                  colorIndex={idx}
                 />
               ))
             )}
