@@ -405,25 +405,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 pt-1 pb-24 sm:px-6 lg:px-8 md:py-8 sm:pb-8">
-        {showNotificationSettings ? (
-          <div className="space-y-6 animate-fade-in">
-            <div className="flex items-center justify-between">
-              <h1 className="text-lg md:text-2xl font-bold">
-                <span className="md:hidden">Benachrichtigungen</span>
-                <span className="hidden md:inline">Benachrichtigungseinstellungen</span>
-              </h1>
-              <Button 
-                variant="outline" 
-                onClick={() => setShowNotificationSettings(false)}
-                className="hover-scale"
-              >
-                Zurück zum Kalender
-              </Button>
-            </div>
-            <NotificationSettings />
-          </div>
-        ) : (
-          <>
+        <>
+
             {/* Header */}
             <div className="mb-6 space-y-4">
               {/* Mobile Layout - Stack vertically */}
