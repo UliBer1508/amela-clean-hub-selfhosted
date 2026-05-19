@@ -507,13 +507,13 @@ const Calendar = ({ chatProps }: CalendarProps) => {
             <Card>
               <CardContent className="p-4 md:p-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-lg md:text-xl font-semibold">{calendarTitle}</h2>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm" onClick={previousPeriod}>
-                      <ChevronLeft className="h-4 w-4" />
+                  <h2 className="hidden sm:block text-lg md:text-xl font-semibold">{calendarTitle}</h2>
+                  <div className="flex items-center gap-2 ml-auto">
+                    <Button variant="ghost" onClick={previousPeriod} className="h-11 w-11 p-0 active:scale-95">
+                      <ChevronLeft className="h-5 w-5" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={nextPeriod}>
-                      <ChevronRight className="h-4 w-4" />
+                    <Button variant="ghost" onClick={nextPeriod} className="h-11 w-11 p-0 active:scale-95">
+                      <ChevronRight className="h-5 w-5" />
                     </Button>
                   </div>
                 </div>
