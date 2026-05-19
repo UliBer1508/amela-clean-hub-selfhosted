@@ -8,103 +8,60 @@ import { getGuestName } from '@/lib/guestHelpers';
 
 export const useBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [allBookings, setAllBookings] = useState<Booking[]>([]);
   const [standaloneCleanings, setStandaloneCleanings] = useState<StandaloneCleaningTask[]>([]);
   const [combinedEntries, setCombinedEntries] = useState<CleaningEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
-  const fetchBookings = useCallback(async (forceRefresh = false) => {
+  const fetchBookings = useCallback(async (_forceRefresh = false) => {
     try {
       setLoading(true);
       setError(null);
-      
-      // Fetch bookings (cleaning + all) in parallel
-      const [
-        { data: cleaningData, error: cleaningError },
-        { data: allData, error: allError },
-      ] = await Promise.all([
-        supabase
-          .from('bookings')
-          .select(`
+
+      const { data: cleaningData, error: cleaningError } = await supabase
+        .from('bookings')
+        .select(`
+          id,
+          guest_name,
+          guest_email,
+          check_in,
+          check_out,
+          number_of_guests,
+          status,
+          house_id,
+          houses!bookings_house_id_fkey (
+            name,
+            address
+          ),
+          guests (*),
+          service_tasks!service_tasks_booking_id_fkey!inner (
             id,
-            guest_name,
-            guest_email,
-            check_in,
-            check_out,
-            number_of_guests,
+            service_type,
+            scheduled_date,
+            scheduled_time,
             status,
-            house_id,
-            houses!bookings_house_id_fkey (
-              name,
-              address
-            ),
-            guests (*),
-            service_tasks!service_tasks_booking_id_fkey!inner (
-              id,
-              service_type,
-              scheduled_date,
-              scheduled_time,
-              status,
-              assigned_staff_id,
-              provider_id,
-              completed_at,
-              notes,
-              payment_status,
-              service_providers!service_tasks_provider_id_fkey (
-                name
-              )
+            assigned_staff_id,
+            provider_id,
+            completed_at,
+            notes,
+            payment_status,
+            service_providers!service_tasks_provider_id_fkey (
+              name
             )
-          `)
-          .eq('service_tasks.service_type', 'cleaning')
-          .limit(APP_CONFIG.ITEMS_PER_PAGE),
-        supabase
-          .from('bookings')
-          .select(`
-            id,
-            guest_name,
-            guest_email,
-            check_in,
-            check_out,
-            number_of_guests,
-            status,
-            house_id,
-            houses!bookings_house_id_fkey (
-              name,
-              address
-            ),
-            guests (*),
-            service_tasks!service_tasks_booking_id_fkey (
-              id,
-              service_type,
-              scheduled_date,
-              scheduled_time,
-              status,
-              assigned_staff_id,
-              provider_id,
-              completed_at,
-              notes,
-              payment_status,
-              service_providers!service_tasks_provider_id_fkey (
-                name
-              )
-            )
-          `)
-          .order('check_in', { ascending: true }),
-      ]);
+          )
+        `)
+        .eq('service_tasks.service_type', 'cleaning')
+        .limit(APP_CONFIG.ITEMS_PER_PAGE);
 
       if (cleaningError) throw cleaningError;
-      if (allError) throw allError;
-      
-      // Cast the data to match our Booking interface
+
       const bookingsData = cleaningData as unknown as Booking[];
-      const allBookingsData = allData as unknown as Booking[];
-      
-      const bookingsWithCleaning = bookingsData?.filter(booking => 
+
+      const bookingsWithCleaning = bookingsData?.filter(booking =>
         booking.service_tasks && booking.service_tasks.length > 0
       ) || [];
-      
+
       // Sort by earliest cleaning date first
       bookingsWithCleaning.sort((a, b) => {
         const aDate = a.service_tasks?.[0]?.scheduled_date;
@@ -112,7 +69,7 @@ export const useBookings = () => {
         if (!aDate || !bDate) return 0;
         return new Date(aDate).getTime() - new Date(bDate).getTime();
       });
-      
+
       // Fetch standalone cleaning tasks (ohne booking_id)
       const { data: standaloneData, error: standaloneError } = await supabase
         .from('service_tasks')
@@ -144,19 +101,17 @@ export const useBookings = () => {
       const standaloneCleaningsData = standaloneData as unknown as StandaloneCleaningTask[];
       setStandaloneCleanings(standaloneCleaningsData || []);
 
-      // Kombiniere beide Listen
       const combined: CleaningEntry[] = [
         ...bookingsWithCleaning.map(b => ({ type: 'booking' as const, data: b })),
         ...(standaloneCleaningsData || []).map(s => ({ type: 'standalone' as const, data: s }))
       ];
 
-      // Sortiere nach Datum
       combined.sort((a, b) => {
-        const aDate = a.type === 'booking' 
-          ? a.data.service_tasks?.[0]?.scheduled_date 
+        const aDate = a.type === 'booking'
+          ? a.data.service_tasks?.[0]?.scheduled_date
           : a.data.scheduled_date;
-        const bDate = b.type === 'booking' 
-          ? b.data.service_tasks?.[0]?.scheduled_date 
+        const bDate = b.type === 'booking'
+          ? b.data.service_tasks?.[0]?.scheduled_date
           : b.data.scheduled_date;
         if (!aDate || !bDate) return 0;
         return new Date(aDate).getTime() - new Date(bDate).getTime();
@@ -164,7 +119,6 @@ export const useBookings = () => {
 
       setCombinedEntries(combined);
       setBookings(bookingsWithCleaning);
-      setAllBookings(allBookingsData || []);
       setLastRefresh(new Date());
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Fehler beim Laden der Buchungen';
