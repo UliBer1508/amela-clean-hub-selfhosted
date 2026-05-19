@@ -845,34 +845,30 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     </div>
     </PullToRefresh>
 
-    {/* Mobile Tag-Detail Sheet */}
-    <Sheet open={dayDetailOpen} onOpenChange={setDayDetailOpen}>
-      <SheetContent
-        side="bottom"
-        className="sm:hidden max-h-[70vh] overflow-y-auto rounded-t-3xl px-4 pt-3 pb-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] border-0 shadow-2xl [&>button]:hidden"
+    {/* Mobile Tag-Detail Dialog (zentriertes Popup) */}
+    <Dialog open={dayDetailOpen} onOpenChange={setDayDetailOpen}>
+      <DialogContent
+        className="sm:hidden w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto rounded-3xl p-5 border-0 shadow-2xl [&>button]:hidden"
       >
-        {/* Grab-Handle */}
-        <div className="mx-auto w-10 h-1.5 rounded-full bg-muted-foreground/30 mb-4" />
-
         {/* Header */}
-        <SheetHeader className="text-left flex-row items-start justify-between space-y-0 mb-4">
+        <DialogHeader className="text-left flex-row items-start justify-between space-y-0 mb-4">
           <div className="min-w-0">
-            <SheetTitle className="text-xl font-semibold leading-tight">
+            <DialogTitle className="text-xl font-semibold leading-tight">
               {selectedDate ? format(selectedDate, 'EEEE', { locale: de }) : 'Termine'}
-            </SheetTitle>
+            </DialogTitle>
             {selectedDate && (
               <p className="text-sm text-muted-foreground mt-0.5">
                 {format(selectedDate, 'd. MMMM yyyy', { locale: de })}
               </p>
             )}
           </div>
-          <SheetClose className="w-9 h-9 rounded-full bg-muted/60 hover:bg-muted active:bg-muted flex items-center justify-center shrink-0 transition-colors">
+          <DialogClose className="w-9 h-9 rounded-full bg-muted/60 hover:bg-muted active:bg-muted flex items-center justify-center shrink-0 transition-colors">
             <span className="sr-only">Schliessen</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
-          </SheetClose>
-        </SheetHeader>
+          </DialogClose>
+        </DialogHeader>
 
         {/* Event-Karten */}
         <div className="space-y-2">
@@ -882,7 +878,6 @@ const Calendar = ({ chatProps }: CalendarProps) => {
               const isCleaning = event.type === 'cleaning';
               const isInteractive = isCleaning;
 
-              // Icon je Typ
               const IconCmp =
                 event.type === 'cleaning' ? Sparkles
                 : event.type === 'laundry-delivery' || event.type === 'laundry-pickup' ? Shirt
@@ -890,7 +885,6 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                 : event.type === 'checkout' ? LogOut
                 : Bed;
 
-              // Typ-Label
               const typeLabel =
                 event.type === 'cleaning' ? `Reinigung${event.scheduledTime ? ' • ' + event.scheduledTime.slice(0, 5) : ''}`
                 : event.type === 'laundry-delivery' ? 'Wäsche Lieferung'
@@ -899,7 +893,6 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                 : event.type === 'checkout' ? 'Check-out'
                 : 'Belegt';
 
-              // Status-Label & Dot-Farbe
               const statusMap: Record<string, { label: string; dot: string }> = {
                 scheduled: { label: 'Geplant', dot: 'bg-blue-500' },
                 in_progress: { label: 'In Arbeit', dot: 'bg-amber-500' },
@@ -923,7 +916,6 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                   } : undefined}
                   role={isInteractive ? 'button' : undefined}
                 >
-                  {/* Icon-Bubble */}
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
                     style={{ backgroundColor: `${houseColor.hex}26` }}
@@ -931,8 +923,6 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                     <IconCmp className="w-5 h-5" style={{ color: houseColor.hex }} />
                   </div>
 
-
-                  {/* Text */}
                   <div className="min-w-0 flex-1">
                     <div className="font-semibold text-sm truncate">{event.house}</div>
                     <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5 flex-wrap">
@@ -959,14 +949,13 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           )}
         </div>
 
-        {/* Footer-Link */}
-        <SheetClose asChild>
+        <DialogClose asChild>
           <Button variant="ghost" className="w-full h-11 mt-4 text-muted-foreground hover:text-foreground">
             Schliessen
           </Button>
-        </SheetClose>
-      </SheetContent>
-    </Sheet>
+        </DialogClose>
+      </DialogContent>
+    </Dialog>
 
 
     {/* Mobile Reinigungsauftrag-Detail Sheet */}
