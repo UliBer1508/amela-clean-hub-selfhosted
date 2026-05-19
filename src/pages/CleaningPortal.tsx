@@ -474,7 +474,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
               </div>
             </div>
             <div className="flex items-center space-x-2 md:space-x-3">
-              <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
+              <div className="hidden sm:block">
+                <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
+              </div>
               <div className={cardConfig.showMobileSettingsButton ? "block" : "hidden sm:block"}>
                 <BookingCardSettings
                   config={cardConfig}
