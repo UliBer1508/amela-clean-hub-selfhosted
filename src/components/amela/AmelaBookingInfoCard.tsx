@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Home, MapPin, User, Users, CalendarDays } from 'lucide-react';
+import { House, MapPin, User, Users, CalendarDays } from 'lucide-react';
 import { getGuestName } from '@/lib/guestHelpers';
 import { formatDateTime } from '@/utils/date';
 
@@ -22,7 +22,7 @@ const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking, ac
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <Home className="w-4 h-4" />
+              <House className="w-4 h-4" strokeWidth={1.75} />
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-foreground text-sm truncate">
