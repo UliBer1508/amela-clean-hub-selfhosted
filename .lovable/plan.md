@@ -1,31 +1,31 @@
-## Ziel
+## Problem
 
-Klick auf das Glocken-Icon „Hinweise" (Header + Mobile-Bottom-Nav) öffnet ein kleines Popup mit nur den Erinnerungs-Einstellungen. Der Erinnerungs-Banner selbst wird ebenfalls als Popup/Dialog angezeigt statt inline über der Auftragsliste.
+Nach dem Ausblenden des Mobile-Headers bleibt oben ~48px Leerraum. Ursache: Der Wrapper `<div className="pt-12 md:pt-0">` reserviert auf Mobile fix 48px für die `PWAStatusBar`. Diese Statusleiste ist jedoch nur sichtbar wenn:
+- die App als PWA installiert ist, **oder**
+- das Gerät offline ist.
 
-## Änderungen
+Im Normalfall (Browser, online) ist der Platz also leer – genau das, was du siehst.
 
-### 1. Neues kleines Erinnerungs-Popup
-Neue Datei `src/components/amela/ReminderSettingsPopover.tsx`:
-- Kompakter Dialog (shadcn `Dialog`) mit Titel „Erinnerung"
-- Switch „Erinnerung aktiv" (an/aus)
-- Tage-Auswahl mit `−` / Zahl / `+` (44px Touch-Targets, 0–14)
-- Liest/schreibt über bestehenden `useReminderSettings`-Hook
+Zusätzlich erzeugt `<main class="py-3">` nochmals 12px Padding oben.
 
-### 2. CleaningPortal.tsx
-- Neuer State `showReminderPopup`
-- `handleNotificationClick` öffnet jetzt `showReminderPopup` statt des großen `NotificationSettings`-Panels
-- Inline-Rendering von `<NotificationSettings />` (Zeile 527–533) wird entfernt
-- `<ReminderSettingsPopover open={showReminderPopup} onOpenChange={…} />` einbinden
+## Lösung
 
-### 3. Erinnerungs-Banner als Popup
-- `CleaningReminderBanner` (aktuell inline oberhalb der Karten) wird zu einem automatisch geöffneten Dialog umgebaut:
-  - Wenn `enabled` und `daysUntil <= daysBefore`: Dialog erscheint einmal pro Tag (Dismiss in `sessionStorage` merken, damit er nicht bei jedem Render aufploppt)
-  - Inhalt: Icon, „Nächste Reinigung", Datum/Zeit, Objekt, Schließen-Button (≥44px)
-- Inline-Banner-Stelle in CleaningPortal entfernt, Komponente weiterhin gemountet (rendert nur den Dialog)
+**1. `pt-12` dynamisch machen** – nur reservieren, wenn die `PWAStatusBar` tatsächlich angezeigt wird.
 
-### Unverändert
-- Vollständige `NotificationSettings`-Seite bleibt im Code (kann später anderswo verlinkt werden), wird aber nicht mehr über die Glocke geöffnet
-- Header- und Bottom-Nav-Layout bleiben gleich, nur der Klick-Handler ändert sein Ziel
+- `usePWA()` Hook nutzen, um `isInstalled` und `isOnline` abzufragen
+- Wrapper-Klasse: `${shouldShow ? 'pt-12' : 'pt-0'} md:pt-0`
 
-## Touch / Mobile
-Alle Buttons im Popup ≥44×44px, Dialog mit `max-w-sm`, vollflächig auf Mobile mit ausreichend Padding.
+**2. Top-Padding des Main-Bereichs auf Mobile reduzieren**
+
+- `py-3` → `pt-1 pb-3` (oder `pt-2`) auf Mobile, Desktop bleibt `md:py-8`
+
+## Betroffene Dateien
+
+- `src/pages/CleaningPortal.tsx` (Zeile 463 + Zeile 530)
+- `src/pages/Calendar.tsx` (Zeile 348 + Main-Padding analog)
+
+## Ergebnis
+
+- Im Browser/online: Inhalte rücken ~56px nach oben, kein Leerraum mehr.
+- Als installierte PWA oder offline: Statusleiste bleibt wie gewohnt sichtbar, kein Überlappen.
+- Desktop bleibt unverändert.

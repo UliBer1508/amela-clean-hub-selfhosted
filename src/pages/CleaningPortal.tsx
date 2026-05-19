@@ -13,6 +13,7 @@ import { AMELA_PROVIDER_ID } from '@/constants/app';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import NotificationSettings from '@/components/NotificationSettings';
 import PWAStatusBar from '@/components/PWAStatusBar';
+import { usePWA } from '@/hooks/usePWA';
 import PullToRefresh from '@/components/PullToRefresh';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -82,6 +83,8 @@ interface CleaningPortalProps {
 const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   const { notify, preferences } = useNotify();
   const { unreadCount } = usePortalMessages();
+  const { isInstalled, isOnline } = usePWA();
+  const pwaBarVisible = isInstalled || !isOnline;
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('scheduled');
   const [staffFilter, setStaffFilter] = useState<string>('all'); // "all" = alle anzeigen
@@ -460,7 +463,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
 
     <div className="min-h-screen bg-background">
       <PWAStatusBar />
-      <div className="pt-12 md:pt-0">
+      <div className={`${pwaBarVisible ? 'pt-12' : 'pt-0'} md:pt-0`}>
       {/* Header */}
         <header className="hidden sm:block bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-8">
@@ -527,7 +530,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
 
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-2 py-3 md:px-4 md:py-8 lg:px-8 pb-24 sm:pb-3 md:pb-8">
+      <main className="max-w-7xl mx-auto px-2 pt-1 pb-24 md:px-4 md:py-8 lg:px-8 sm:pb-3 md:pb-8">
         <div className="space-y-3 md:space-y-6">
 
           {/* Erinnerungs-Banner */}

@@ -11,6 +11,7 @@ import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import PWAStatusBar from '@/components/PWAStatusBar';
+import { usePWA } from '@/hooks/usePWA';
 import NotificationSettings from '@/components/NotificationSettings';
 import ReminderSettingsPopover from '@/components/amela/ReminderSettingsPopover';
 import BookingCardSettings, { useBookingCardConfig } from '@/components/BookingCardSettings';
@@ -64,6 +65,8 @@ interface CalendarProps {
 
 const Calendar = ({ chatProps }: CalendarProps) => {
   const { unreadCount } = usePortalMessages();
+  const { isInstalled, isOnline } = usePWA();
+  const pwaBarVisible = isInstalled || !isOnline;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [viewType, setViewType] = useState<ViewType>('gantt');
@@ -345,7 +348,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     <PullToRefresh onRefresh={handleRefresh} disabled={loading}>
     <div className="min-h-screen bg-background">
       <PWAStatusBar />
-      <div className="pt-12 md:pt-0">
+      <div className={`${pwaBarVisible ? 'pt-12' : 'pt-0'} md:pt-0`}>
       {/* Header */}
       <header className="hidden sm:block bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-8">
@@ -405,7 +408,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
 
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 sm:pb-8">
+      <main className="max-w-7xl mx-auto px-4 pt-1 pb-24 sm:px-6 lg:px-8 md:py-8 sm:pb-8">
         {showNotificationSettings ? (
           <div className="space-y-6 animate-fade-in">
             <div className="flex items-center justify-between">
