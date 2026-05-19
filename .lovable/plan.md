@@ -1,52 +1,64 @@
-# Gruppierte Darstellung: 1 Buchung → mehrere Reinigungsaufträge
+# Farbgruppierung: Buchung + zugehörige Reinigungen
 
-## Problem
-Aktuell wird die Buchungskarte für jeden Reinigungsauftrag wiederholt. Bei 2 Reinigungen für Helena Kunz erscheint die identische Buchungskarte zweimal.
+## Ziel
+Jede Buchung bekommt eine **eigene, eindeutige Randfarbe** auf der linken Kartenseite. Alle Reinigungsaufträge, die zu dieser Buchung gehören, erhalten dieselbe Farbe. So ist auf einen Blick erkennbar, welche Reinigung zu welcher Buchung gehört (siehe Image Hausverwaltung).
 
-## Lösung
-Buchungskarte nur **einmal** anzeigen, darunter beide Reinigungskarten gruppiert. Visuelle Verbindung über einen umschließenden „Gruppen-Container" mit linker Akzentleiste, sodass klar ist: alle Reinigungen darunter gehören zur selben Buchung.
+## Lösungsansatz
 
-## Layout (mobile, 390px)
+### 1. Farb-Palette
+Neue Hilfsdatei `src/lib/bookingColors.ts`:
 
-```text
-┌──────────────────────────────────────┐
-│ ▎ ┌─ Buchungskarte (Helena Kunz) ─┐ │
-│ ▎ │ Wald Chalet · 3 Pers          │ │
-│ ▎ │ Check-in 30.05 · Check-out 06 │ │
-│ ▎ └───────────────────────────────┘ │
-│ ▎                                    │
-│ ▎ ↳ 2 Reinigungen                    │
-│ ▎ ┌─ Reinigung 1/2 ───────────────┐ │
-│ ▎ │ 30.05.2026 · geplant          │ │
-│ ▎ └───────────────────────────────┘ │
-│ ▎ ┌─ Reinigung 2/2 ───────────────┐ │
-│ ▎ │ 06.06.2026 · geplant          │ │
-│ ▎ └───────────────────────────────┘ │
-└──────────────────────────────────────┘
+```ts
+const PALETTE = [
+  { border: '#10b981', bg: '#ecfdf5' }, // emerald
+  { border: '#f59e0b', bg: '#fffbeb' }, // amber
+  { border: '#8b5cf6', bg: '#f5f3ff' }, // violet
+  { border: '#ec4899', bg: '#fdf2f8' }, // pink
+  { border: '#06b6d4', bg: '#ecfeff' }, // cyan
+  { border: '#f97316', bg: '#fff7ed' }, // orange
+  { border: '#84cc16', bg: '#f7fee7' }, // lime
+  { border: '#3b82f6', bg: '#eff6ff' }, // blue
+];
+
+export function getBookingColor(bookingId: string) {
+  // deterministischer Hash → stabile Farbe pro Buchung
+  let h = 0;
+  for (const c of bookingId) h = (h * 31 + c.charCodeAt(0)) | 0;
+  return PALETTE[Math.abs(h) % PALETTE.length];
+}
 ```
 
-- Linke Akzentleiste (`border-l-2 border-primary/40`) klammert Buchung + alle Reinigungen visuell zusammen.
-- Kleiner Zähler-Hinweis zwischen Buchung und Reinigungen: „2 Reinigungsaufträge" mit `Sparkles`-Icon.
-- Jede Reinigungskarte zeigt zusätzlich eine kleine Positionsmarkierung (`1/2`, `2/2`) im Header, damit sofort klar ist, welcher Auftrag gemeint ist.
-- Bei nur **1 Reinigung**: Zähler-Hinweis und Positionsmarkierung entfallen, Look bleibt wie bisher (Buchungskarte + 1 Reinigungskarte).
-- Standalone-Reinigungen (ohne Buchung): unverändert ohne Gruppen-Container.
+→ Stabile Zuordnung: gleiche Buchung bekommt bei jedem Reload dieselbe Farbe. Reinigungen ohne Buchung (standalone) bekommen eine neutrale graue Farbe.
 
-## Änderungen
+### 2. Komponenten-Änderungen
 
-**`src/components/amela/AmelaEntryRow.tsx`**
-- Buchungskarte nur einmal rendern, danach `tasks.map()` über alle Reinigungen.
-- Alles in einen Container mit `border-l-2 border-primary/40 pl-3 space-y-2`.
-- Zwischen Buchung und Reinigungs-Liste eine kleine Zeile: `↳ {tasks.length} Reinigungsaufträge`, nur wenn `tasks.length > 1`.
+**`AmelaBookingInfoCard.tsx`**
+- Neuer optionaler Prop `accentColor?: string`.
+- `border-l-emerald-500` (hartkodiert) entfernen → ersetzen durch inline `style={{ borderLeftColor: accentColor }}` + `border-l-4`.
+- Cremegelber Hintergrund bleibt unverändert.
 
-**`src/components/amela/AmelaCleaningCard.tsx`**
-- Optionaler Prop `positionLabel?: string` (z. B. `"1/2"`).
-- Wenn gesetzt: kleines Badge `Auftrag 1/2` neben „Reinigungsauftrag"-Titel.
+**`AmelaCleaningCard.tsx`**
+- Neuer optionaler Prop `accentColor?: string`.
+- `border-l-sky-400` (hartkodiert) entfernen → ersetzen durch inline `style={{ borderLeftColor: accentColor }}` + `border-l-4`.
+- Hellblauer Hintergrund bleibt unverändert.
+
+**`AmelaEntryRow.tsx`**
+- Bei `entry.type === 'booking'`: `getBookingColor(booking.id)` einmal aufrufen, Farbe an beide Karten weiterreichen.
+- Die linke Gruppen-Akzentleiste (`border-l-2 border-primary/40 pl-3`) wird **entfernt** — die Zugehörigkeit ergibt sich jetzt allein über die gemeinsame Randfarbe der Karten. Das spart horizontalen Platz auf Mobile.
+- Bei `entry.type === 'standalone'`: neutrale graue Akzentfarbe (`#94a3b8`).
+
+### 3. Optisches Ergebnis
+- Helena Kunz Buchung + ihre 2 Reinigungen: alle drei Karten mit **z. B. grünem** linken Rand.
+- Luca Buchung + ihre Reinigungen: alle mit **z. B. orangem** Rand.
+- Sofort visuelle Gruppierung ohne Container/Klammer.
 
 ## Nicht geändert
-- `AmelaBookingInfoCard`, Daten-Flow, Hooks, Filter, DB, Status-Logik.
+- Datenfluss, Hooks, Filter, DB, Status-Logik.
+- Hintergrundfarben der Karten (gelb / hellblau).
+- Layout/Stacking der Karten.
 
-## Verifikation
-- Helena Kunz mit 2 Reinigungen: 1 Buchungskarte oben, 2 Reinigungskarten gestapelt, Positionsbadges `1/2` und `2/2`.
-- Buchung mit 1 Reinigung: keine Positionsbadges, kein Zähler-Hinweis.
-- Standalone-Reinigung: unverändert.
-- Mobile 390px: kein horizontales Scrollen, alle Touch-Targets ≥ 44px.
+## Verifikation (Mobile 390px)
+- Helena Kunz mit 2 Reinigungen: alle 3 Karten haben identische Randfarbe.
+- Andere Buchungen daneben: deutlich unterscheidbare Randfarben.
+- Reload: Farben bleiben stabil pro Buchung.
+- Standalone-Reinigung: neutraler grauer Rand.
