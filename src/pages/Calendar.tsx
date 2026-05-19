@@ -825,60 +825,128 @@ const Calendar = ({ chatProps }: CalendarProps) => {
 
     {/* Mobile Tag-Detail Sheet */}
     <Sheet open={dayDetailOpen} onOpenChange={setDayDetailOpen}>
-      <SheetContent side="bottom" className="sm:hidden max-h-[80vh] overflow-y-auto rounded-t-2xl pb-[env(safe-area-inset-bottom)]">
-        <SheetHeader className="text-left">
-          <SheetTitle>
-            {selectedDate ? `Termine für ${format(selectedDate, 'EEEE, d. MMMM', { locale: de })}` : 'Termine'}
-          </SheetTitle>
+      <SheetContent
+        side="bottom"
+        className="sm:hidden max-h-[70vh] overflow-y-auto rounded-t-3xl px-4 pt-3 pb-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] border-0 shadow-2xl [&>button]:hidden"
+      >
+        {/* Grab-Handle */}
+        <div className="mx-auto w-10 h-1.5 rounded-full bg-muted-foreground/30 mb-4" />
+
+        {/* Header */}
+        <SheetHeader className="text-left flex-row items-start justify-between space-y-0 mb-4">
+          <div className="min-w-0">
+            <SheetTitle className="text-xl font-semibold leading-tight">
+              {selectedDate ? format(selectedDate, 'EEEE', { locale: de }) : 'Termine'}
+            </SheetTitle>
+            {selectedDate && (
+              <p className="text-sm text-muted-foreground mt-0.5">
+                {format(selectedDate, 'd. MMMM yyyy', { locale: de })}
+              </p>
+            )}
+          </div>
+          <SheetClose className="w-9 h-9 rounded-full bg-muted/60 hover:bg-muted active:bg-muted flex items-center justify-center shrink-0 transition-colors">
+            <span className="sr-only">Schliessen</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </SheetClose>
         </SheetHeader>
-        <div className="mt-4 space-y-2">
+
+        {/* Event-Karten */}
+        <div className="space-y-2">
           {selectedDateEvents.length > 0 ? (
             selectedDateEvents.map(event => {
               const houseColor = getHouseColor(event.house_id);
               const isCleaning = event.type === 'cleaning';
+              const isInteractive = isCleaning;
+
+              // Icon je Typ
+              const IconCmp =
+                event.type === 'cleaning' ? Sparkles
+                : event.type === 'laundry-delivery' || event.type === 'laundry-pickup' ? Shirt
+                : event.type === 'checkin' ? LogIn
+                : event.type === 'checkout' ? LogOut
+                : Bed;
+
+              // Typ-Label
+              const typeLabel =
+                event.type === 'cleaning' ? `Reinigung${event.scheduledTime ? ' • ' + event.scheduledTime.slice(0, 5) : ''}`
+                : event.type === 'laundry-delivery' ? 'Wäsche Lieferung'
+                : event.type === 'laundry-pickup' ? 'Wäsche Abholung'
+                : event.type === 'checkin' ? 'Check-in'
+                : event.type === 'checkout' ? 'Check-out'
+                : 'Belegt';
+
+              // Status-Label & Dot-Farbe
+              const statusMap: Record<string, { label: string; dot: string }> = {
+                scheduled: { label: 'Geplant', dot: 'bg-blue-500' },
+                in_progress: { label: 'In Arbeit', dot: 'bg-amber-500' },
+                completed: { label: 'Erledigt', dot: 'bg-emerald-500' },
+                delivered: { label: 'Geliefert', dot: 'bg-emerald-500' },
+                cancelled: { label: 'Abgebrochen', dot: 'bg-rose-500' },
+              };
+              const statusInfo = event.status ? statusMap[event.status] : null;
+
               return (
                 <div
                   key={event.id}
                   className={cn(
-                    "p-3 rounded-lg border flex items-start gap-3 min-h-[56px]",
-                    isCleaning && "cursor-pointer hover:bg-accent active:bg-accent transition-colors"
+                    "rounded-2xl bg-card border border-border/60 p-3 flex items-center gap-3 min-h-[64px]",
+                    isInteractive && "cursor-pointer active:scale-[0.98] active:bg-accent/50 transition-all"
                   )}
-                  onClick={isCleaning ? () => {
+                  onClick={isInteractive ? () => {
                     setSelectedCleaningTaskId(event.taskId ?? null);
                     setDayDetailOpen(false);
                     setCleaningDetailOpen(true);
                   } : undefined}
-                  role={isCleaning ? 'button' : undefined}
+                  role={isInteractive ? 'button' : undefined}
                 >
-                  <div className={cn("w-3 h-3 rounded-full mt-1.5 shrink-0", houseColor.bg)} />
-                  <div className="min-w-0 flex-1">
-                    <div className="font-medium text-sm">{event.title}</div>
-                    <div className="text-xs text-muted-foreground">{event.house}</div>
-                    {event.status && (
-                      <Badge variant="secondary" className="text-xs mt-1">
-                        {event.status}
-                      </Badge>
+                  {/* Icon-Bubble */}
+                  <div
+                    className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+                      houseColor.bg.replace('bg-', 'bg-') + '/15'
                     )}
+                  >
+                    <IconCmp className={cn("w-5 h-5", houseColor.bg.replace('bg-', 'text-').replace('-500', '-600'))} />
                   </div>
-                  {isCleaning && (
-                    <ChevronRight className="w-4 h-4 text-muted-foreground mt-1 shrink-0" />
+
+                  {/* Text */}
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-sm truncate">{event.house}</div>
+                    <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5 flex-wrap">
+                      <span className="truncate">{typeLabel}</span>
+                      {statusInfo && (
+                        <>
+                          <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", statusInfo.dot)} />
+                          <span>{statusInfo.label}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {isInteractive && (
+                    <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
                   )}
                 </div>
               );
             })
           ) : (
-            <p className="text-sm text-muted-foreground py-6 text-center">
+            <p className="text-sm text-muted-foreground py-8 text-center">
               Keine Termine für diesen Tag
             </p>
           )}
         </div>
+
+        {/* Footer-Link */}
         <SheetClose asChild>
-          <Button variant="outline" className="w-full mt-6 min-h-[44px]">
+          <Button variant="ghost" className="w-full h-11 mt-4 text-muted-foreground hover:text-foreground">
             Schliessen
           </Button>
         </SheetClose>
       </SheetContent>
     </Sheet>
+
 
     {/* Mobile Reinigungsauftrag-Detail Sheet */}
     {(() => {
