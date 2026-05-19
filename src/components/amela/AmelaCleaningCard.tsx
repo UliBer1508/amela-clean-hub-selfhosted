@@ -9,7 +9,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, Clock, CalendarIcon, Pencil, ClipboardCheck, ChevronDown } from 'lucide-react';
+import { Sparkles, Clock, CalendarIcon, Pencil, ClipboardCheck, ChevronDown, CheckCircle2, XCircle, AlertTriangle, PlayCircle, StickyNote } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { formatDateTime } from '@/utils/date';
@@ -27,11 +27,11 @@ interface AmelaCleaningCardProps {
 }
 
 const STATUS_OPTIONS: Array<{ value: string; label: string }> = [
-  { value: 'scheduled', label: '📅 Geplant' },
-  { value: 'in_progress', label: '⏳ In Bearbeitung' },
-  { value: 'completed', label: '✅ Abgeschlossen' },
-  { value: 'delayed', label: '⚠️ Verzögert' },
-  { value: 'cancelled', label: '❌ Storniert' },
+  { value: 'scheduled', label: 'Geplant', Icon: CalendarIcon },
+  { value: 'in_progress', label: 'In Bearbeitung', Icon: PlayCircle },
+  { value: 'completed', label: 'Abgeschlossen', Icon: CheckCircle2 },
+  { value: 'delayed', label: 'Verzögert', Icon: AlertTriangle },
+  { value: 'cancelled', label: 'Storniert', Icon: XCircle },
 ];
 
 const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
@@ -68,11 +68,11 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
   const paymentStatus = task.payment_status as string | undefined;
   const paymentBadge =
     paymentStatus === 'paid'
-      ? { variant: 'default' as const, label: '✅ Bezahlt', className: '' }
+      ? { variant: 'default' as const, label: 'Bezahlt', Icon: CheckCircle2, className: '' }
       : paymentStatus === 'pending'
-      ? { variant: 'secondary' as const, label: '⏳ Ausstehend', className: '' }
+      ? { variant: 'secondary' as const, label: 'Ausstehend', Icon: Clock, className: '' }
       : paymentStatus === 'unpaid'
-      ? { variant: 'outline' as const, label: '❌ Unbezahlt', className: 'bg-green-100 text-green-800 border-green-300 dark:bg-green-950/40 dark:text-green-300 dark:border-green-800' }
+      ? { variant: 'outline' as const, label: 'Unbezahlt', Icon: XCircle, className: 'bg-green-100 text-green-800 border-green-300 dark:bg-green-950/40 dark:text-green-300 dark:border-green-800' }
       : null;
 
   return (
