@@ -26,7 +26,7 @@ interface AmelaCleaningCardProps {
   accentColor?: string;
 }
 
-const STATUS_OPTIONS: Array<{ value: string; label: string }> = [
+const STATUS_OPTIONS: Array<{ value: string; label: string; Icon: typeof CheckCircle2 }> = [
   { value: 'scheduled', label: 'Geplant', Icon: CalendarIcon },
   { value: 'in_progress', label: 'In Bearbeitung', Icon: PlayCircle },
   { value: 'completed', label: 'Abgeschlossen', Icon: CheckCircle2 },
