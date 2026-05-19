@@ -452,7 +452,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
                   onStatusUpdate={handleStatusUpdate}
                   onStaffUpdate={handleStaffUpdate}
                   onDateTimeUpdate={handleDateTimeUpdateFromCard}
-                  onTaskNotesUpdate={entry.type === 'booking' ? handleTaskNotesUpdate : handleStandaloneNotesUpdate}
+                  onTaskNotesUpdate={handleNotesUpdate}
                   colorIndex={idx}
                 />
               ))
