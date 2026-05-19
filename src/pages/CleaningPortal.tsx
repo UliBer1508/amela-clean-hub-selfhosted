@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
-import Footer from '@/components/Footer';
+import Footer, { CopyrightLine } from '@/components/Footer';
 import { useNotify } from '@/hooks/useNotify';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
