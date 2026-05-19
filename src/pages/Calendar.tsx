@@ -341,93 +341,68 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   };
 
   return (
+    <>
     <PullToRefresh onRefresh={handleRefresh} disabled={loading}>
     <div className="min-h-screen bg-background">
       <PWAStatusBar />
       <div className="pt-12 md:pt-0">
       {/* Header */}
       <header className="bg-card border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <Home className="w-6 h-6 text-primary-foreground" />
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-primary rounded-lg flex items-center justify-center">
+                <Home className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
+                <h1 className="text-lg md:text-xl font-bold text-foreground">Amela Reinigungsportal</h1>
               </div>
             </div>
-              <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 md:space-x-3">
+              <div className="hidden sm:block">
                 <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
-                <div className={cardConfig.showMobileSettingsButton ? '' : 'hidden lg:block'}>
-                  <BookingCardSettings 
-                    config={cardConfig}
-                    onConfigChange={updateCardConfig}
-                  />
-                </div>
-                <PWAInstallButton />
               </div>
+              <div className={cardConfig.showMobileSettingsButton ? 'block' : 'hidden sm:block'}>
+                <BookingCardSettings
+                  config={cardConfig}
+                  onConfigChange={updateCardConfig}
+                />
+              </div>
+              <PWAInstallButton />
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Navigation */}
-      <div className="bg-card border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Desktop Navigation */}
-          <div className="hidden sm:flex space-x-6">
+      {/* Desktop Navigation */}
+      <div className="hidden sm:block bg-card border-b border-border">
+        <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-8">
+          <div className="flex space-x-6">
             <Link to="/">
-              <Button variant="ghost" size="sm" className="my-2 hover-scale">
+              <Button variant="ghost" size="sm" className="my-2 hover-scale min-h-[44px]">
                 🏠 Reinigungen ({totalCleaningTasks})
               </Button>
             </Link>
-            <Button variant="default" size="sm" className="my-2">
+            <Button variant="default" size="sm" className="my-2 min-h-[44px]">
               📅 Kalender
             </Button>
-            <Link to="/putzkraefte">
-              <Button variant="ghost" size="sm" className="my-2 hover-scale">
-                👥 Putzkräfte
-              </Button>
-            </Link>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="my-2 hover-scale"
-              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="my-2 hover-scale min-h-[44px]"
+              onClick={() => setShowReminderPopup(true)}
             >
+              <Bell className="w-4 h-4 mr-2" />
               🔔 Benachrichtigungen
-            </Button>
-          </div>
-          
-          {/* Mobile Navigation - Icon Only */}
-          <div className="sm:hidden flex justify-around items-center gap-1 py-2">
-            <Link to="/">
-              <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center relative hover-scale">
-                <span className="text-xl">🏠</span>
-                <Badge className="absolute -top-1 -right-1 h-5 min-w-[20px] text-[10px] px-1 bg-primary text-primary-foreground">
-                  {totalCleaningTasks}
-                </Badge>
-              </Button>
-            </Link>
-            <Button variant="default" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center">
-              <span className="text-xl">📅</span>
-            </Button>
-            <Link to="/putzkraefte">
-              <Button variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale">
-                <span className="text-xl">👥</span>
-              </Button>
-            </Link>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="min-h-[44px] min-w-[44px] p-2 justify-center hover-scale"
-              onClick={() => setShowNotificationSettings(!showNotificationSettings)}
-            >
-              <span className="text-xl">🔔</span>
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Erinnerungs-Einstellungen Popup */}
+      <ReminderSettingsPopover open={showReminderPopup} onOpenChange={setShowReminderPopup} />
+
+
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
