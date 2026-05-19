@@ -23,6 +23,7 @@ interface AmelaCleaningCardProps {
   onDateTimeUpdate: (taskId: string, date: string, time: string) => void;
   onNotesUpdate?: (taskId: string, notes: string) => void;
   positionLabel?: string;
+  accentColor?: string;
 }
 
 const STATUS_OPTIONS: Array<{ value: string; label: string }> = [
