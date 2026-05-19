@@ -217,7 +217,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <p className="text-xs font-medium text-muted-foreground">Buchungsnotizen:</p>
+                      <p className="text-muted-foreground text-sm font-bold">Buchungsnotizen:</p>
                       {config.showEditableNotes && (
                         <Button
                           variant="ghost"
