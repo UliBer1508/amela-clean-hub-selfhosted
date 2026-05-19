@@ -528,7 +528,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
       )}
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-2 py-3 md:px-4 md:py-8 lg:px-8">
+      <main className="max-w-7xl mx-auto px-2 py-3 md:px-4 md:py-8 lg:px-8 pb-24 sm:pb-3 md:pb-8">
         <div className="space-y-3 md:space-y-6">
 
           {/* Haus-Filter-Karten */}
