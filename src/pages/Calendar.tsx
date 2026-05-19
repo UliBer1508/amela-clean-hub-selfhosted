@@ -415,12 +415,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
             <div className="mb-6 space-y-4">
               {/* Mobile Layout - Stack vertically */}
               <div className="sm:hidden space-y-3">
-                <h1 className="text-2xl font-bold">
-                  {viewType === 'week' 
-                    ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
-                    : format(currentDate, 'MMMM yyyy', { locale: de })
-                  }
-                </h1>
+                <h1 className="text-2xl font-bold">{calendarTitle}</h1>
                 
                 {/* Zeile 1: Navigation - zentriert */}
                 <div className="flex items-center justify-center space-x-2">
@@ -464,12 +459,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
               {/* Desktop Layout - Single row */}
               <div className="hidden sm:flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <h1 className="text-2xl font-bold">
-                    {viewType === 'week' 
-                      ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
-                      : format(currentDate, 'MMMM yyyy', { locale: de })
-                    }
-                  </h1>
+                  <h1 className="text-2xl font-bold">{calendarTitle}</h1>
                   <div className="flex items-center space-x-2">
                     <Button variant="outline" size="sm" onClick={previousPeriod}>
                       <ChevronLeft className="h-4 w-4" />
@@ -515,12 +505,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
             <Card>
               <CardContent className="p-4 md:p-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-lg md:text-xl font-semibold">
-                    {viewType === 'week' 
-                      ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
-                      : format(currentDate, 'MMMM yyyy', { locale: de })
-                    }
-                  </h2>
+                  <h2 className="text-lg md:text-xl font-semibold">{calendarTitle}</h2>
                   <div className="flex items-center space-x-2">
                     <Button variant="ghost" size="sm" onClick={previousPeriod}>
                       <ChevronLeft className="h-4 w-4" />
