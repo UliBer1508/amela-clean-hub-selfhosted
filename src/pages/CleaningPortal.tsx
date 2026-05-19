@@ -13,6 +13,7 @@ import { AMELA_PROVIDER_ID } from '@/constants/app';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import NotificationSettings from '@/components/NotificationSettings';
 import PWAStatusBar from '@/components/PWAStatusBar';
+import { usePWA } from '@/hooks/usePWA';
 import PullToRefresh from '@/components/PullToRefresh';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
