@@ -572,136 +572,87 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-3 py-4 md:px-4 md:py-8 lg:px-8">
         <div className="space-y-4 md:space-y-6">
-          {/* Search and Filters Toggle */}
-          <Card className="shadow-sm border border-border">
-            <CardContent className="p-3 md:p-4">
+          {/* Haus-Filter-Karten */}
+          <div>
+            <div className="flex gap-2 overflow-x-auto pb-2 -mx-3 px-3 md:mx-0 md:px-0 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-visible">
               <button
-                onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-                className="w-full flex items-center justify-between text-left hover:bg-muted/50 rounded-lg p-2 transition-colors min-h-[44px]"
+                onClick={() => setHouseFilter('all')}
+                className={`shrink-0 min-w-[120px] md:min-w-0 min-h-[44px] rounded-lg border-2 px-3 py-2 text-left transition-all active:scale-95 ${
+                  houseFilter === 'all'
+                    ? 'border-primary bg-primary text-primary-foreground shadow-md'
+                    : 'border-border bg-card hover:border-primary/50'
+                }`}
               >
-                <div className="flex items-center space-x-2">
-                  <Search className="w-4 h-4 text-primary" />
-                  <span className="font-medium text-foreground text-xs md:text-sm">🔍 Such & Filter</span>
+                <div className="flex items-center gap-2">
+                  <Home className="w-4 h-4 shrink-0" />
+                  <span className="text-sm font-bold truncate">Alle Häuser</span>
                 </div>
-                {isFiltersOpen ? (
-                  <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                )}
               </button>
-              
-              {isFiltersOpen && (
-                <div className="mt-4 space-y-4 border-t border-border pt-4">
-                  <div className="flex items-center space-x-2">
-                    <Search className="w-4 h-4 text-primary" />
-                    <span className="font-medium text-foreground text-xs md:text-sm">🔍 Suche</span>
-                  </div>
-                  
-                  <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-                    <div className="relative flex-1">
-                      <Input
-                        placeholder="Nach Gast, Haus oder Adresse suchen..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 min-h-[44px]"
-                      />
-                      <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-3" />
+              {houses.map((house) => {
+                const active = houseFilter === house.id;
+                return (
+                  <button
+                    key={house.id}
+                    onClick={() => setHouseFilter(active ? 'all' : house.id)}
+                    className={`shrink-0 min-w-[140px] md:min-w-0 min-h-[44px] rounded-lg border-2 px-3 py-2 text-left transition-all active:scale-95 ${
+                      active
+                        ? 'border-primary bg-primary text-primary-foreground shadow-md'
+                        : 'border-border bg-card hover:border-primary/50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Home className="w-4 h-4 shrink-0" />
+                      <span className="text-sm font-bold truncate">{house.name}</span>
                     </div>
-                    
-                    <div className="flex items-center space-x-2 shrink-0">
-                      <Checkbox 
-                        id="showCheckedIn"
-                        checked={showCheckedIn}
-                        onCheckedChange={(checked) => setShowCheckedIn(checked === true)}
-                      />
-                      <Label htmlFor="showCheckedIn" className="text-xs md:text-sm cursor-pointer whitespace-nowrap">
-                        ⚠️ Auch eingecheckt
-                      </Label>
-                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Zeitraum-Filter-Karten */}
+          <div className="grid grid-cols-2 gap-2 md:gap-3">
+            {([
+              { key: 'thisWeek' as TimeFilter, label: 'Diese Woche' },
+              { key: 'nextWeek' as TimeFilter, label: 'Nächste Woche' },
+            ]).map(({ key, label }) => {
+              const active = timeFilter === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setTimeFilter(active ? 'all' : key)}
+                  className={`min-h-[56px] rounded-lg border-2 px-3 py-2 text-left transition-all active:scale-95 ${
+                    active
+                      ? 'border-primary bg-primary text-primary-foreground shadow-md'
+                      : 'border-border bg-card hover:border-primary/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 shrink-0" />
+                    <span className="text-sm font-bold">{label}</span>
                   </div>
+                </button>
+              );
+            })}
+          </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Filter className="w-4 h-4 text-primary" />
-                    <span className="font-medium text-foreground text-xs md:text-sm">🔧 Filter</span>
-                  </div>
+          <div className="flex justify-between items-center text-xs text-muted-foreground px-1">
+            <span>{currentFilteredEntries.length} von {totalCleaningTasks} Aufträgen</span>
+            {(houseFilter !== 'all' || timeFilter !== 'all') && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => {
+                  setHouseFilter('all');
+                  setTimeFilter('all');
+                }}
+              >
+                Filter zurücksetzen
+              </Button>
+            )}
+          </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-                    <Select value={statusFilter} onValueChange={(value: StatusFilter) => setStatusFilter(value)}>
-                      <SelectTrigger className="min-h-[44px]">
-                        <SelectValue placeholder="Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(STATUS_FILTERS).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>{label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    <Select value={staffFilter} onValueChange={(value: StaffFilter) => setStaffFilter(value)}>
-                      <SelectTrigger className="min-h-[44px]">
-                        <SelectValue placeholder="Putzkraft" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Alle Putzkräfte</SelectItem>
-                        {staff.map((member) => (
-                          <SelectItem key={member.id} value={member.id}>
-                            {member.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    <Select value={houseFilter} onValueChange={(value: HouseFilter) => setHouseFilter(value)}>
-                      <SelectTrigger className="min-h-[44px]">
-                        <SelectValue placeholder="Haus" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Alle Häuser</SelectItem>
-                        {houses.map((house) => (
-                          <SelectItem key={house.id} value={house.id}>{house.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    <Select value={timeFilter} onValueChange={(value: TimeFilter) => setTimeFilter(value)}>
-                      <SelectTrigger className="min-h-[44px]">
-                        <SelectValue placeholder="Zeitraum" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(TIME_FILTERS).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>{label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    {/* Provider-Filter ist im Amela-Portal fest auf Amela gesetzt */}
-                    {/* Das Dropdown wird nicht angezeigt, um Verwirrung zu vermeiden */}
-                  </div>
-
-                  <div className="flex justify-between items-center pt-2 border-t border-border gap-2 flex-wrap">
-                    <span className="text-sm text-muted-foreground">
-                      {currentFilteredEntries.length} von {totalCleaningTasks} Aufträgen
-                    </span>
-                    {(statusFilter !== 'scheduled' || houseFilter !== 'all' || staffFilter !== 'all' || timeFilter !== 'all' || searchTerm) && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setStatusFilter('scheduled');
-                          setHouseFilter('all');
-                          setStaffFilter('all');
-                          setTimeFilter('all');
-                          setSearchTerm('');
-                        }}
-                      >
-                        Filter zurücksetzen
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
 
           {lastRefresh && (
             <p className="text-xs text-muted-foreground text-center">
