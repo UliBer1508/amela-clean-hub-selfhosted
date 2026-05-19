@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Home, Calendar as CalendarIcon, Users, Bell, RefreshCw, MessageCircle } from 'lucide-react';
-import Footer from '@/components/Footer';
+import Footer, { CopyrightLine } from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
