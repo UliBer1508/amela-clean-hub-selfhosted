@@ -570,8 +570,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
       )}
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-3 py-4 md:px-4 md:py-8 lg:px-8">
-        <div className="space-y-4 md:space-y-6">
+      <main className="max-w-7xl mx-auto px-2 py-3 md:px-4 md:py-8 lg:px-8">
+        <div className="space-y-3 md:space-y-6">
+
           {/* Haus-Filter-Karten */}
           <div className="grid grid-cols-2 gap-2 md:gap-3 md:grid-cols-3 lg:grid-cols-4">
             {houses.map((house) => {
@@ -622,13 +623,12 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           </div>
 
 
-          <div className="flex justify-between items-center text-xs text-muted-foreground px-1">
-            <span>{currentFilteredEntries.length} von {totalCleaningTasks} Aufträgen</span>
-            {(houseFilter !== 'all' || timeFilter !== 'all') && (
+          {(houseFilter !== 'all' || timeFilter !== 'all') && (
+            <div className="flex justify-end">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 text-xs"
+                className="h-7 text-xs text-muted-foreground"
                 onClick={() => {
                   setHouseFilter('all');
                   setTimeFilter('all');
@@ -636,15 +636,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
               >
                 Filter zurücksetzen
               </Button>
-            )}
-          </div>
-
-
-          {lastRefresh && (
-            <p className="text-xs text-muted-foreground text-center">
-              Zuletzt aktualisiert: {format(lastRefresh, 'HH:mm:ss', { locale: de })}
-            </p>
+            </div>
           )}
+
 
           {/* Booking and Standalone Cleaning Cards */}
           <div className="space-y-3 md:space-y-4">
