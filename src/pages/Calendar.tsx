@@ -208,7 +208,12 @@ const Calendar = ({ chatProps }: CalendarProps) => {
             house_id: booking.house_id,
             status: task.status,
             guestName: guestName,
-            bookingId: booking.id
+            bookingId: booking.id,
+            taskId: task.id,
+            scheduledTime: task.scheduled_time ?? null,
+            notes: task.notes ?? null,
+            assignedStaffId: task.assigned_staff_id ?? null,
+            houseAddress: booking.houses?.address ?? null,
           });
         }
       });
