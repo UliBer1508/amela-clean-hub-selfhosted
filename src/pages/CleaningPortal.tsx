@@ -659,45 +659,46 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
       </main>
       <Footer />
       </div>
+    </div>
+    </PullToRefresh>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-card border-t border-border pb-[env(safe-area-inset-bottom)] shadow-lg">
-        <div className="flex justify-around items-center h-16">
-          <Link to="/" className="flex-1">
-            <button className="relative w-full h-16 flex flex-col items-center justify-center gap-1 text-primary">
-              <span className="text-2xl leading-none">🏠</span>
-              <span className="text-[10px] font-medium">Reinigung</span>
-              {totalCleaningTasks > 0 && (
-                <span className="absolute top-1 right-1/4 bg-primary text-primary-foreground text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
-                  {totalCleaningTasks}
-                </span>
-              )}
-            </button>
-          </Link>
-          <Link to="/calendar" className="flex-1">
-            <button className="w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground">
-              <span className="text-2xl leading-none">📅</span>
-              <span className="text-[10px] font-medium">Kalender</span>
-            </button>
-          </Link>
-          <button
-            onClick={handleNotificationClick}
-            className={`flex-1 w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground relative ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
-          >
-            <span className="text-2xl leading-none">🔔</span>
-            <span className="text-[10px] font-medium">Hinweise</span>
-            {newTaskCount > 0 && (
-              <span className="absolute top-1 right-1/4 bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center animate-pulse">
-                {newTaskCount}
+    {/* Mobile Bottom Navigation */}
+    <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-card border-t border-border pb-[env(safe-area-inset-bottom)] shadow-lg">
+      <div className="flex justify-around items-center h-16">
+        <Link to="/" className="flex-1">
+          <button className="relative w-full h-16 flex flex-col items-center justify-center gap-1 text-primary">
+            <span className="text-2xl leading-none">🏠</span>
+            <span className="text-[10px] font-medium">Reinigung</span>
+            {totalCleaningTasks > 0 && (
+              <span className="absolute top-1 right-1/4 bg-primary text-primary-foreground text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
+                {totalCleaningTasks}
               </span>
             )}
           </button>
-        </div>
-      </nav>
-    </div>
-
-    </PullToRefresh>
+        </Link>
+        <Link to="/calendar" className="flex-1">
+          <button className="w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground">
+            <span className="text-2xl leading-none">📅</span>
+            <span className="text-[10px] font-medium">Kalender</span>
+          </button>
+        </Link>
+        <button
+          onClick={handleNotificationClick}
+          className={`flex-1 w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground relative ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
+        >
+          <span className="text-2xl leading-none">🔔</span>
+          <span className="text-[10px] font-medium">Hinweise</span>
+          {newTaskCount > 0 && (
+            <span className="absolute top-1 right-1/4 bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center animate-pulse">
+              {newTaskCount}
+            </span>
+          )}
+        </button>
+      </div>
+    </nav>
+    </>
   );
+
 };
 
 export default CleaningPortal;
