@@ -282,7 +282,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                     </svg>
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Aufgaben Notizen:</p>
+                    <p className="text-muted-foreground text-sm font-bold mb-1">Aufgaben Notizen:</p>
                     {booking.service_tasks?.map((task: any) => (
                       <div key={task.id} className="mb-2 last:mb-0">
                         <div className="flex items-center justify-between mb-1">
