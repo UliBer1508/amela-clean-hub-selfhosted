@@ -1,9 +1,10 @@
 import React from 'react';
+import { Sparkles } from 'lucide-react';
 import AmelaBookingInfoCard from './AmelaBookingInfoCard';
 import AmelaCleaningCard from './AmelaCleaningCard';
 
 interface AmelaEntryRowProps {
-  entry: any; // CleaningEntry union from useBookings
+  entry: any;
   staff: any[];
   onStatusUpdate: (taskId: string, status: string) => void;
   onStaffUpdate: (taskId: string, staffId: string | null) => void;
@@ -22,16 +23,14 @@ const AmelaEntryRow: React.FC<AmelaEntryRowProps> = ({
   if (entry.type === 'standalone') {
     const task = entry.data;
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <AmelaCleaningCard
-          task={task}
-          staff={staff}
-          onStatusUpdate={onStatusUpdate}
-          onStaffUpdate={onStaffUpdate}
-          onDateTimeUpdate={onDateTimeUpdate}
-          onNotesUpdate={onTaskNotesUpdate}
-        />
-      </div>
+      <AmelaCleaningCard
+        task={task}
+        staff={staff}
+        onStatusUpdate={onStatusUpdate}
+        onStaffUpdate={onStaffUpdate}
+        onDateTimeUpdate={onDateTimeUpdate}
+        onNotesUpdate={onTaskNotesUpdate}
+      />
     );
   }
 
@@ -41,28 +40,34 @@ const AmelaEntryRow: React.FC<AmelaEntryRowProps> = ({
   );
 
   if (tasks.length === 0) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <AmelaBookingInfoCard booking={booking} />
-      </div>
-    );
+    return <AmelaBookingInfoCard booking={booking} />;
   }
 
+  const isMulti = tasks.length > 1;
+
   return (
-    <div className="space-y-3">
-      {tasks.map((task: any) => (
-        <div key={task.id} className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <AmelaBookingInfoCard booking={booking} />
+    <div className="border-l-2 border-primary/40 pl-3 space-y-2.5">
+      <AmelaBookingInfoCard booking={booking} />
+      {isMulti && (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground pl-1">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>{tasks.length} Reinigungsaufträge zu dieser Buchung</span>
+        </div>
+      )}
+      <div className="space-y-2.5">
+        {tasks.map((task: any, idx: number) => (
           <AmelaCleaningCard
+            key={task.id}
             task={task}
             staff={staff}
             onStatusUpdate={onStatusUpdate}
             onStaffUpdate={onStaffUpdate}
             onDateTimeUpdate={onDateTimeUpdate}
             onNotesUpdate={onTaskNotesUpdate}
+            positionLabel={isMulti ? `${idx + 1}/${tasks.length}` : undefined}
           />
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
