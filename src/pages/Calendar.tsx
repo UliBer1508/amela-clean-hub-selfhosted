@@ -7,12 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Link } from 'react-router-dom';
+import { useAllBookings } from '@/hooks/useAllBookings';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import PWAStatusBar from '@/components/PWAStatusBar';
 import { usePWA } from '@/hooks/usePWA';
-import NotificationSettings from '@/components/NotificationSettings';
+
 import ReminderSettingsPopover from '@/components/amela/ReminderSettingsPopover';
 import BookingCardSettings, { useBookingCardConfig } from '@/components/BookingCardSettings';
 import PullToRefresh from '@/components/PullToRefresh';
@@ -72,11 +73,11 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const [viewType, setViewType] = useState<ViewType>('gantt');
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const [showReminderPopup, setShowReminderPopup] = useState(false);
 
-  const { allBookings, loading, totalCleaningTasks, forceRefresh, lastRefresh } = useBookings();
-  const { config: cardConfig, updateConfig: updateCardConfig, loading: configLoading } = useBookingCardConfig();
+  const { allBookings, loading, forceRefresh } = useAllBookings();
+  const { totalCleaningTasks } = useBookings();
+  const { config: cardConfig, updateConfig: updateCardConfig } = useBookingCardConfig();
   const { houses } = useHouses();
 
   // Get calendar days for the current month/week
@@ -329,13 +330,6 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     }
   };
 
-  const previousMonth = () => {
-    setCurrentDate(prev => subMonths(prev, 1));
-  };
-
-  const nextMonth = () => {
-    setCurrentDate(prev => addMonths(prev, 1));
-  };
 
   const weekDays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
