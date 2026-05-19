@@ -474,7 +474,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
               </div>
             </div>
             <div className="flex items-center space-x-2 md:space-x-3">
-              <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
+              <div className="hidden sm:block">
+                <ChatButton onClick={() => chatProps.setIsChatOpen(true)} unreadCount={unreadCount} />
+              </div>
               <div className={cardConfig.showMobileSettingsButton ? "block" : "hidden sm:block"}>
                 <BookingCardSettings
                   config={cardConfig}
@@ -691,6 +693,18 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           {newTaskCount > 0 && (
             <span className="absolute top-1 right-1/4 bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center animate-pulse">
               {newTaskCount}
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => chatProps.setIsChatOpen(true)}
+          className="flex-1 w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground relative"
+        >
+          <span className="text-2xl leading-none">💬</span>
+          <span className="text-[10px] font-medium">Chat</span>
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-1/4 bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
+              {unreadCount}
             </span>
           )}
         </button>
