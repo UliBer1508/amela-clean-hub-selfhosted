@@ -145,7 +145,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
         <div className="flex items-center gap-2">
           <Label className="text-sm font-bold text-muted-foreground w-20 shrink-0">Status</Label>
           <Select value={task.status} onValueChange={(v) => onStatusUpdate(task.id, v)}>
-            <SelectTrigger className="min-h-[44px] flex-1">
+            <SelectTrigger className="min-h-[44px] flex-1 bg-sky-100 dark:bg-sky-950/40 border-sky-200 dark:border-sky-900">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
