@@ -81,7 +81,12 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
               <Sparkles className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <p className="font-semibold text-foreground text-sm">Reinigungsauftrag</p>
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-foreground text-sm">Reinigungsauftrag</p>
+                {positionLabel && (
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0">{positionLabel}</Badge>
+                )}
+              </div>
               <p className="text-xs text-muted-foreground font-mono">#{task.id.slice(-6)}</p>
             </div>
           </div>
