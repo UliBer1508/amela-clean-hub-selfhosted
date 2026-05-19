@@ -536,6 +536,11 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
       <main className="max-w-7xl mx-auto px-2 py-3 md:px-4 md:py-8 lg:px-8 pb-24 sm:pb-3 md:pb-8">
         <div className="space-y-3 md:space-y-6">
 
+          {/* Erinnerungs-Banner */}
+          <CleaningReminderBanner entries={currentFilteredEntries} />
+
+
+
           {/* Haus-Filter-Karten */}
           <div className="grid grid-cols-2 gap-2 md:gap-3 md:grid-cols-3 lg:grid-cols-4">
             {houses.map((house) => {
