@@ -106,14 +106,11 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
 
   // Service Provider Filter ist fest auf Amela gesetzt (ID: 9de6e071-7e89-4d66-9433-a5f01acaa493)
 
-  // Handler für Benachrichtigungsklick
+  // Handler für Benachrichtigungsklick → öffnet Erinnerungs-Popup
   const handleNotificationClick = () => {
-    // Animation stoppen
     setHasUnreadNotifications(false);
     setNewTaskCount(0);
-    
-    // Benachrichtigungseinstellungen öffnen/schließen
-    setShowNotificationSettings(!showNotificationSettings);
+    setShowReminderPopup(true);
   };
 
   const { 
