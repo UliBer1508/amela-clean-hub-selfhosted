@@ -575,19 +575,6 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           {/* Haus-Filter-Karten */}
           <div>
             <div className="flex gap-2 overflow-x-auto pb-2 -mx-3 px-3 md:mx-0 md:px-0 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-visible">
-              <button
-                onClick={() => setHouseFilter('all')}
-                className={`shrink-0 min-w-[120px] md:min-w-0 min-h-[44px] rounded-lg border-2 px-3 py-2 text-left transition-all active:scale-95 ${
-                  houseFilter === 'all'
-                    ? 'border-primary bg-primary text-primary-foreground shadow-md'
-                    : 'border-border bg-card hover:border-primary/50'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Home className="w-4 h-4 shrink-0" />
-                  <span className="text-sm font-bold truncate">Alle Häuser</span>
-                </div>
-              </button>
               {houses.map((house) => {
                 const active = houseFilter === house.id;
                 return (
