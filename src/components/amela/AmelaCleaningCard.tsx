@@ -165,7 +165,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
             {editingNotes ? (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-muted-foreground">📝 Notizen</span>
+                  <span className="text-muted-foreground text-sm font-bold">📝 Notizen</span>
                   <Button
                     variant="ghost"
                     size="sm"
