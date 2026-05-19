@@ -463,7 +463,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
 
     <div className="min-h-screen bg-background">
       <PWAStatusBar />
-      <div className="pt-12 md:pt-0">
+      <div className={`${pwaBarVisible ? 'pt-12' : 'pt-0'} md:pt-0`}>
       {/* Header */}
         <header className="hidden sm:block bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-8">
