@@ -602,7 +602,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 text-xs text-muted-foreground"
+                className="min-h-[44px] text-xs text-muted-foreground"
                 onClick={() => {
                   setHouseFilter('all');
                   setTimeFilter('all');
