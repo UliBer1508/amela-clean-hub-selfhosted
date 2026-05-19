@@ -59,7 +59,7 @@ const AmelaEntryRow: React.FC<AmelaEntryRowProps> = ({
       <AmelaBookingInfoCard booking={booking} accentColor={accentColor} />
       {isMulti && (
         <div className="flex items-center gap-1.5 text-muted-foreground pl-1">
-          <Sparkles className="w-3.5 h-3.5" />
+          <Sparkles className="h-3.5 w-[16px]" />
           <span className="font-bold text-sm">{tasks.length} Reinigungsaufträge zu dieser Buchung</span>
         </div>
       )}

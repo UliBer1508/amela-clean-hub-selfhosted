@@ -44,10 +44,10 @@ const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking, ac
         )}
 
         <div className="flex items-center gap-1.5 text-sm text-foreground">
-          <User className="w-4 h-4 text-muted-foreground shrink-0" />
+          <User className="w-4 h-4 text-muted-foreground shrink-0 font-bold" />
           <span className="truncate min-w-0 text-sm font-bold">{getGuestName(booking) || '—'}</span>
           <span className="text-muted-foreground shrink-0">·</span>
-          <Users className="w-4 h-4 text-muted-foreground shrink-0" />
+          <Users className="w-4 h-4 text-muted-foreground shrink-0 font-bold" />
           <span className="shrink-0 text-sm font-bold">{booking.number_of_guests ?? 0}</span>
         </div>
 
