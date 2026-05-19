@@ -420,38 +420,38 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                 <h1 className="text-2xl font-bold">{calendarTitle}</h1>
                 
                 {/* Zeile 1: Navigation - zentriert */}
-                <div className="flex items-center justify-center space-x-2">
-                  <Button variant="outline" size="sm" onClick={previousPeriod}>
-                    <ChevronLeft className="h-4 w-4" />
+                <div className="flex items-center justify-center gap-2">
+                  <Button variant="outline" onClick={previousPeriod} className="min-h-[44px] min-w-[44px] active:scale-95">
+                    <ChevronLeft className="h-5 w-5" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={goToToday}>
+                  <Button variant="outline" onClick={goToToday} className="min-h-[44px] px-5 active:scale-95">
                     Heute
                   </Button>
-                  <Button variant="outline" size="sm" onClick={nextPeriod}>
-                    <ChevronRight className="h-4 w-4" />
+                  <Button variant="outline" onClick={nextPeriod} className="min-h-[44px] min-w-[44px] active:scale-95">
+                    <ChevronRight className="h-5 w-5" />
                   </Button>
                 </div>
                 
-                {/* Zeile 2: Ansichtswahl - zentriert */}
-                <div className="flex items-center justify-center space-x-2">
+                {/* Zeile 2: Ansichtswahl - 3-Spalten-Grid */}
+                <div className="grid grid-cols-3 gap-2">
                   <Button
                     variant={viewType === 'month' ? 'default' : 'outline'}
-                    size="sm"
                     onClick={() => setViewType('month')}
+                    className="min-h-[44px] active:scale-95"
                   >
                     Monat
                   </Button>
                   <Button
                     variant={viewType === 'week' ? 'default' : 'outline'}
-                    size="sm"
                     onClick={() => setViewType('week')}
+                    className="min-h-[44px] active:scale-95"
                   >
                     Woche
                   </Button>
                   <Button
                     variant={viewType === 'gantt' ? 'default' : 'outline'}
-                    size="sm"
                     onClick={() => setViewType('gantt')}
+                    className="min-h-[44px] active:scale-95"
                   >
                     Gantt
                   </Button>
