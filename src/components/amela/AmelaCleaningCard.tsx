@@ -208,8 +208,12 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           <ClipboardCheck className="w-4 h-4 mr-2" />
           ❗ Bevor du gehst!
         </Button>
+          </>
+        )}
 
         <BeforeYouGoChecklist open={showChecklist} onOpenChange={setShowChecklist} />
+
+
 
         {/* Datum/Zeit Dialog */}
         <Dialog open={isDateDialogOpen} onOpenChange={setIsDateDialogOpen}>
