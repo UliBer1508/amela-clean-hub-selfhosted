@@ -30,6 +30,7 @@ const NotificationSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { notify } = useNotify();
+  const { settings: reminderSettings, update: updateReminder } = useReminderSettings();
 
   useEffect(() => {
     fetchPreferences();
