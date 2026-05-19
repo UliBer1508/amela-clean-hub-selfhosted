@@ -21,8 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import BookingCardSettings, { useBookingCardConfig } from "@/components/BookingCardSettings";
-import ConfigurableBookingCard from "@/components/ConfigurableBookingCard";
-import StandaloneCleaningCard from "@/components/StandaloneCleaningCard";
+import AmelaEntryRow from "@/components/amela/AmelaEntryRow";
 import AddStandaloneCleaningDialog from "@/components/AddStandaloneCleaningDialog";
 import { ChatButton } from '@/components/PortalChat';
 import { usePortalMessages } from '@/hooks/usePortalMessages';
@@ -751,38 +750,17 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
                 </CardContent>
               </Card>
             ) : (
-              currentFilteredEntries.map((entry) => {
-                if (entry.type === 'booking') {
-                  return (
-                    <ConfigurableBookingCard
-                      key={entry.data.id}
-                      booking={entry.data}
-                      config={cardConfig}
-                      staff={staff}
-                      onStatusUpdate={handleStatusUpdate}
-                      onStaffUpdate={handleStaffUpdate}
-                      onDateTimeUpdate={handleDateTimeUpdateFromCard}
-                      onBookingNotesUpdate={handleBookingNotesUpdate}
-                      onTaskNotesUpdate={handleTaskNotesUpdate}
-                      formatDateTime={formatDateTime}
-                    />
-                  );
-                } else {
-                  return (
-                    <StandaloneCleaningCard
-                      key={entry.data.id}
-                      cleaning={entry.data}
-                      config={cardConfig}
-                      staff={staff}
-                      onStatusUpdate={handleStatusUpdate}
-                      onStaffUpdate={handleStaffUpdate}
-                      onDateTimeUpdate={handleDateTimeUpdateFromCard}
-                      onNotesUpdate={handleStandaloneNotesUpdate}
-                      formatDateTime={formatDateTime}
-                    />
-                  );
-                }
-              })
+              currentFilteredEntries.map((entry) => (
+                <AmelaEntryRow
+                  key={entry.data.id}
+                  entry={entry}
+                  staff={staff}
+                  onStatusUpdate={handleStatusUpdate}
+                  onStaffUpdate={handleStaffUpdate}
+                  onDateTimeUpdate={handleDateTimeUpdateFromCard}
+                  onTaskNotesUpdate={entry.type === 'booking' ? handleTaskNotesUpdate : handleStandaloneNotesUpdate}
+                />
+              ))
             )}
           </div>
         </div>
