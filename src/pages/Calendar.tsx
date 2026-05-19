@@ -330,6 +330,10 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     }
   };
 
+  const calendarTitle = viewType === 'week'
+    ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
+    : format(currentDate, 'MMMM yyyy', { locale: de });
+
 
   const weekDays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
