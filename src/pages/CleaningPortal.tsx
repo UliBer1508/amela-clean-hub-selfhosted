@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
-import Footer from '@/components/Footer';
+import Footer, { CopyrightLine } from '@/components/Footer';
 import { useNotify } from '@/hooks/useNotify';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
@@ -328,7 +328,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
 
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-2 pt-1 pb-24 md:px-4 md:py-8 lg:px-8 sm:pb-3 md:pb-8">
+      <main className="max-w-7xl mx-auto px-2 pt-1 pb-28 md:px-4 md:py-8 lg:px-8 sm:pb-3 md:pb-8">
         <div className="space-y-3 md:space-y-6">
 
           {/* Erinnerungs-Banner */}
@@ -467,6 +467,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
 
     {/* Mobile Bottom Navigation */}
     <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-sky-50 dark:bg-sky-950/30 border-t border-sky-200 dark:border-sky-900 pb-[env(safe-area-inset-bottom)] shadow-lg">
+      <CopyrightLine className="py-1 border-b border-sky-200/50 dark:border-sky-900/50" />
       <div className="flex justify-around items-center h-16">
         <Link to="/" className="flex-1">
           <button className="relative w-full h-16 flex flex-col items-center justify-center gap-1 text-primary">
