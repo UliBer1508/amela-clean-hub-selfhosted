@@ -43,7 +43,7 @@ import { Link } from 'react-router-dom';
 type StatusFilter = 'all' | 'scheduled' | 'in_progress' | 'completed' | 'delayed' | 'cancelled';
 type StaffFilter = 'all' | 'assigned' | 'unassigned';
 type HouseFilter = 'all' | string;
-type TimeFilter = 'all' | 'week' | 'month' | '3months';
+type TimeFilter = 'all' | 'week' | 'thisWeek' | 'nextWeek' | 'month' | '3months';
 type ProviderFilter = 'all' | 'unassigned' | string;
 
 interface TaskEditingState {
