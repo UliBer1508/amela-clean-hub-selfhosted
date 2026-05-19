@@ -663,7 +663,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     </PullToRefresh>
 
     {/* Mobile Bottom Navigation */}
-    <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-card border-t border-border pb-[env(safe-area-inset-bottom)] shadow-lg">
+    <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-sky-50 dark:bg-sky-950/30 border-t border-sky-200 dark:border-sky-900 pb-[env(safe-area-inset-bottom)] shadow-lg">
       <div className="flex justify-around items-center h-16">
         <Link to="/" className="flex-1">
           <button className="relative w-full h-16 flex flex-col items-center justify-center gap-1 text-primary">
