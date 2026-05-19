@@ -622,13 +622,12 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           </div>
 
 
-          <div className="flex justify-between items-center text-xs text-muted-foreground px-1">
-            <span>{currentFilteredEntries.length} von {totalCleaningTasks} Aufträgen</span>
-            {(houseFilter !== 'all' || timeFilter !== 'all') && (
+          {(houseFilter !== 'all' || timeFilter !== 'all') && (
+            <div className="flex justify-end">
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 text-xs"
+                className="h-7 text-xs text-muted-foreground"
                 onClick={() => {
                   setHouseFilter('all');
                   setTimeFilter('all');
@@ -636,15 +635,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
               >
                 Filter zurücksetzen
               </Button>
-            )}
-          </div>
-
-
-          {lastRefresh && (
-            <p className="text-xs text-muted-foreground text-center">
-              Zuletzt aktualisiert: {format(lastRefresh, 'HH:mm:ss', { locale: de })}
-            </p>
+            </div>
           )}
+
 
           {/* Booking and Standalone Cleaning Cards */}
           <div className="space-y-3 md:space-y-4">
