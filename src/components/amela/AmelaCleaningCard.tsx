@@ -40,6 +40,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
   onStaffUpdate,
   onDateTimeUpdate,
   onNotesUpdate,
+  positionLabel,
 }) => {
   const [isDateDialogOpen, setIsDateDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
