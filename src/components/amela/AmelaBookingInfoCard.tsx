@@ -28,7 +28,7 @@ const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking, ac
               <p className="font-semibold text-foreground text-sm truncate">
                 {booking.houses?.name || 'Unterkunft'}
               </p>
-              <p className="text-[10px] text-muted-foreground">Buchung</p>
+              <p className="text-muted-foreground text-xs font-bold">Buchung</p>
             </div>
           </div>
           {isCheckedIn && (
