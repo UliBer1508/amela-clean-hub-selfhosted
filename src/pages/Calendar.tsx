@@ -584,16 +584,23 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                 className="absolute inset-0 grid" 
                                 style={{ gridTemplateColumns: `repeat(${ganttDays.length}, minmax(32px, 1fr))` }}
                               >
-                                {ganttDays.map((day) => (
-                                  <div
-                                    key={day.toISOString()}
-                                    className={cn(
-                                      "border-r last:border-r-0 h-full",
-                                      isToday(day) && "bg-primary/10",
-                                      (day.getDay() === 0 || day.getDay() === 6) && "bg-muted/20"
-                                    )}
-                                  />
-                                ))}
+                                {ganttDays.map((day) => {
+                                  const houseOccupied = houseBookings.some(
+                                    (b) => day >= b.check_in && day <= b.check_out
+                                  );
+                                  return (
+                                    <div
+                                      key={day.toISOString()}
+                                      className={cn(
+                                        "border-r last:border-r-0 h-full",
+                                        houseOccupied
+                                          ? "bg-sky-100 dark:bg-sky-900/40"
+                                          : "bg-sky-50 dark:bg-sky-950/30",
+                                        isToday(day) && "ring-1 ring-primary/40 ring-inset"
+                                      )}
+                                    />
+                                  );
+                                })}
                               </div>
 
                               {/* Buchungsbalken */}
