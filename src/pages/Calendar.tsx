@@ -798,6 +798,48 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     </div>
     </PullToRefresh>
 
+    {/* Mobile Tag-Detail Sheet */}
+    <Sheet open={dayDetailOpen} onOpenChange={setDayDetailOpen}>
+      <SheetContent side="bottom" className="sm:hidden max-h-[80vh] overflow-y-auto rounded-t-2xl pb-[env(safe-area-inset-bottom)]">
+        <SheetHeader className="text-left">
+          <SheetTitle>
+            {selectedDate ? `Termine für ${format(selectedDate, 'EEEE, d. MMMM', { locale: de })}` : 'Termine'}
+          </SheetTitle>
+        </SheetHeader>
+        <div className="mt-4 space-y-2">
+          {selectedDateEvents.length > 0 ? (
+            selectedDateEvents.map(event => {
+              const houseColor = getHouseColor(event.house_id);
+              return (
+                <div key={event.id} className="p-3 rounded-lg border flex items-start gap-3 min-h-[56px]">
+                  <div className={cn("w-3 h-3 rounded-full mt-1.5 shrink-0", houseColor.bg)} />
+                  <div className="min-w-0 flex-1">
+                    <div className="font-medium text-sm">{event.title}</div>
+                    <div className="text-xs text-muted-foreground">{event.house}</div>
+                    {event.status && (
+                      <Badge variant="secondary" className="text-xs mt-1">
+                        {event.status}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-sm text-muted-foreground py-6 text-center">
+              Keine Termine für diesen Tag
+            </p>
+          )}
+        </div>
+        <SheetClose asChild>
+          <Button variant="outline" className="w-full mt-6 min-h-[44px]">
+            Schliessen
+          </Button>
+        </SheetClose>
+      </SheetContent>
+    </Sheet>
+
+
     {/* Mobile Bottom Navigation */}
     <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-sky-50 dark:bg-sky-950/30 border-t border-sky-200 dark:border-sky-900 pb-[env(safe-area-inset-bottom)] shadow-lg">
       <div className="flex justify-around items-center h-16">
