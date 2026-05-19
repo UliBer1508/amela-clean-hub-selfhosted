@@ -39,7 +39,14 @@ import {
   UserPlus,
   RefreshCw,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  MessageCircle,
+  CalendarRange,
+  CalendarDays,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
