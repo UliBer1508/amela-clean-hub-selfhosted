@@ -83,6 +83,8 @@ interface CleaningPortalProps {
 const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   const { notify, preferences } = useNotify();
   const { unreadCount } = usePortalMessages();
+  const { isInstalled, isOnline } = usePWA();
+  const pwaBarVisible = isInstalled || !isOnline;
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('scheduled');
   const [staffFilter, setStaffFilter] = useState<string>('all'); // "all" = alle anzeigen
