@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Bell, Mail, Volume2, Smartphone, AlertTriangle } from 'lucide-react';
+import { Bell, Mail, Volume2, Smartphone, AlertTriangle, CalendarClock, Minus, Plus } from 'lucide-react';
+import { useReminderSettings } from '@/hooks/useReminderSettings';
 import { useNotify } from '@/hooks/useNotify';
 import { validateEmail } from '@/utils/validation';
 
