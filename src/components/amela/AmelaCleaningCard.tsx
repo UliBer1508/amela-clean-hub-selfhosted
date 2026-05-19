@@ -48,6 +48,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
   const [showChecklist, setShowChecklist] = useState(false);
   const [editingNotes, setEditingNotes] = useState(false);
   const [notesValue, setNotesValue] = useState(task.notes || '');
+  const [expanded, setExpanded] = useState(task.status !== 'completed');
 
   const openDateDialog = () => {
     setSelectedDate(task.scheduled_date ? new Date(task.scheduled_date) : new Date());
