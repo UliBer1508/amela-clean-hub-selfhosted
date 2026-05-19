@@ -7,13 +7,17 @@ import { formatDateTime } from '@/utils/date';
 
 interface AmelaBookingInfoCardProps {
   booking: any;
+  accentColor?: string;
 }
 
-const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking }) => {
+const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking, accentColor }) => {
   const isCheckedIn = booking.status === 'checked_in';
 
   return (
-    <Card className="bg-[#fdf6d8] dark:bg-amber-950/30 border-l-4 border-l-emerald-500 active:scale-[0.99] transition-transform select-none">
+    <Card
+      className="bg-[#fdf6d8] dark:bg-amber-950/30 border-l-4 active:scale-[0.99] transition-transform select-none"
+      style={accentColor ? { borderLeftColor: accentColor } : undefined}
+    >
       <CardContent className="p-3 space-y-2.5">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">

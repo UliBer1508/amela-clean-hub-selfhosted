@@ -23,6 +23,7 @@ interface AmelaCleaningCardProps {
   onDateTimeUpdate: (taskId: string, date: string, time: string) => void;
   onNotesUpdate?: (taskId: string, notes: string) => void;
   positionLabel?: string;
+  accentColor?: string;
 }
 
 const STATUS_OPTIONS: Array<{ value: string; label: string }> = [
@@ -41,6 +42,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
   onDateTimeUpdate,
   onNotesUpdate,
   positionLabel,
+  accentColor,
 }) => {
   const [isDateDialogOpen, setIsDateDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -74,7 +76,10 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
       : null;
 
   return (
-    <Card className="bg-sky-50 dark:bg-sky-950/30 border-l-4 border-l-sky-400 hover:shadow-md transition-shadow">
+    <Card
+      className="bg-sky-50 dark:bg-sky-950/30 border-l-4 hover:shadow-md transition-shadow"
+      style={accentColor ? { borderLeftColor: accentColor } : undefined}
+    >
       <CardContent className="p-3 space-y-2.5">
         <button
           type="button"
