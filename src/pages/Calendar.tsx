@@ -903,13 +903,12 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                 >
                   {/* Icon-Bubble */}
                   <div
-                    className={cn(
-                      "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
-                      houseColor.bg.replace('bg-', 'bg-') + '/15'
-                    )}
+                    className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: `${houseColor.hex}26` }}
                   >
-                    <IconCmp className={cn("w-5 h-5", houseColor.bg.replace('bg-', 'text-').replace('-500', '-600'))} />
+                    <IconCmp className="w-5 h-5" style={{ color: houseColor.hex }} />
                   </div>
+
 
                   {/* Text */}
                   <div className="min-w-0 flex-1">
