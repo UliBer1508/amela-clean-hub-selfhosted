@@ -12,6 +12,7 @@ import { useHouses } from '@/hooks/useHouses';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import PWAStatusBar from '@/components/PWAStatusBar';
 import NotificationSettings from '@/components/NotificationSettings';
+import ReminderSettingsPopover from '@/components/amela/ReminderSettingsPopover';
 import BookingCardSettings, { useBookingCardConfig } from '@/components/BookingCardSettings';
 import PullToRefresh from '@/components/PullToRefresh';
 import { formatGermanDate } from '@/utils/date';
