@@ -79,7 +79,7 @@ export type CleaningEntry =
   | { type: 'standalone'; data: StandaloneCleaningTask };
 
 export type StatusFilter = 'all' | 'scheduled' | 'completed' | 'cancelled' | 'in_progress' | 'delayed';
-export type TimeFilter = 'all' | 'today' | 'week' | 'month' | '3months' | '6months' | '12months';
+export type TimeFilter = 'all' | 'today' | 'week' | 'thisWeek' | 'nextWeek' | 'month' | '3months' | '6months' | '12months';
 export type StaffFilter = string; // Staff-ID oder leerer String für "alle"
 export type HouseFilter = 'all' | string; // 'all' or house ID
 export type ProviderFilter = 'all' | 'unassigned' | string; // 'all', 'unassigned', or provider ID
