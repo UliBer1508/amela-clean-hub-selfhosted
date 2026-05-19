@@ -1,19 +1,31 @@
-## Problem
+## Ziel
 
-Die mobile Bottom-Navigation ist im Code vorhanden, wird aber im Handy-Preview nicht angezeigt.
+Klick auf das Glocken-Icon „Hinweise" (Header + Mobile-Bottom-Nav) öffnet ein kleines Popup mit nur den Erinnerungs-Einstellungen. Der Erinnerungs-Banner selbst wird ebenfalls als Popup/Dialog angezeigt statt inline über der Auftragsliste.
 
-## Ursache
+## Änderungen
 
-`<PullToRefresh>` umschließt den gesamten Portal-Inhalt inklusive der Bottom-Nav. Die innere Hülle in `PullToRefresh.tsx` (Zeile 120–130) trägt dauerhaft ein `transform: translateY(...)` Style.
+### 1. Neues kleines Erinnerungs-Popup
+Neue Datei `src/components/amela/ReminderSettingsPopover.tsx`:
+- Kompakter Dialog (shadcn `Dialog`) mit Titel „Erinnerung"
+- Switch „Erinnerung aktiv" (an/aus)
+- Tage-Auswahl mit `−` / Zahl / `+` (44px Touch-Targets, 0–14)
+- Liest/schreibt über bestehenden `useReminderSettings`-Hook
 
-Ein CSS-`transform` auf einem Vorfahren erzeugt einen neuen Containing Block für `position: fixed`. Dadurch verhält sich `fixed bottom-0` der Nav nicht mehr wie viewport-fixiert, sondern wird relativ zum transformierten Wrapper positioniert – sie sitzt am Ende des gesamten Inhaltes und ist außerhalb des Sichtbereichs.
+### 2. CleaningPortal.tsx
+- Neuer State `showReminderPopup`
+- `handleNotificationClick` öffnet jetzt `showReminderPopup` statt des großen `NotificationSettings`-Panels
+- Inline-Rendering von `<NotificationSettings />` (Zeile 527–533) wird entfernt
+- `<ReminderSettingsPopover open={showReminderPopup} onOpenChange={…} />` einbinden
 
-## Lösung
+### 3. Erinnerungs-Banner als Popup
+- `CleaningReminderBanner` (aktuell inline oberhalb der Karten) wird zu einem automatisch geöffneten Dialog umgebaut:
+  - Wenn `enabled` und `daysUntil <= daysBefore`: Dialog erscheint einmal pro Tag (Dismiss in `sessionStorage` merken, damit er nicht bei jedem Render aufploppt)
+  - Inhalt: Icon, „Nächste Reinigung", Datum/Zeit, Objekt, Schließen-Button (≥44px)
+- Inline-Banner-Stelle in CleaningPortal entfernt, Komponente weiterhin gemountet (rendert nur den Dialog)
 
-Bottom-Nav aus dem `<PullToRefresh>`-Wrapper herausziehen, sodass kein transformierter Vorfahre mehr existiert.
+### Unverändert
+- Vollständige `NotificationSettings`-Seite bleibt im Code (kann später anderswo verlinkt werden), wird aber nicht mehr über die Glocke geöffnet
+- Header- und Bottom-Nav-Layout bleiben gleich, nur der Klick-Handler ändert sein Ziel
 
-In `src/pages/CleaningPortal.tsx`:
-- JSX-Struktur ändern zu einem React-Fragment, das `<PullToRefresh>` und die `<nav>` als Geschwister rendert
-- Damit `fixed bottom-0 z-50` wieder am Viewport haftet
-
-Keine weiteren Änderungen am Design oder an den Menüpunkten – nur Positionierung wird korrigiert.
+## Touch / Mobile
+Alle Buttons im Popup ≥44×44px, Dialog mit `max-w-sm`, vollflächig auf Mobile mit ausreichend Padding.

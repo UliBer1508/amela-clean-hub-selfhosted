@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import BookingCardSettings, { useBookingCardConfig } from "@/components/BookingCardSettings";
 import AmelaEntryRow from "@/components/amela/AmelaEntryRow";
 import CleaningReminderBanner from "@/components/amela/CleaningReminderBanner";
+import ReminderSettingsPopover from "@/components/amela/ReminderSettingsPopover";
 import AddStandaloneCleaningDialog from "@/components/AddStandaloneCleaningDialog";
 import { ChatButton } from '@/components/PortalChat';
 import { usePortalMessages } from '@/hooks/usePortalMessages';
@@ -92,6 +93,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   const [selectedTime, setSelectedTime] = useState('');
   const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const [showReminderPopup, setShowReminderPopup] = useState(false);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [newTaskCount, setNewTaskCount] = useState(0);
@@ -104,14 +106,11 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
 
   // Service Provider Filter ist fest auf Amela gesetzt (ID: 9de6e071-7e89-4d66-9433-a5f01acaa493)
 
-  // Handler für Benachrichtigungsklick
+  // Handler für Benachrichtigungsklick → öffnet Erinnerungs-Popup
   const handleNotificationClick = () => {
-    // Animation stoppen
     setHasUnreadNotifications(false);
     setNewTaskCount(0);
-    
-    // Benachrichtigungseinstellungen öffnen/schließen
-    setShowNotificationSettings(!showNotificationSettings);
+    setShowReminderPopup(true);
   };
 
   const { 
@@ -523,14 +522,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
       </div>
 
 
-      {/* Notification Settings */}
-      {showNotificationSettings && (
-        <div className="bg-card border-b border-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <NotificationSettings />
-          </div>
-        </div>
-      )}
+      {/* Erinnerungs-Einstellungen Popup (über Glocken-Icon) */}
+      <ReminderSettingsPopover open={showReminderPopup} onOpenChange={setShowReminderPopup} />
+
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-2 py-3 md:px-4 md:py-8 lg:px-8 pb-24 sm:pb-3 md:pb-8">
