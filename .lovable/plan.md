@@ -1,41 +1,19 @@
-## Ziel
+## Problem
 
-Die aktuelle "Such & Filter"-Leiste oben auf der Reinigungsübersicht wird durch klickbare Filterkarten ersetzt.
+Die mobile Bottom-Navigation ist im Code vorhanden, wird aber im Handy-Preview nicht angezeigt.
 
-## Neues Layout
+## Ursache
 
-**Zeile 1 – Häuser** (horizontal scrollbar auf Mobile, Grid auf Desktop):
-- Eine Karte pro touristisches Haus (`houses` Array, bereits gefiltert auf `is_touristic`)
-- Zusätzlich eine "Alle Häuser"-Karte ganz links
-- Aktive Karte visuell hervorgehoben (z.B. Primary-Border + dunklerer Hintergrund)
+`<PullToRefresh>` umschließt den gesamten Portal-Inhalt inklusive der Bottom-Nav. Die innere Hülle in `PullToRefresh.tsx` (Zeile 120–130) trägt dauerhaft ein `transform: translateY(...)` Style.
 
-**Zeile 2 – Zeitraum**:
-- Karte "Diese Woche"
-- Karte "Nächste Woche"
-- (Zusätzlich "Alle" Karte zum Zurücksetzen)
+Ein CSS-`transform` auf einem Vorfahren erzeugt einen neuen Containing Block für `position: fixed`. Dadurch verhält sich `fixed bottom-0` der Nav nicht mehr wie viewport-fixiert, sondern wird relativ zum transformierten Wrapper positioniert – sie sitzt am Ende des gesamten Inhaltes und ist außerhalb des Sichtbereichs.
 
-Klick auf eine Karte setzt den jeweiligen Filter (`houseFilter` bzw. `timeFilter`). Erneuter Klick auf die aktive Karte setzt zurück auf "all".
+## Lösung
 
-## Was entfällt
+Bottom-Nav aus dem `<PullToRefresh>`-Wrapper herausziehen, sodass kein transformierter Vorfahre mehr existiert.
 
-- Aufklappbarer "🔍 Such & Filter"-Bereich mit Toggle
-- Such-Input (Gast/Haus/Adresse)
-- Status-Dropdown, Putzkraft-Dropdown, Haus-Dropdown, Zeitraum-Dropdown
-- "Auch eingecheckt"-Checkbox
-- Counter + "Filter zurücksetzen"-Button
+In `src/pages/CleaningPortal.tsx`:
+- JSX-Struktur ändern zu einem React-Fragment, das `<PullToRefresh>` und die `<nav>` als Geschwister rendert
+- Damit `fixed bottom-0 z-50` wieder am Viewport haftet
 
-Da Status, Putzkraft, Suche und Checked-In bisher ebenfalls über diese Leiste gesteuert wurden, müssen wir entscheiden was damit passiert.
-
-## Technische Details
-
-- `CleaningPortal.tsx` Zeilen 575–704 werden durch zwei `<div>` mit Karten-Grids ersetzt
-- Neue `TimeFilter`-Variante `'nextWeek'` ergänzen in `CleaningPortal.tsx`, `useBookings.ts` und `utils/date.ts` (`isWithinTimeRange`)
-- Karten als neue Komponente `AmelaFilterCard.tsx` (mit Icon, Label, optional Count)
-- Optional: Anzahl der Aufträge je Haus/Woche auf der Karte anzeigen
-
-## Offene Frage
-
-Was soll mit den restlichen Filtern (Status, Putzkraft, Suche, "Auch eingecheckt"-Checkbox) passieren?
-- A) Komplett entfernen – nur Haus + Woche bleiben als Filter
-- B) In ein kleines Dropdown / Sheet "Weitere Filter" verschieben
-- C) Status-Standard bleibt auf 'scheduled', der Rest entfällt
+Keine weiteren Änderungen am Design oder an den Menüpunkten – nur Positionierung wird korrigiert.
