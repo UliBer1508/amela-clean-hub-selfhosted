@@ -69,49 +69,38 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   const pwaBarVisible = isInstalled || !isOnline;
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('scheduled');
-  const [staffFilter, setStaffFilter] = useState<string>('all'); // "all" = alle anzeigen
+  const [staffFilter, setStaffFilter] = useState<string>('all');
   const [houseFilter, setHouseFilter] = useState<HouseFilter>('all');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
   // Portal zeigt nur Amela-zugewiesene Reinigungen
-  const [providerFilter, setProviderFilter] = useState<ProviderFilter>(AMELA_PROVIDER_ID);
-  const [selectedDate, setSelectedDate] = useState<Date>();
-  const [selectedTime, setSelectedTime] = useState('');
-  const [editingTask, setEditingTask] = useState<TaskEditingState | null>(null);
-  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const [providerFilter] = useState<ProviderFilter>(AMELA_PROVIDER_ID);
   const [showReminderPopup, setShowReminderPopup] = useState(false);
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [newTaskCount, setNewTaskCount] = useState(0);
-  const [showCheckedIn, setShowCheckedIn] = useState(true);
-  
-  // Booking card configuration
+  const [showCheckedIn] = useState(true);
+
   const { config: cardConfig, updateConfig: updateCardConfig, loading: configLoading } = useBookingCardConfig();
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  // Service Provider Filter ist fest auf Amela gesetzt (ID: 9de6e071-7e89-4d66-9433-a5f01acaa493)
-
-  // Handler für Benachrichtigungsklick → öffnet Erinnerungs-Popup
   const handleNotificationClick = () => {
     setHasUnreadNotifications(false);
     setNewTaskCount(0);
     setShowReminderPopup(true);
   };
 
-  const { 
-    bookings = [],
-    standaloneCleanings = [],
-    combinedEntries = [],
+  const {
     filteredBookings: filteredEntries,
-    loading: bookingsLoading, 
+    loading: bookingsLoading,
     error: bookingsError,
-    totalCleaningTasks: hookTotalCleaningTasks,
-    refetch: refetchBookings,
+    totalCleaningTasks,
+    updateTaskStatus,
+    updateTaskStaff,
+    updateTaskDateTime,
     forceRefresh,
-    lastRefresh
   } = useBookings();
 
-  // Realtime-Überwachung NUR für Notifications (Datenrefresh erfolgt in useBookings)
+  // Realtime: NUR INSERT für Bell-Badge/Toast. Datenrefresh + UPDATE-Events erledigt useBookings.
   useEffect(() => {
     const channel = supabase
       .channel('amela-portal-notifications')
@@ -121,41 +110,22 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           event: 'INSERT',
           schema: 'public',
           table: 'service_tasks',
-          filter: `provider_id=eq.${AMELA_PROVIDER_ID}`
+          filter: `provider_id=eq.${AMELA_PROVIDER_ID}`,
         },
         (payload) => {
           console.log('🆕 Neuer Reinigungsauftrag:', payload);
           setHasUnreadNotifications(true);
-          setNewTaskCount(prev => prev + 1);
+          setNewTaskCount((prev) => prev + 1);
           notify({
-            title: "🆕 Neuer Reinigungsauftrag",
-            description: "Ein neuer Auftrag wurde zugewiesen.",
-            eventType: "new_task",
+            title: '🆕 Neuer Reinigungsauftrag',
+            description: 'Ein neuer Auftrag wurde zugewiesen.',
+            eventType: 'new_task',
             duration: 5000,
           });
           if (preferences?.sound_notifications) {
             const audio = new Audio('/notification-sound.mp3');
-            audio.play().catch(e => console.log('Sound konnte nicht abgespielt werden:', e));
+            audio.play().catch((e) => console.log('Sound konnte nicht abgespielt werden:', e));
           }
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'service_tasks',
-          filter: `provider_id=eq.${AMELA_PROVIDER_ID}`
-        },
-        (payload) => {
-          console.log('🔄 Reinigungsauftrag aktualisiert:', payload);
-          setHasUnreadNotifications(true);
-          notify({
-            title: "🔄 Auftrag aktualisiert",
-            description: "Ein Reinigungsauftrag wurde geändert.",
-            eventType: "task_change",
-            duration: 4000,
-          });
         }
       )
       .subscribe();
@@ -165,18 +135,10 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     };
   }, [notify, preferences]);
 
-  const { 
-    houses: allHouses = [], 
-    loading: housesLoading 
-  } = useHouses();
+  const { houses: allHouses = [], loading: housesLoading } = useHouses();
+  const houses = allHouses.filter((house) => house.rental_type === 'tourist');
 
-  // Nur touristische Objekte anzeigen
-  const houses = allHouses.filter(house => house.rental_type === 'tourist');
-
-  const { 
-    staff = [], 
-    loading: staffLoading 
-  } = useCleaningStaff();
+  const { staff = [], loading: staffLoading } = useCleaningStaff();
 
   const currentFilteredEntries = filteredEntries(
     debouncedSearchTerm,
@@ -188,224 +150,76 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     showCheckedIn
   );
 
-  const totalCleaningTasks = hookTotalCleaningTasks;
+  const showError = (description: string) =>
+    notify({ title: 'Fehler', description, variant: 'destructive', eventType: 'info' });
 
-  const handleStatusUpdate = useCallback(async (taskId: string, newStatus: 'scheduled' | 'completed' | 'cancelled' | 'in_progress' | 'delayed') => {
-    try {
-      const { error } = await supabase
-        .from('service_tasks')
-        .update({ 
-          status: newStatus,
-          completed_at: newStatus === 'completed' ? new Date().toISOString() : null,
-          status_changed_by: 'Amela',
-          status_changed_at: new Date().toISOString()
-        })
-        .eq('id', taskId);
-
-      if (error) throw error;
-
+  const handleStatusUpdate = useCallback(
+    async (taskId: string, newStatus: 'scheduled' | 'completed' | 'cancelled' | 'in_progress' | 'delayed') => {
+      const result = await updateTaskStatus(taskId, newStatus);
+      if (!result.success) {
+        showError('Status konnte nicht aktualisiert werden.');
+        return;
+      }
       notify({
-        title: "Status aktualisiert",
+        title: 'Status aktualisiert',
         description: `Der Status wurde erfolgreich auf "${STATUS_FILTERS[newStatus as StatusFilter]}" geändert.`,
-        eventType: "status_update"
+        eventType: 'status_update',
       });
+    },
+    [updateTaskStatus, notify]
+  );
 
-      refetchBookings();
-    } catch (error) {
-      console.error('Error updating task status:', error);
+  const handleStaffUpdate = useCallback(
+    async (taskId: string, staffId: string | null) => {
+      const result = await updateTaskStaff(taskId, staffId);
+      if (!result.success) {
+        showError('Zuweisung konnte nicht aktualisiert werden.');
+        return;
+      }
+      const staffName = staffId ? staff.find((s) => s.id === staffId)?.name || 'Unbekannt' : 'Nicht zugewiesen';
       notify({
-        title: "Fehler",
-        description: "Status konnte nicht aktualisiert werden.",
-        variant: "destructive",
-        eventType: "info"
-      });
-    }
-  }, [notify, refetchBookings]);
-
-  const handleStaffUpdate = useCallback(async (taskId: string, staffId: string | null) => {
-    try {
-      const { error } = await supabase
-        .from('service_tasks')
-        .update({ 
-          assigned_staff_id: staffId,
-        })
-        .eq('id', taskId);
-
-      if (error) throw error;
-
-      const staffName = staffId ? staff.find(s => s.id === staffId)?.name || 'Unbekannt' : 'Nicht zugewiesen';
-      
-      notify({
-        title: "Zuweisung aktualisiert",
+        title: 'Zuweisung aktualisiert',
         description: `Die Aufgabe wurde ${staffName} zugewiesen.`,
-        eventType: "staff_change"
+        eventType: 'staff_change',
       });
+    },
+    [updateTaskStaff, staff, notify]
+  );
 
-      refetchBookings();
-    } catch (error) {
-      console.error('Error updating staff assignment:', error);
+  const handleDateTimeUpdateFromCard = useCallback(
+    async (taskId: string, date: string, time: string) => {
+      const result = await updateTaskDateTime(taskId, new Date(date), time);
+      if (!result.success) {
+        showError('Termin konnte nicht aktualisiert werden.');
+        return;
+      }
       notify({
-        title: "Fehler",
-        description: "Zuweisung konnte nicht aktualisiert werden.",
-        variant: "destructive",
-        eventType: "info"
+        title: 'Termin aktualisiert',
+        description: 'Der Termin wurde erfolgreich aktualisiert.',
+        eventType: 'task_change',
       });
-    }
-  }, [notify, refetchBookings, staff]);
+    },
+    [updateTaskDateTime, notify]
+  );
 
-  const handleEditDateTime = (task: TaskEditingState) => {
-    setEditingTask(task);
-    setSelectedDate(new Date(task.scheduled_date));
-    setSelectedTime(task.scheduled_time || '');
-  };
+  const handleNotesUpdate = useCallback(
+    async (taskId: string, notes: string) => {
+      try {
+        const { error } = await supabase.from('service_tasks').update({ notes }).eq('id', taskId);
+        if (error) throw error;
+        notify({
+          title: 'Notizen aktualisiert',
+          description: 'Die Notizen wurden erfolgreich gespeichert.',
+          eventType: 'task_change',
+        });
+      } catch (e) {
+        console.error('Error updating notes:', e);
+        showError('Notizen konnten nicht aktualisiert werden.');
+      }
+    },
+    [notify]
+  );
 
-  const handleDateTimeUpdate = useCallback(async () => {
-    if (!editingTask || !selectedDate) return;
-
-    try {
-      const dateString = selectedDate.toISOString().split('T')[0];
-      
-      const { error } = await supabase
-        .from('service_tasks')
-        .update({ 
-          scheduled_date: dateString,
-          scheduled_time: selectedTime || null
-        })
-        .eq('id', editingTask.id);
-
-      if (error) throw error;
-
-      notify({
-        title: "Termin aktualisiert",
-        description: `Der Termin wurde erfolgreich aktualisiert.`,
-        eventType: "task_change"
-      });
-
-      refetchBookings();
-      setEditingTask(null);
-      setSelectedDate(undefined);
-      setSelectedTime('');
-    } catch (error) {
-      console.error('Error updating task datetime:', error);
-      notify({
-        title: "Fehler",
-        description: "Termin konnte nicht aktualisiert werden.",
-        variant: "destructive",
-        eventType: "info"
-      });
-    }
-  }, [editingTask, selectedDate, selectedTime, notify, refetchBookings]);
-
-  const handleDateTimeUpdateFromCard = useCallback(async (taskId: string, date: string, time: string) => {
-    try {
-      const { error } = await supabase
-        .from('service_tasks')
-        .update({
-          scheduled_date: date,
-          scheduled_time: time || null
-        })
-        .eq('id', taskId);
-
-      if (error) throw error;
-
-      notify({
-        title: "Termin aktualisiert",
-        description: "Der Termin wurde erfolgreich aktualisiert.",
-        eventType: "task_change"
-      });
-
-      refetchBookings();
-    } catch (error) {
-      console.error('Error updating task datetime from card:', error);
-      notify({
-        title: "Fehler",
-        description: "Termin konnte nicht aktualisiert werden.",
-        variant: "destructive",
-        eventType: "info"
-      });
-    }
-  }, [notify, refetchBookings]);
-
-  const handleBookingNotesUpdate = useCallback(async (bookingId: string, notes: string) => {
-    try {
-      const { error } = await supabase
-        .from('bookings')
-        .update({ notes })
-        .eq('id', bookingId);
-
-      if (error) throw error;
-
-      notify({
-        title: "Notizen aktualisiert",
-        description: "Die Buchungsnotizen wurden erfolgreich gespeichert.",
-        eventType: "task_change"
-      });
-
-      refetchBookings();
-    } catch (error) {
-      console.error('Error updating booking notes:', error);
-      notify({
-        title: "Fehler",
-        description: "Notizen konnten nicht aktualisiert werden.",
-        variant: "destructive",
-        eventType: "info"
-      });
-    }
-  }, [notify, refetchBookings]);
-
-  const handleTaskNotesUpdate = useCallback(async (taskId: string, notes: string) => {
-    try {
-      const { error } = await supabase
-        .from('service_tasks')
-        .update({ notes })
-        .eq('id', taskId);
-
-      if (error) throw error;
-
-      notify({
-        title: "Aufgaben-Notizen aktualisiert",
-        description: "Die Aufgaben-Notizen wurden erfolgreich gespeichert.",
-        eventType: "task_change"
-      });
-
-      refetchBookings();
-    } catch (error) {
-      console.error('Error updating task notes:', error);
-      notify({
-        title: "Fehler",
-        description: "Aufgaben-Notizen konnten nicht aktualisiert werden.",
-        variant: "destructive",
-        eventType: "info"
-      });
-    }
-  }, [notify, refetchBookings]);
-
-  const handleStandaloneNotesUpdate = useCallback(async (taskId: string, notes: string) => {
-    try {
-      const { error } = await supabase
-        .from('service_tasks')
-        .update({ notes })
-        .eq('id', taskId);
-
-      if (error) throw error;
-
-      notify({
-        title: "Notizen aktualisiert",
-        description: "Die Notizen wurden erfolgreich gespeichert.",
-        eventType: "task_change"
-      });
-
-      refetchBookings();
-    } catch (error) {
-      console.error('Error updating standalone cleaning notes:', error);
-      notify({
-        title: "Fehler",
-        description: "Notizen konnten nicht aktualisiert werden.",
-        variant: "destructive",
-        eventType: "info"
-      });
-    }
-  }, [notify, refetchBookings]);
 
   if (housesLoading || staffLoading || configLoading) {
     return (
