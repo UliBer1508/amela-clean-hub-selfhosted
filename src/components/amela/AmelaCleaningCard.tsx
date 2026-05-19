@@ -138,8 +138,8 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
               </span>
             </div>
           </div>
-          <Pencil className="w-4 h-4 text-muted-foreground shrink-0" />
         </button>
+
 
         {/* Status */}
         <div className="flex items-center gap-2">
