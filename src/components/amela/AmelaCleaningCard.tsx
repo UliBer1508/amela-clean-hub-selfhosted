@@ -9,7 +9,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, Clock, CalendarIcon, Pencil, ClipboardCheck } from 'lucide-react';
+import { Sparkles, Clock, CalendarIcon, Pencil, ClipboardCheck, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { formatDateTime } from '@/utils/date';
