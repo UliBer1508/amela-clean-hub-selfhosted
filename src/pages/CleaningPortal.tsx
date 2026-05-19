@@ -505,12 +505,14 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           <div className="flex space-x-6">
             <Link to="/">
               <Button variant="default" size="sm" className="my-2 hover-scale min-h-[44px]">
-                🏠 Reinigungen ({totalCleaningTasks})
+                <Home className="w-4 h-4 mr-2" />
+                Reinigungen ({totalCleaningTasks})
               </Button>
             </Link>
             <Link to="/calendar">
               <Button variant="ghost" size="sm" className="my-2 hover-scale min-h-[44px]">
-                📅 Kalender
+                <Calendar className="w-4 h-4 mr-2" />
+                Kalender
               </Button>
             </Link>
             <Button
@@ -520,7 +522,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
               onClick={handleNotificationClick}
             >
               <Bell className={`w-4 h-4 mr-2 ${hasUnreadNotifications ? 'text-orange-500' : ''}`} />
-              🔔 Benachrichtigungen
+              Benachrichtigungen
               {newTaskCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
                   {newTaskCount}
