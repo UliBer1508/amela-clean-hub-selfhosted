@@ -9,7 +9,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, Clock, CalendarIcon, Pencil, ClipboardCheck } from 'lucide-react';
+import { Sparkles, Clock, CalendarIcon, Pencil, ClipboardCheck, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { formatDateTime } from '@/utils/date';
@@ -48,6 +48,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
   const [showChecklist, setShowChecklist] = useState(false);
   const [editingNotes, setEditingNotes] = useState(false);
   const [notesValue, setNotesValue] = useState(task.notes || '');
+  const [expanded, setExpanded] = useState(task.status !== 'completed');
 
   const openDateDialog = () => {
     setSelectedDate(task.scheduled_date ? new Date(task.scheduled_date) : new Date());
@@ -73,29 +74,49 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
       : null;
 
   return (
-    <Card className="bg-card hover:shadow-md transition-shadow">
-      <CardContent className="p-4 space-y-3">
-        <div className="flex items-center justify-between gap-2">
+    <Card className="bg-sky-50 dark:bg-sky-950/30 border-l-4 border-l-sky-400 hover:shadow-md transition-shadow">
+      <CardContent className="p-3 space-y-2.5">
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="w-full flex items-center justify-between gap-2 text-left"
+        >
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-9 h-9 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-lg bg-sky-500/15 text-sky-600 flex items-center justify-center shrink-0">
               <Sparkles className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <p className="font-semibold text-foreground text-sm">Reinigungsauftrag</p>
                 {positionLabel && (
                   <Badge variant="outline" className="text-[10px] px-1.5 py-0">{positionLabel}</Badge>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground font-mono">#{task.id.slice(-6)}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {formatDateTime(task.scheduled_date, task.scheduled_time)}
+                {' · '}
+                {STATUS_OPTIONS.find((o) => o.value === task.status)?.label ?? task.status}
+              </p>
             </div>
           </div>
-          {paymentBadge && (
-            <Badge variant={paymentBadge.variant} className="text-[10px] shrink-0">
-              {paymentBadge.label}
-            </Badge>
-          )}
-        </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {paymentBadge && (
+              <Badge variant={paymentBadge.variant} className="text-[10px]">
+                {paymentBadge.label}
+              </Badge>
+            )}
+            <ChevronDown
+              className={cn(
+                'w-5 h-5 text-muted-foreground transition-transform',
+                expanded && 'rotate-180'
+              )}
+            />
+          </div>
+        </button>
+
+        {expanded && (
+          <>
+
 
         {/* Termin – klickbar */}
         <button
@@ -187,8 +208,12 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           <ClipboardCheck className="w-4 h-4 mr-2" />
           ❗ Bevor du gehst!
         </Button>
+          </>
+        )}
 
         <BeforeYouGoChecklist open={showChecklist} onOpenChange={setShowChecklist} />
+
+
 
         {/* Datum/Zeit Dialog */}
         <Dialog open={isDateDialogOpen} onOpenChange={setIsDateDialogOpen}>
