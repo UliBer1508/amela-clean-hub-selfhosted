@@ -186,7 +186,7 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <p className="text-xs font-medium text-muted-foreground">Notizen:</p>
+                      <p className="text-muted-foreground text-sm font-bold">Notizen:</p>
                       {config.showEditableNotes && (
                         <Button
                           variant="ghost"
