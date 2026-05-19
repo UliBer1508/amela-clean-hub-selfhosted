@@ -71,6 +71,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const pwaBarVisible = isInstalled || !isOnline;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [dayDetailOpen, setDayDetailOpen] = useState(false);
   const [viewType, setViewType] = useState<ViewType>('gantt');
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
