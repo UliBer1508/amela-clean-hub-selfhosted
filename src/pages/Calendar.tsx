@@ -419,18 +419,6 @@ const Calendar = ({ chatProps }: CalendarProps) => {
               <div className="sm:hidden space-y-3">
                 <h1 className="text-2xl font-bold">{calendarTitle}</h1>
                 
-                {/* Zeile 1: Navigation - zentriert */}
-                <div className="flex items-center justify-center gap-2">
-                  <Button variant="outline" onClick={previousPeriod} className="min-h-[44px] min-w-[44px] active:scale-95">
-                    <ChevronLeft className="h-5 w-5" />
-                  </Button>
-                  <Button variant="outline" onClick={goToToday} className="min-h-[44px] px-5 active:scale-95">
-                    Heute
-                  </Button>
-                  <Button variant="outline" onClick={nextPeriod} className="min-h-[44px] min-w-[44px] active:scale-95">
-                    <ChevronRight className="h-5 w-5" />
-                  </Button>
-                </div>
                 
                 {/* Zeile 2: Ansichtswahl - 3-Spalten-Grid */}
                 <div className="grid grid-cols-3 gap-2">
@@ -511,6 +499,9 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                   <div className="flex items-center gap-2 ml-auto">
                     <Button variant="ghost" onClick={previousPeriod} className="h-11 w-11 p-0 active:scale-95">
                       <ChevronLeft className="h-5 w-5" />
+                    </Button>
+                    <Button variant="outline" onClick={goToToday} className="h-11 px-4 active:scale-95">
+                      Heute
                     </Button>
                     <Button variant="ghost" onClick={nextPeriod} className="h-11 w-11 p-0 active:scale-95">
                       <ChevronRight className="h-5 w-5" />
