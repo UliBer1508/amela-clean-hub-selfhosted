@@ -260,6 +260,15 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     return monthEvents.filter(event => isSameDay(event.date, day));
   };
 
+  const isDayOccupied = (day: Date) => {
+    return monthEvents.some(
+      event =>
+        isSameDay(event.date, day) &&
+        (event.type === 'checkin' || event.type === 'checkout' || event.type === 'occupied')
+    );
+  };
+
+
   // Gantt-Chart: Tage für aktuellen Monat
   const ganttDays = useMemo(() => {
     const monthStart = startOfMonth(currentDate);
