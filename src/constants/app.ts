@@ -1,4 +1,6 @@
-export const AMELA_PROVIDER_ID = '9de6e071-7e89-4d66-9433-a5f01acaa493';
+export const AMELA_PROVIDER_ID =
+  (import.meta.env.VITE_AMELA_PROVIDER_ID as string | undefined) ??
+  '9de6e071-7e89-4d66-9433-a5f01acaa493';
 
 export const APP_CONFIG = {
   ITEMS_PER_PAGE: 50,

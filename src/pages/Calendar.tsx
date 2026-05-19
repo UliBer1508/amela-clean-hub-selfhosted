@@ -7,12 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Link } from 'react-router-dom';
+import { useAllBookings } from '@/hooks/useAllBookings';
 import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import PWAStatusBar from '@/components/PWAStatusBar';
 import { usePWA } from '@/hooks/usePWA';
-import NotificationSettings from '@/components/NotificationSettings';
+
 import ReminderSettingsPopover from '@/components/amela/ReminderSettingsPopover';
 import BookingCardSettings, { useBookingCardConfig } from '@/components/BookingCardSettings';
 import PullToRefresh from '@/components/PullToRefresh';
@@ -72,11 +73,11 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const [viewType, setViewType] = useState<ViewType>('gantt');
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const [showReminderPopup, setShowReminderPopup] = useState(false);
 
-  const { allBookings, loading, totalCleaningTasks, forceRefresh, lastRefresh } = useBookings();
-  const { config: cardConfig, updateConfig: updateCardConfig, loading: configLoading } = useBookingCardConfig();
+  const { allBookings, loading, forceRefresh } = useAllBookings();
+  const { totalCleaningTasks } = useBookings();
+  const { config: cardConfig, updateConfig: updateCardConfig } = useBookingCardConfig();
   const { houses } = useHouses();
 
   // Get calendar days for the current month/week
@@ -329,13 +330,10 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     }
   };
 
-  const previousMonth = () => {
-    setCurrentDate(prev => subMonths(prev, 1));
-  };
+  const calendarTitle = viewType === 'week'
+    ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
+    : format(currentDate, 'MMMM yyyy', { locale: de });
 
-  const nextMonth = () => {
-    setCurrentDate(prev => addMonths(prev, 1));
-  };
 
   const weekDays = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 
@@ -411,35 +409,13 @@ const Calendar = ({ chatProps }: CalendarProps) => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 pt-1 pb-24 sm:px-6 lg:px-8 md:py-8 sm:pb-8">
-        {showNotificationSettings ? (
-          <div className="space-y-6 animate-fade-in">
-            <div className="flex items-center justify-between">
-              <h1 className="text-lg md:text-2xl font-bold">
-                <span className="md:hidden">Benachrichtigungen</span>
-                <span className="hidden md:inline">Benachrichtigungseinstellungen</span>
-              </h1>
-              <Button 
-                variant="outline" 
-                onClick={() => setShowNotificationSettings(false)}
-                className="hover-scale"
-              >
-                Zurück zum Kalender
-              </Button>
-            </div>
-            <NotificationSettings />
-          </div>
-        ) : (
-          <>
+        <>
+
             {/* Header */}
             <div className="mb-6 space-y-4">
               {/* Mobile Layout - Stack vertically */}
               <div className="sm:hidden space-y-3">
-                <h1 className="text-2xl font-bold">
-                  {viewType === 'week' 
-                    ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
-                    : format(currentDate, 'MMMM yyyy', { locale: de })
-                  }
-                </h1>
+                <h1 className="text-2xl font-bold">{calendarTitle}</h1>
                 
                 {/* Zeile 1: Navigation - zentriert */}
                 <div className="flex items-center justify-center space-x-2">
@@ -483,12 +459,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
               {/* Desktop Layout - Single row */}
               <div className="hidden sm:flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <h1 className="text-2xl font-bold">
-                    {viewType === 'week' 
-                      ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
-                      : format(currentDate, 'MMMM yyyy', { locale: de })
-                    }
-                  </h1>
+                  <h1 className="text-2xl font-bold">{calendarTitle}</h1>
                   <div className="flex items-center space-x-2">
                     <Button variant="outline" size="sm" onClick={previousPeriod}>
                       <ChevronLeft className="h-4 w-4" />
@@ -534,12 +505,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
             <Card>
               <CardContent className="p-4 md:p-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-lg md:text-xl font-semibold">
-                    {viewType === 'week' 
-                      ? `Woche vom ${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} - ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
-                      : format(currentDate, 'MMMM yyyy', { locale: de })
-                    }
-                  </h2>
+                  <h2 className="text-lg md:text-xl font-semibold">{calendarTitle}</h2>
                   <div className="flex items-center space-x-2">
                     <Button variant="ghost" size="sm" onClick={previousPeriod}>
                       <ChevronLeft className="h-4 w-4" />
@@ -820,7 +786,6 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           )}
         </div>
         </>
-        )}
       </main>
       <Footer />
       </div>
