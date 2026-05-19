@@ -21,7 +21,7 @@ const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking, ac
       <CardContent className="p-3 space-y-2.5">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-md bg-primary text-primary-foreground flex items-center justify-center shrink-0">
               <Home className="w-4 h-4" />
             </div>
             <div className="min-w-0">
