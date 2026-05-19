@@ -522,14 +522,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
       </div>
 
 
-      {/* Notification Settings */}
-      {showNotificationSettings && (
-        <div className="bg-card border-b border-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <NotificationSettings />
-          </div>
-        </div>
-      )}
+      {/* Erinnerungs-Einstellungen Popup (über Glocken-Icon) */}
+      <ReminderSettingsPopover open={showReminderPopup} onOpenChange={setShowReminderPopup} />
+
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-2 py-3 md:px-4 md:py-8 lg:px-8 pb-24 sm:pb-3 md:pb-8">
