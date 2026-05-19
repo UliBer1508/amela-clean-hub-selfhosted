@@ -250,7 +250,7 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
             onClick={() => setShowChecklist(true)}
             className="w-full bg-gradient-to-r from-emerald-50 to-green-50 hover:from-emerald-100 hover:to-green-100 border-emerald-200 text-emerald-700 dark:from-emerald-950/30 dark:to-green-950/30 dark:border-emerald-800 dark:text-emerald-300 dark:hover:from-emerald-950/50 dark:hover:to-green-950/50"
           >
-            ❗ Bevor du gehst!
+            ❗ Checkliste
           </Button>
         </div>
 

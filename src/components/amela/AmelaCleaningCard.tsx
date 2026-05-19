@@ -220,7 +220,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           className="w-full min-h-[44px] bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50 dark:border-emerald-800 dark:text-emerald-300"
         >
           <ClipboardCheck className="w-4 h-4 mr-2" />
-          ❗ Bevor du gehst!
+          ❗ Checkliste
         </Button>
           </>
         )}
