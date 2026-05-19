@@ -485,11 +485,10 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
         </div>
       </header>
 
-      {/* Navigation */}
-      <div className="bg-card border-b border-border">
+      {/* Desktop Navigation */}
+      <div className="hidden sm:block bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-8">
-          {/* Desktop Navigation */}
-          <div className="hidden sm:flex space-x-6">
+          <div className="flex space-x-6">
             <Link to="/">
               <Button variant="default" size="sm" className="my-2 hover-scale min-h-[44px]">
                 🏠 Reinigungen ({totalCleaningTasks})
@@ -500,14 +499,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
                 📅 Kalender
               </Button>
             </Link>
-            <Link to="/putzkraefte">
-              <Button variant="ghost" size="sm" className="my-2 hover-scale min-h-[44px]">
-                👥 Putzkräfte
-              </Button>
-            </Link>
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className={`my-2 hover-scale relative min-h-[44px] ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
               onClick={handleNotificationClick}
             >
@@ -520,45 +514,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
               )}
             </Button>
           </div>
-          
-          {/* Mobile Navigation - Single Row */}
-          <div className="sm:hidden flex justify-around items-center gap-1 py-2">
-            <Link to="/">
-              <Button variant="default" size="sm" className="relative flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale">
-                <span className="text-xl">🏠</span>
-                {totalCleaningTasks > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-secondary text-secondary-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                    {totalCleaningTasks}
-                  </span>
-                )}
-              </Button>
-            </Link>
-            <Link to="/calendar">
-              <Button variant="ghost" size="sm" className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale">
-                <span className="text-xl">📅</span>
-              </Button>
-            </Link>
-            <Link to="/putzkraefte">
-              <Button variant="ghost" size="sm" className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale">
-                <span className="text-xl">👥</span>
-              </Button>
-            </Link>
-            <Button
-              variant="ghost" 
-              size="sm" 
-              className={`relative flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
-              onClick={handleNotificationClick}
-            >
-              <span className={`text-xl ${hasUnreadNotifications ? 'brightness-75' : ''}`}>🔔</span>
-              {newTaskCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center animate-pulse">
-                  {newTaskCount}
-                </span>
-              )}
-            </Button>
-          </div>
         </div>
       </div>
+
 
       {/* Notification Settings */}
       {showNotificationSettings && (
