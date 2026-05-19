@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import BookingCardSettings, { useBookingCardConfig } from "@/components/BookingCardSettings";
 import AmelaEntryRow from "@/components/amela/AmelaEntryRow";
 import CleaningReminderBanner from "@/components/amela/CleaningReminderBanner";
+import ReminderSettingsPopover from "@/components/amela/ReminderSettingsPopover";
 import AddStandaloneCleaningDialog from "@/components/AddStandaloneCleaningDialog";
 import { ChatButton } from '@/components/PortalChat';
 import { usePortalMessages } from '@/hooks/usePortalMessages';
