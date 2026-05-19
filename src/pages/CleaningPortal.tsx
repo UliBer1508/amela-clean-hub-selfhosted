@@ -681,7 +681,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
       <div className="flex justify-around items-center h-16">
         <Link to="/" className="flex-1">
           <button className="relative w-full h-16 flex flex-col items-center justify-center gap-1 text-primary">
-            <span className="leading-none text-3xl">🏠</span>
+            <Home className="w-6 h-6" strokeWidth={2.25} />
             <span className="font-medium text-sm">Reinigung</span>
             {totalCleaningTasks > 0 && (
               <span className="absolute top-1 right-1/4 bg-primary text-primary-foreground text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
@@ -692,7 +692,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
         </Link>
         <Link to="/calendar" className="flex-1">
           <button className="w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground">
-            <span className="leading-none text-3xl">📅</span>
+            <Calendar className="w-6 h-6" strokeWidth={2.25} />
             <span className="font-medium text-sm">Kalender</span>
           </button>
         </Link>
@@ -700,7 +700,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           onClick={handleNotificationClick}
           className={`flex-1 w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground relative ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
         >
-          <span className="leading-none text-3xl">🔔</span>
+          <Bell className="w-6 h-6" strokeWidth={2.25} />
           <span className="font-medium text-sm">Hinweise</span>
           {newTaskCount > 0 && (
             <span className="absolute top-1 right-1/4 bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center animate-pulse">
@@ -712,7 +712,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           onClick={() => chatProps.setIsChatOpen(true)}
           className="flex-1 w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground relative"
         >
-          <span className="leading-none text-3xl">💬</span>
+          <MessageCircle className="w-6 h-6" strokeWidth={2.25} />
           <span className="font-medium text-sm">Chat</span>
           {unreadCount > 0 && (
             <span className="absolute top-1 right-1/4 bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
