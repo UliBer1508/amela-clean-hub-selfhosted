@@ -485,11 +485,10 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
         </div>
       </header>
 
-      {/* Navigation */}
-      <div className="bg-card border-b border-border">
+      {/* Desktop Navigation */}
+      <div className="hidden sm:block bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-8">
-          {/* Desktop Navigation */}
-          <div className="hidden sm:flex space-x-6">
+          <div className="flex space-x-6">
             <Link to="/">
               <Button variant="default" size="sm" className="my-2 hover-scale min-h-[44px]">
                 🏠 Reinigungen ({totalCleaningTasks})
@@ -500,14 +499,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
                 📅 Kalender
               </Button>
             </Link>
-            <Link to="/putzkraefte">
-              <Button variant="ghost" size="sm" className="my-2 hover-scale min-h-[44px]">
-                👥 Putzkräfte
-              </Button>
-            </Link>
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               className={`my-2 hover-scale relative min-h-[44px] ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
               onClick={handleNotificationClick}
             >
@@ -520,45 +514,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
               )}
             </Button>
           </div>
-          
-          {/* Mobile Navigation - Single Row */}
-          <div className="sm:hidden flex justify-around items-center gap-1 py-2">
-            <Link to="/">
-              <Button variant="default" size="sm" className="relative flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale">
-                <span className="text-xl">🏠</span>
-                {totalCleaningTasks > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-secondary text-secondary-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
-                    {totalCleaningTasks}
-                  </span>
-                )}
-              </Button>
-            </Link>
-            <Link to="/calendar">
-              <Button variant="ghost" size="sm" className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale">
-                <span className="text-xl">📅</span>
-              </Button>
-            </Link>
-            <Link to="/putzkraefte">
-              <Button variant="ghost" size="sm" className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale">
-                <span className="text-xl">👥</span>
-              </Button>
-            </Link>
-            <Button
-              variant="ghost" 
-              size="sm" 
-              className={`relative flex items-center justify-center min-h-[44px] min-w-[44px] p-2 hover-scale ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
-              onClick={handleNotificationClick}
-            >
-              <span className={`text-xl ${hasUnreadNotifications ? 'brightness-75' : ''}`}>🔔</span>
-              {newTaskCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center animate-pulse">
-                  {newTaskCount}
-                </span>
-              )}
-            </Button>
-          </div>
         </div>
       </div>
+
 
       {/* Notification Settings */}
       {showNotificationSettings && (
@@ -570,7 +528,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
       )}
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-2 py-3 md:px-4 md:py-8 lg:px-8">
+      <main className="max-w-7xl mx-auto px-2 py-3 md:px-4 md:py-8 lg:px-8 pb-24 sm:pb-3 md:pb-8">
         <div className="space-y-3 md:space-y-6">
 
           {/* Haus-Filter-Karten */}
@@ -699,7 +657,43 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
       </main>
       <Footer />
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-card border-t border-border pb-[env(safe-area-inset-bottom)] shadow-lg">
+        <div className="flex justify-around items-center h-16">
+          <Link to="/" className="flex-1">
+            <button className="relative w-full h-16 flex flex-col items-center justify-center gap-1 text-primary">
+              <span className="text-2xl leading-none">🏠</span>
+              <span className="text-[10px] font-medium">Reinigung</span>
+              {totalCleaningTasks > 0 && (
+                <span className="absolute top-1 right-1/4 bg-primary text-primary-foreground text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
+                  {totalCleaningTasks}
+                </span>
+              )}
+            </button>
+          </Link>
+          <Link to="/calendar" className="flex-1">
+            <button className="w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground">
+              <span className="text-2xl leading-none">📅</span>
+              <span className="text-[10px] font-medium">Kalender</span>
+            </button>
+          </Link>
+          <button
+            onClick={handleNotificationClick}
+            className={`flex-1 w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground relative ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
+          >
+            <span className="text-2xl leading-none">🔔</span>
+            <span className="text-[10px] font-medium">Hinweise</span>
+            {newTaskCount > 0 && (
+              <span className="absolute top-1 right-1/4 bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center animate-pulse">
+                {newTaskCount}
+              </span>
+            )}
+          </button>
+        </div>
+      </nav>
     </div>
+
     </PullToRefresh>
   );
 };
