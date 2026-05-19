@@ -797,7 +797,6 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           )}
         </div>
         </>
-        )}
       </main>
       <Footer />
       </div>
