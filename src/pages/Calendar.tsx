@@ -549,9 +549,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                             <div
                               key={day.toISOString()}
                               className={cn(
-                                "p-1 text-center text-xs border-r last:border-r-0",
-                                isToday(day) && "bg-primary/20 font-bold",
-                                (day.getDay() === 0 || day.getDay() === 6) && "bg-muted/30"
+                                "p-1 text-center text-xs border-r last:border-r-0 bg-sky-50 dark:bg-sky-950/30",
+                                isToday(day) && "ring-2 ring-primary/60 ring-inset font-bold"
                               )}
                             >
                               <div>{format(day, 'd')}</div>
