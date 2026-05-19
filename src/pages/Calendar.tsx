@@ -73,6 +73,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [dayDetailOpen, setDayDetailOpen] = useState(false);
+  const [cleaningDetailOpen, setCleaningDetailOpen] = useState(false);
+  const [selectedCleaningTaskId, setSelectedCleaningTaskId] = useState<string | null>(null);
   const [viewType, setViewType] = useState<ViewType>('gantt');
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -82,6 +84,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const { totalCleaningTasks } = useBookings();
   const { config: cardConfig, updateConfig: updateCardConfig } = useBookingCardConfig();
   const { houses } = useHouses();
+  const { staff: cleaningStaff } = useCleaningStaff();
 
   // Get calendar days for the current month/week
   const calendarDays = useMemo(() => {
