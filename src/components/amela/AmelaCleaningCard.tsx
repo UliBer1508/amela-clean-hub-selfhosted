@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,15 +9,19 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, Clock, CalendarIcon, Pencil, ClipboardCheck, ChevronDown, CheckCircle2, XCircle, AlertTriangle, PlayCircle, StickyNote } from 'lucide-react';
+import { Sparkles, Clock, CalendarIcon, ClipboardCheck, ChevronDown, CheckCircle2, XCircle, AlertTriangle, PlayCircle, StickyNote } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { formatDateTime } from '@/utils/date';
 import BeforeYouGoChecklist from '@/components/BeforeYouGoChecklist';
+import type { ServiceTask, StandaloneCleaningTask } from '@/types/booking';
+import type { CleaningStaff } from '@/types/staff';
+
+type CardTask = (ServiceTask | StandaloneCleaningTask) & { id: string };
 
 interface AmelaCleaningCardProps {
-  task: any;
-  staff: any[];
+  task: CardTask;
+  staff: CleaningStaff[];
   onStatusUpdate: (taskId: string, status: string) => void;
   onStaffUpdate: (taskId: string, staffId: string | null) => void;
   onDateTimeUpdate: (taskId: string, date: string, time: string) => void;
@@ -50,6 +54,11 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
   const [showChecklist, setShowChecklist] = useState(false);
   const [editingNotes, setEditingNotes] = useState(false);
   const [notesValue, setNotesValue] = useState(task.notes || '');
+
+  // Sync notes from props when prop changes — but NOT during active edit (would clobber user input)
+  useEffect(() => {
+    if (!editingNotes) setNotesValue(task.notes || '');
+  }, [task.notes, editingNotes]);
   const [expanded, setExpanded] = useState(task.status !== 'completed');
 
   const openDateDialog = () => {
