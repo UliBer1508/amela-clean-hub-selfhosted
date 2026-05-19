@@ -143,7 +143,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
 
         {/* Status */}
         <div className="flex items-center gap-2">
-          <Label className="text-xs text-muted-foreground w-20 shrink-0">Status</Label>
+          <Label className="text-sm font-bold text-muted-foreground w-20 shrink-0">Status</Label>
           <Select value={task.status} onValueChange={(v) => onStatusUpdate(task.id, v)}>
             <SelectTrigger className="min-h-[44px] flex-1">
               <SelectValue />
