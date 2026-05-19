@@ -159,31 +159,29 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
 
 
 
-        {/* Notizen (kompakt) */}
+        {/* Notizen (kompakt) – ganze Karte klickbar */}
         {onNotesUpdate && (
           <div className="rounded-lg border border-border bg-muted/20 p-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">📝 Notizen</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setNotesValue(task.notes || '');
-                  setEditingNotes(!editingNotes);
-                }}
-                className="h-7 px-2 text-xs"
-              >
-                {editingNotes ? 'Abbrechen' : 'Bearbeiten'}
-              </Button>
-            </div>
             {editingNotes ? (
-              <div className="space-y-2 mt-2">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-muted-foreground">📝 Notizen</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEditingNotes(false)}
+                    className="h-7 px-2 text-xs"
+                  >
+                    Abbrechen
+                  </Button>
+                </div>
                 <Textarea
                   value={notesValue}
                   onChange={(e) => setNotesValue(e.target.value)}
                   rows={3}
                   placeholder="Notizen hinzufügen..."
                   className="text-sm"
+                  autoFocus
                 />
                 <Button
                   size="sm"
@@ -197,12 +195,23 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
                 </Button>
               </div>
             ) : (
-              <p className="text-sm text-foreground whitespace-pre-wrap mt-1">
-                {task.notes || <span className="text-muted-foreground">Keine Notizen</span>}
-              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setNotesValue(task.notes || '');
+                  setEditingNotes(true);
+                }}
+                className="w-full text-left min-h-[44px] rounded-md hover:bg-muted/40 transition-colors p-1"
+              >
+                <span className="text-xs font-medium text-muted-foreground">📝 Notizen</span>
+                <p className="text-sm text-foreground whitespace-pre-wrap mt-1">
+                  {task.notes || <span className="text-muted-foreground">Keine Notizen – tippen zum Hinzufügen</span>}
+                </p>
+              </button>
             )}
           </div>
         )}
+
 
         {/* Checklist Button */}
         <Button
