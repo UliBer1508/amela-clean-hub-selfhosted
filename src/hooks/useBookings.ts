@@ -362,7 +362,6 @@ export const useBookings = () => {
 
   return {
     bookings,
-    allBookings, // All bookings for calendar view
     standaloneCleanings,
     combinedEntries,
     loading,
