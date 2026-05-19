@@ -260,6 +260,15 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     return monthEvents.filter(event => isSameDay(event.date, day));
   };
 
+  const isDayOccupied = (day: Date) => {
+    return monthEvents.some(
+      event =>
+        isSameDay(event.date, day) &&
+        (event.type === 'checkin' || event.type === 'checkout' || event.type === 'occupied')
+    );
+  };
+
+
   // Gantt-Chart: Tage für aktuellen Monat
   const ganttDays = useMemo(() => {
     const monthStart = startOfMonth(currentDate);
@@ -540,9 +549,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                             <div
                               key={day.toISOString()}
                               className={cn(
-                                "p-1 text-center text-xs border-r last:border-r-0",
-                                isToday(day) && "bg-primary/20 font-bold",
-                                (day.getDay() === 0 || day.getDay() === 6) && "bg-muted/30"
+                                "p-1 text-center text-xs border-r last:border-r-0 bg-sky-50 dark:bg-sky-950/30",
+                                isToday(day) && "ring-2 ring-primary/60 ring-inset font-bold"
                               )}
                             >
                               <div>{format(day, 'd')}</div>
@@ -576,16 +584,23 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                 className="absolute inset-0 grid" 
                                 style={{ gridTemplateColumns: `repeat(${ganttDays.length}, minmax(32px, 1fr))` }}
                               >
-                                {ganttDays.map((day) => (
-                                  <div
-                                    key={day.toISOString()}
-                                    className={cn(
-                                      "border-r last:border-r-0 h-full",
-                                      isToday(day) && "bg-primary/10",
-                                      (day.getDay() === 0 || day.getDay() === 6) && "bg-muted/20"
-                                    )}
-                                  />
-                                ))}
+                                {ganttDays.map((day) => {
+                                  const houseOccupied = houseBookings.some(
+                                    (b) => day >= b.check_in && day <= b.check_out
+                                  );
+                                  return (
+                                    <div
+                                      key={day.toISOString()}
+                                      className={cn(
+                                        "border-r last:border-r-0 h-full",
+                                        houseOccupied
+                                          ? "bg-sky-100 dark:bg-sky-900/40"
+                                          : "bg-sky-50 dark:bg-sky-950/30",
+                                        isToday(day) && "ring-1 ring-primary/40 ring-inset"
+                                      )}
+                                    />
+                                  );
+                                })}
                               </div>
 
                               {/* Buchungsbalken */}
@@ -645,6 +660,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                       const isCurrentMonth = viewType === 'week' ? true : isSameMonth(day, currentDate);
                       const isTodayDate = isToday(day);
                       const isSelected = selectedDate && isSameDay(day, selectedDate);
+                      const occupied = isDayOccupied(day);
 
                       return (
                         <div
@@ -652,8 +668,12 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                           className={cn(
                             viewType === 'week' ? 'min-h-[120px]' : 'min-h-[88px] sm:min-h-[100px]',
                             'p-1.5 sm:p-2 border border-border cursor-pointer transition-colors rounded-sm',
-                            !isCurrentMonth && 'bg-muted/50 text-muted-foreground',
-                            isTodayDate && !isSelected && 'bg-primary/10',
+                            isCurrentMonth
+                              ? occupied
+                                ? 'bg-sky-100 dark:bg-sky-900/40'
+                                : 'bg-sky-50 dark:bg-sky-950/30'
+                              : 'bg-muted/50 text-muted-foreground',
+                            isTodayDate && !isSelected && 'ring-2 ring-primary/60 ring-inset',
                             isSelected && 'ring-2 ring-primary ring-inset',
                             'hover:bg-accent active:bg-accent'
                           )}
