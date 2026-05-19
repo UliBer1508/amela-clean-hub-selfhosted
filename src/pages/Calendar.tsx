@@ -139,6 +139,11 @@ const Calendar = ({ chatProps }: CalendarProps) => {
       status?: string;
       guestName?: string;
       bookingId?: string;
+      taskId?: string;
+      scheduledTime?: string | null;
+      notes?: string | null;
+      assignedStaffId?: string | null;
+      houseAddress?: string | null;
     }> = [];
 
     allBookings.forEach(booking => {
