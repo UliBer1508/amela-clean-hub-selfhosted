@@ -573,28 +573,26 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
       <main className="max-w-7xl mx-auto px-3 py-4 md:px-4 md:py-8 lg:px-8">
         <div className="space-y-4 md:space-y-6">
           {/* Haus-Filter-Karten */}
-          <div>
-            <div className="flex gap-2 overflow-x-auto pb-2 -mx-3 px-3 md:mx-0 md:px-0 md:grid md:grid-cols-3 lg:grid-cols-4 md:overflow-visible">
-              {houses.map((house) => {
-                const active = houseFilter === house.id;
-                return (
-                  <button
-                    key={house.id}
-                    onClick={() => setHouseFilter(active ? 'all' : house.id)}
-                    className={`shrink-0 min-w-[140px] md:min-w-0 min-h-[44px] rounded-lg border-2 px-3 py-2 text-left transition-all active:scale-95 ${
-                      active
-                        ? 'border-primary bg-primary text-primary-foreground shadow-md'
-                        : 'border-border bg-card hover:border-primary/50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Home className="w-4 h-4 shrink-0" />
-                      <span className="text-sm font-bold truncate">{house.name}</span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+          <div className="grid grid-cols-2 gap-2 md:gap-3 md:grid-cols-3 lg:grid-cols-4">
+            {houses.map((house) => {
+              const active = houseFilter === house.id;
+              return (
+                <button
+                  key={house.id}
+                  onClick={() => setHouseFilter(active ? 'all' : house.id)}
+                  className={`min-h-[56px] rounded-lg border-2 px-3 py-2 text-left transition-all active:scale-95 ${
+                    active
+                      ? 'border-primary bg-primary text-primary-foreground shadow-md'
+                      : 'border-border bg-card hover:border-primary/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Home className="w-4 h-4 shrink-0" />
+                    <span className="text-sm font-bold truncate">{house.name}</span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
           {/* Zeitraum-Filter-Karten */}
@@ -616,12 +614,13 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
                 >
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 shrink-0" />
-                    <span className="text-sm font-bold">{label}</span>
+                    <span className="text-sm font-bold truncate">{label}</span>
                   </div>
                 </button>
               );
             })}
           </div>
+
 
           <div className="flex justify-between items-center text-xs text-muted-foreground px-1">
             <span>{currentFilteredEntries.length} von {totalCleaningTasks} Aufträgen</span>
