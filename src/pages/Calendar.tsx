@@ -410,7 +410,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
 
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 pt-1 pb-24 sm:px-6 lg:px-8 md:py-8 sm:pb-8">
+      <main className="max-w-7xl mx-auto px-4 pt-1 pb-28 sm:px-6 lg:px-8 md:py-8 sm:pb-8">
         <>
 
             {/* Header */}
