@@ -540,14 +540,14 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                     })}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <Button variant="ghost" onClick={previousPeriod} className="h-11 w-11 p-0 active:scale-95">
-                      <ChevronLeft className="h-5 w-5" />
+                    <Button variant="outline" onClick={previousPeriod} className="h-11 w-11 p-0 rounded-full shadow-sm active:scale-95">
+                      <ChevronLeft className="h-6 w-6" />
                     </Button>
-                    <Button variant="outline" onClick={goToToday} className="h-11 px-4 active:scale-95">
+                    <Button variant="outline" onClick={goToToday} className="h-11 px-4 rounded-full shadow-sm active:scale-95">
                       Heute
                     </Button>
-                    <Button variant="ghost" onClick={nextPeriod} className="h-11 w-11 p-0 active:scale-95">
-                      <ChevronRight className="h-5 w-5" />
+                    <Button variant="outline" onClick={nextPeriod} className="h-11 w-11 p-0 rounded-full shadow-sm active:scale-95">
+                      <ChevronRight className="h-6 w-6" />
                     </Button>
                   </div>
                 </div>

@@ -1,39 +1,20 @@
 ## Ziel
 
-Wenn du im Editor "Publish → Update" klickst, soll Amelas installierte PWA die neue Version innerhalb von ~1 Minute automatisch laden — ohne dass sie selbst aktualisieren muss.
+Die Vor/Zurück-Pfeile neben "Heute" im Kalender sollen auf dem Handy klar als tippbare Buttons erkennbar sein.
 
-## Status Quo
+## Änderung
 
-- `vite-plugin-pwa` ist bereits installiert, `registerType: 'autoUpdate'`, `skipWaiting: true`.
-- `src/main.tsx` ruft `updateSW(true)` automatisch bei `onNeedRefresh` → die App lädt sich still neu, *sobald* der Service Worker eine neue Version entdeckt.
-- **Problem**: Der SW prüft per Default nur beim App-Start. Eine offen liegende App bekommt das Update u. U. erst nach 24 h oder gar nicht.
+`src/pages/Calendar.tsx`, Zeilen 543 + 549:
 
-## Umsetzung
+- Variante `ghost` → `outline` (sichtbarer Rand wie der "Heute"-Button).
+- Form `rounded-full` für klare Touch-Affordanz.
+- Größe bleibt `h-11 w-11` (Apple-konformes 44 px Touchtarget).
+- Icon vergrößern: `h-5 w-5` → `h-6 w-6` (besser sichtbar).
+- Aktive Rückmeldung: `active:scale-95` bleibt, zusätzlich `shadow-sm`.
 
-`src/main.tsx`: `registerSW` um Update-Polling erweitern.
+Resultat: drei optisch gleichwertige, klar abgegrenzte Pill-Buttons `‹  Heute  ›`.
 
-```text
-onRegisteredSW(_url, registration) {
-  setInterval(() => registration.update(), 60_000);   // alle 60s
-  on visibilitychange + focus → registration.update();
-}
-```
+## Nicht betroffen
 
-- `onNeedRefresh` bleibt bei `updateSW(true)` → still + sofort.
-- Fehler werden geschluckt (z. B. offline).
-
-## Resultat
-
-- Tab offen → spätestens nach 60 s neue Version.
-- Tab im Hintergrund → beim nächsten Tab-Wechsel sofort Check.
-- Iframe-/Preview-Schutz nicht nötig (PWA ist nur in der published Domain aktiv, in der Editor-Preview gibt's keinen SW).
-
-## Betroffene Dateien
-
-- `src/main.tsx`
-
-## Nicht enthalten
-
-- Keine Web Push Notifications für Tasks.
-- Kein "Update verfügbar"-Banner (Update läuft still im Hintergrund).
-- Manifest/Vite-Config bleiben unverändert.
+- Desktop-Variante (Zeilen 477–485) bleibt unverändert.
+- Funktion (`previousPeriod` / `nextPeriod`) unverändert.
