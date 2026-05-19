@@ -11,6 +11,7 @@ import { useBookings } from '@/hooks/useBookings';
 import { useHouses } from '@/hooks/useHouses';
 import PWAInstallButton from '@/components/PWAInstallButton';
 import PWAStatusBar from '@/components/PWAStatusBar';
+import { usePWA } from '@/hooks/usePWA';
 import NotificationSettings from '@/components/NotificationSettings';
 import ReminderSettingsPopover from '@/components/amela/ReminderSettingsPopover';
 import BookingCardSettings, { useBookingCardConfig } from '@/components/BookingCardSettings';
