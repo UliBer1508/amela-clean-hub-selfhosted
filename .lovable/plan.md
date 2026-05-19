@@ -1,74 +1,37 @@
 ## Ziel
 
-Das Tages-Termine-Popup (Mobile Sheet im Kalender) wird kompakter, touch-freundlicher und visuell attraktiver — im Stil einer modernen iOS-Action-Sheet-Card.
+In der Kalender-Card oben links (wo aktuell auf Mobile leerer Raum neben den Pfeil/Heute-Buttons ist) wird eine kompakte Legende der Hausfarben angezeigt.
 
-## Designvorschlag
+## Umsetzung
 
-```text
-┌─────────────────────────────────┐
-│        ━━━━ (Grab-Handle)        │  ← Drag-Indicator
-│                                  │
-│  Freitag                    [✕]  │
-│  29. Mai                         │  ← großer Datums-Header
-│                                  │
-│  ┌────────────────────────────┐ │
-│  │ 🧹  Reinigung              │ │
-│  │     Wald Chalet            │ │
-│  │     • Geplant         →    │ │  ← Karte mit Icon-Bubble
-│  └────────────────────────────┘ │
-│  ┌────────────────────────────┐ │
-│  │ 🧺  Wäsche Lieferung       │ │
-│  │     Wald Chalet            │ │
-│  │     • Geliefert            │ │
-│  └────────────────────────────┘ │
-│                                  │
-│      Schliessen (Text-Link)      │
-└─────────────────────────────────┘
-```
+In `src/pages/Calendar.tsx` (Card-Header, Zeilen ~520-533):
 
-### Konkrete Änderungen
+1. **Layout-Anpassung**: Aktueller Header ist `flex items-center justify-between` mit `ml-auto` auf der Nav. Linke Seite bekommt einen horizontal scrollbaren Chip-Container statt nur dem versteckten `h2`.
 
-**Container (Sheet)**
-- `max-h-[70vh]` (statt 80vh) — kompakter
-- `rounded-t-3xl` (stärker gerundet, iOS-like)
-- `px-4 pt-3 pb-6` mit safe-area
-- Drag-Handle oben: `mx-auto w-10 h-1.5 rounded-full bg-muted-foreground/30 mb-3`
+2. **Legende-Komponente** (inline): Horizontale Liste aller Häuser aus `houses`:
+   - `flex gap-1.5 overflow-x-auto scrollbar-none flex-1 min-w-0 mr-2`
+   - Pro Haus ein Chip:
+     ```
+     <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/40 shrink-0">
+       <span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: hex}} />
+       <span className="text-[11px] font-medium">{abbr}</span>
+     </div>
+     ```
+   - Verwendet bestehende Helfer `getHouseColor(house.id)` und `getHouseAbbreviation(house.name)`.
+   - Tooltip via `title={house.name}` für vollen Namen.
 
-**Header**
-- Wochentag groß (`text-xl font-semibold`), Datum klein darunter (`text-sm text-muted-foreground`)
-- Schliessen-Icon oben rechts (`w-9 h-9 rounded-full bg-muted/50`) — ersetzt den Standard-Sheet-X
-- Kein Border unten — Luft
+3. **Desktop**: Der vorhandene `h2`-Titel bleibt nur ganz oben in einer eigenen Zeile darüber, damit Legende + Nav nebeneinander passen. Konkret:
+   - `<h2>` aus der Flex-Zeile rausziehen und darüber als eigene Zeile (`hidden sm:block mb-2`) rendern.
+   - Flex-Zeile darunter: `[Legende-Chips, scrollbar] [Nav-Buttons]`.
 
-**Event-Karten**
-- `rounded-2xl bg-card border border-border/60 p-3 active:scale-[0.98] transition-transform`
-- Links: runde Icon-Bubble (`w-10 h-10 rounded-full`) in der Haus-Farbe (semi-transparent, z.B. `bg-sky-500/15`), darin Lucide-Icon je Typ (Sparkles für Reinigung, Shirt für Wäsche, LogIn/LogOut für Check-in/out, Bed für Belegt)
-- Mitte: Titel ohne Präfix ("Wald Chalet" statt "Reinigung: Wald Chalet"), Typ-Label klein darunter ("Reinigung • 10:00" / "Wäsche Lieferung")
-- Status als kleiner Inline-Dot + Text statt großem Badge: `• Geplant` in muted-Farbe; Farb-Dot je Status (grün=erledigt, gelb=in Arbeit, blau=geplant)
-- Chevron rechts nur für anklickbare Einträge (Reinigung)
-- Spacing zwischen Karten: `space-y-2`
-
-**Footer-Button**
-- „Schliessen" als unauffälliger Ghost-Button (`variant="ghost" w-full h-11 text-muted-foreground`) statt voller Outline — weniger Gewicht, da X-Button oben schon vorhanden
-
-**Touch-Targets**
-- Jede Karte mind. 64px hoch
-- Tap-Feedback: `active:scale-[0.98]` + `active:bg-accent/50`
-
-### Status-Mapping (deutsch)
-
-| Status | Anzeige | Dot-Farbe |
-|---|---|---|
-| scheduled | Geplant | blue-500 |
-| in_progress | In Arbeit | amber-500 |
-| completed / delivered | Erledigt | emerald-500 |
-| cancelled | Abgebrochen | rose-500 |
+4. **Touch-Größen**: Chips sind nur Anzeige (kein Klick), 28px Höhe ist ausreichend.
 
 ## Betroffene Dateien
 
-- `src/pages/Calendar.tsx` — nur das Mobile Tages-Detail-Sheet (Zeilen ~806-855)
+- `src/pages/Calendar.tsx`
 
 ## Nicht enthalten
 
-- Kein Redesign des Reinigungsauftrag-Detail-Sheets (kann separat folgen)
-- Keine Datenstruktur- oder Logikänderungen
-- Desktop unverändert
+- Kein Klick-/Filter-Verhalten auf den Chips (reine Legende)
+- Keine Änderungen an `useHouses` oder Farb-Helpern
+- Gantt-Zeilen-Beschriftung bleibt unverändert (haben dort schon Farb-Dot + Name)
