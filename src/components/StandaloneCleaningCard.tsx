@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import type { StandaloneCleaningTask } from '@/types/booking';
 import type { BookingCardConfig } from './BookingCardSettings';
 import BeforeYouGoChecklist from './BeforeYouGoChecklist';
+import CleaningActionTiles from './CleaningActionTiles';
 
 const STATUS_FILTERS = {
   scheduled: '📅 Geplant',
