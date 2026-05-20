@@ -1,19 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, Clock, CalendarIcon, ClipboardCheck, ChevronDown, CheckCircle2, XCircle, AlertTriangle, PlayCircle, StickyNote } from 'lucide-react';
-import { format } from 'date-fns';
+import { Sparkles, Clock, ChevronDown, CheckCircle2, XCircle, AlertTriangle, PlayCircle, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDateTime } from '@/utils/date';
-import BeforeYouGoChecklist from '@/components/BeforeYouGoChecklist';
+import CleaningActionTiles from '@/components/CleaningActionTiles';
 import type { ServiceTask, StandaloneCleaningTask } from '@/types/booking';
 import type { CleaningStaff } from '@/types/staff';
 
