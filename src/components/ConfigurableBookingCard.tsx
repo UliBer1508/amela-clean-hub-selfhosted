@@ -357,37 +357,26 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
             <div className="space-y-2 md:space-y-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg p-3 md:p-4 border border-blue-100 dark:border-blue-900/50">
               <h4 className="font-medium text-foreground text-sm md:text-base">🧹 Reinigungsauftrag</h4>
               {booking.service_tasks?.map((task: any) => (
-                <div key={task.id} className="bg-background/80 rounded-lg p-2 md:p-3 space-y-2 border border-blue-200/30 dark:border-blue-800/30">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs md:text-sm font-medium">🧽 Reinigung</span>
-                  </div>
-
-                  {config.showTaskDateTime && (
-                    <div className="flex items-center space-x-2 text-xs md:text-sm">
-                      <span>🕐 {formatDateTime(task.scheduled_date, task.scheduled_time)}</span>
-                    </div>
-                  )}
-
+                <div key={task.id} className="bg-background/80 rounded-lg p-2 md:p-3 space-y-3 border border-blue-200/30 dark:border-blue-800/30">
                   {config.showTaskAssignment && (
                     <div className="flex items-center space-x-2 text-xs md:text-sm">
                       <span className="text-muted-foreground">👨‍💼 Zugewiesen an:</span>
                       <Select
                         value={task.assigned_staff_id || 'unassigned'}
-                        onValueChange={(value: string) => 
+                        onValueChange={(value: string) =>
                           onStaffUpdate(task.id, value === 'unassigned' ? null : value)
                         }
                       >
                         <SelectTrigger className="w-auto min-h-[44px]">
                           <SelectValue>
-                            {task.assigned_staff_id 
-                              ? staff.find(s => s.id === task.assigned_staff_id)?.name || 'Nicht zugewiesen'
-                              : 'Nicht zugewiesen'
-                            }
+                            {task.assigned_staff_id
+                              ? staff.find((s) => s.id === task.assigned_staff_id)?.name || 'Nicht zugewiesen'
+                              : 'Nicht zugewiesen'}
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="unassigned">Nicht zugewiesen</SelectItem>
-                          {staff.filter(s => s.is_active).map((staffMember) => (
+                          {staff.filter((s) => s.is_active).map((staffMember) => (
                             <SelectItem key={staffMember.id} value={staffMember.id}>
                               {staffMember.name}
                             </SelectItem>
@@ -397,120 +386,45 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
                     </div>
                   )}
 
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {config.showTaskStatus && (
-                      <Select
-                        value={task.status}
-                        onValueChange={(value: string) => onStatusUpdate(task.id, value)}
-                      >
-                        <SelectTrigger className="w-auto min-h-[44px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="scheduled" className="text-blue-700 dark:text-blue-300">📅 Geplant</SelectItem>
-                          <SelectItem value="in_progress" className="text-yellow-700 dark:text-yellow-300">⏳ In Bearbeitung</SelectItem>
-                          <SelectItem value="completed" className="text-green-700 dark:text-green-300">✅ Abgeschlossen</SelectItem>
-                          <SelectItem value="delayed" className="text-orange-700 dark:text-orange-300">⚠️ Verzögert</SelectItem>
-                          <SelectItem value="cancelled" className="text-red-700 dark:text-red-300">❌ Storniert</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
+                  <CleaningActionTiles
+                    taskId={task.id}
+                    scheduledDate={task.scheduled_date}
+                    scheduledTime={task.scheduled_time}
+                    status={task.status}
+                    notes={task.notes}
+                    showDateTime={config.showTaskDateTime}
+                    showStatus={config.showTaskStatus}
+                    showNotes={true}
+                    onStatusUpdate={onStatusUpdate}
+                    onDateTimeUpdate={onDateTimeUpdate}
+                    onNotesUpdate={onTaskNotesUpdate}
+                    formatDateTime={formatDateTime}
+                  />
 
-                    {task.payment_status && (
-                      <Badge 
+                  {task.payment_status && (
+                    <div>
+                      <Badge
                         variant={task.payment_status === 'paid' ? 'default' : 'secondary'}
                         className={
-                          task.payment_status === 'paid' 
+                          task.payment_status === 'paid'
                             ? 'border-green-500 text-green-700 bg-green-50 dark:border-green-600 dark:text-green-300 dark:bg-green-950/30'
                             : task.payment_status === 'pending'
                             ? 'border-orange-500 text-orange-700 bg-orange-50 dark:border-orange-600 dark:text-orange-300 dark:bg-orange-950/30'
                             : 'border-red-500 text-red-700 bg-red-50 dark:border-red-600 dark:text-red-300 dark:bg-red-950/30'
                         }
                       >
-                        {task.payment_status === 'paid' ? '💰 Bezahlt' : 
-                         task.payment_status === 'pending' ? '⏳ Ausstehend' : 
-                         '💸 Unbezahlt'}
+                        {task.payment_status === 'paid'
+                          ? '💰 Bezahlt'
+                          : task.payment_status === 'pending'
+                          ? '⏳ Ausstehend'
+                          : '💸 Unbezahlt'}
                       </Badge>
-                    )}
-
-                    {config.showTaskDateTime && config.showTaskActions && (
-                      <Dialog open={isDateDialogOpen} onOpenChange={setIsDateDialogOpen}>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditDateTime(task)}
-                          >
-                            📅 Termin ändern
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Reinigungstermin ändern</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <div>
-                              <Label>Datum</Label>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    className={cn(
-                                      "w-full justify-start text-left font-normal",
-                                      !selectedDate && "text-muted-foreground"
-                                    )}
-                                  >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Datum wählen"}
-                                  </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                  <CalendarComponent
-                                    mode="single"
-                                    selected={selectedDate}
-                                    onSelect={setSelectedDate}
-                                    disabled={(date) => date < new Date()}
-                                    initialFocus
-                                  />
-                                </PopoverContent>
-                              </Popover>
-                            </div>
-                            <div>
-                              <Label htmlFor="time">Uhrzeit</Label>
-                              <Input
-                                id="time"
-                                type="time"
-                                value={selectedTime}
-                                onChange={(e) => setSelectedTime(e.target.value)}
-                              />
-                            </div>
-                            <Button 
-                              onClick={handleDateTimeUpdateInternal}
-                              disabled={!selectedDate}
-                              className="w-full hover-scale"
-                            >
-                              Termin aktualisieren
-                            </Button>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           )}
-        </div>
-
-        {/* "Bevor du gehst!" Button */}
-        <div className="p-3 md:p-4 border-t border-border">
-          <Button 
-            variant="outline"
-            onClick={() => setShowChecklist(true)}
-            className="w-full bg-gradient-to-r from-emerald-50 to-green-50 hover:from-emerald-100 hover:to-green-100 border-emerald-200 text-emerald-700 dark:from-emerald-950/30 dark:to-green-950/30 dark:border-emerald-800 dark:text-emerald-300 dark:hover:from-emerald-950/50 dark:hover:to-green-950/50"
-          >
-            ❗ Checkliste
-          </Button>
         </div>
 
         <BeforeYouGoChecklist open={showChecklist} onOpenChange={setShowChecklist} />
