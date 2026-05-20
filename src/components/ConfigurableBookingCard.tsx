@@ -28,6 +28,7 @@ import { format } from 'date-fns';
 
 import type { BookingCardConfig } from './BookingCardSettings';
 import BeforeYouGoChecklist from './BeforeYouGoChecklist';
+import CleaningActionTiles from './CleaningActionTiles';
 
 const STATUS_FILTERS = {
   all: 'Alle Status',
