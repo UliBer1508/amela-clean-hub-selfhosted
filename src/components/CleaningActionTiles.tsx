@@ -72,7 +72,7 @@ const Tile: React.FC<TileProps> = ({ label, icon, value, onClick, ringClass, ari
   >
     <div className="flex items-center gap-1.5 text-muted-foreground uppercase tracking-wide text-[11px] font-bold">
       {icon}
-      <span className="font-bold border-0">{label}</span>
+      <span className="font-bold text-xs border-0">{label}</span>
     </div>
     <div className="text-sm font-semibold text-foreground truncate w-full border-0">{value}</div>
   </button>
