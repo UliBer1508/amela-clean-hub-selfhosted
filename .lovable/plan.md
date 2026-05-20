@@ -1,59 +1,65 @@
-## Ziel
+## Problem
 
-Die Bedienelemente der Reinigungskarte (`ConfigurableBookingCard.tsx` und `StandaloneCleaningCard.tsx`) werden vom vertikalen Stack auf ein **2-Spalten-Tile-Grid** umgestellt — analog zum hochgeladenen Screenshot. Alle Tiles sind groß, touchfreundlich (min. 56–64 px hoch), klickbar und öffnen bei Bedarf ein zentriertes Dialog-Popup zum Bearbeiten.
+Die Buttons sind technisch unabhängige States (`houseFilter` und `timeFilter`), sollten sich also kombinieren lassen. In der Praxis erscheint die Trefferliste beim Kombinieren (z. B. *Wald Chalet* + *Diese Woche*) jedoch oft leer, weil die Prädikate **pro Buchung** statt **pro Reinigungs-Task** ausgewertet werden:
 
-## Layout-Konzept
-
-```text
-┌──────────────────────┬──────────────────────┐
-│ 🕐 REINIGUNGSTERMIN  │ 📊 STATUS            │
-│ 19.06.2026 · 09:00   │ 🟡 Geplant           │
-├──────────────────────┼──────────────────────┤
-│ 📝 NOTIZEN           │ ✅ CHECKLISTE        │
-│ Keine / 2 Zeilen…    │ Öffnen               │
-└──────────────────────┴──────────────────────┘
+```ts
+// useBookings.ts (heute)
+matchesStatus = booking.service_tasks?.some(t => t.status === statusFilter)
+matchesTime   = booking.service_tasks?.some(t => isWithinTimeRange(t.scheduled_date, timeFilter))
 ```
 
-- Grid: `grid grid-cols-2 gap-2 md:gap-3`
-- Jede Tile = Card mit Icon + Label (uppercase, klein) oben, Wert (fett) darunter
-- Tile-Klasse: `min-h-[64px] rounded-2xl p-3 bg-card border shadow-sm active:scale-[0.98] transition`, ganze Tile als Button klickbar
-- Aktive/Highlight-Tile (z. B. Status) bekommt farbigen Ring passend zum Status (`ring-2 ring-yellow-400` etc.)
+Eine Buchung erfüllt also Status *und* Zeit, **auch wenn es zwei verschiedene Tasks sind**. Umgekehrt verschwinden Buchungen, deren *einzige passende* Tasks Status/Zeit nicht gleichzeitig erfüllen. Resultat: kombinierte Filter wirken kaputt.
 
-## Interaktionsmuster
+## Ziel
 
-Alle Tiles bleiben Read-View. Bearbeiten erfolgt in zentrierten Dialog-Popups (konsistent mit bestehender Mobile-Regel):
+Je 1 Haus + 1 Zeitraum (+ Status + Mitarbeiter + Provider) sind **vollständig kombinierbar**, und die Trefferliste zeigt genau die Buchungen/Standalone-Reinigungen, die mindestens einen Task haben, der **alle aktiven Filter gleichzeitig** erfüllt.
 
-| Tile             | Klick öffnet                                                                 |
-| ---------------- | ---------------------------------------------------------------------------- |
-| Reinigungstermin | Dialog mit `Calendar` + Zeit-Input + Speichern/Abbrechen                     |
-| Status           | Dialog mit Status-Optionen als große Buttons (je min. 48 px)                 |
-| Notizen          | Dialog mit `Textarea` + Speichern/Abbrechen                                  |
-| Checkliste       | Bestehender `BeforeYouGoChecklist` Dialog                                    |
+## Änderungen
 
-Dialog-Container einheitlich: `w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] max-h-[80vh] overflow-y-auto rounded-3xl p-5 border-0 shadow-2xl` (Mobile-Regel aus Memory).
+### 1. `src/hooks/useBookings.ts` – Prädikat pro Task statt pro Buchung
 
-Inline-`Select` für Status und Inline-Bearbeiten-Buttons für Notizen werden entfernt — Logik (`onStatusUpdate`, `onDateTimeUpdate`, `onNotesUpdate`) bleibt 1:1.
+Im `filteredEntries`-Callback für den `booking`-Zweig:
+
+```ts
+const tasks = booking.service_tasks || [];
+const taskMatches = (t: ServiceTask) =>
+  (statusFilter === 'all' || t.status === statusFilter || (isCheckedIn && includeCheckedIn)) &&
+  (timeFilter   === 'all' || isWithinTimeRange(t.scheduled_date, timeFilter)) &&
+  (!staffFilter || staffFilter === 'all' || t.assigned_staff_id === staffFilter) &&
+  (providerFilter === 'all'
+    || (providerFilter === 'unassigned' ? !t.provider_id : t.provider_id === providerFilter));
+
+const hasMatchingTask = tasks.some(taskMatches);
+
+// Haus/Suche bleiben pro Buchung
+return matchesSearch && matchesHouse && hasMatchingTask;
+```
+
+Standalone-Reinigungen ändern sich nicht (1 Task = 1 Entry, bisherige Logik bleibt).
+
+Eingecheckt-Sonderfall: wenn `includeCheckedIn` & `isCheckedIn`, wird `statusFilter` im Task-Match ignoriert (wie heute).
+
+### 2. `src/pages/CleaningPortal.tsx` – Visuelles Feedback unverändert
+
+- Beide Button-Reihen bleiben Toggle-Buttons (je 1 aktiver Button pro Reihe).
+- Aktiver Zustand bleibt `border-primary bg-primary text-primary-foreground` – beide Reihen können gleichzeitig aktiv sein.
+- „Filter zurücksetzen" und Trefferanzeige bleiben.
+
+### 3. Sanity-Check
+
+Nach dem Fix mit Beispieldatensatz prüfen:
+
+- *Wald Chalet* allein → alle Wald-Einträge
+- *Diese Woche* allein → alle Einträge dieser Woche
+- *Wald Chalet* + *Diese Woche* → genau die Wald-Einträge mit Task in dieser Woche
 
 ## Out of Scope
 
-- **„Zugewiesen an" bleibt unverändert** (kein Tile, weiterhin wie aktuell als Inline-Select)
-- Keine Änderungen am Header (Haus-Info, Gast-Info, Buchungsstatus)
-- Keine Änderungen an Filter-/Listen-Logik, Hooks oder Backend
-- Keine neuen Felder, nur visuelle Neuanordnung + Popup-Bearbeitung der vier Tiles
-
-## Touch- & Accessibility-Regeln
-
-- Jede Tile ≥ 44×44 px (Memory-Regel), Ziel 56–64 px Höhe
-- `aria-label` pro Tile (z. B. „Status ändern, aktuell Geplant")
-- `active:scale-[0.98]` für Tap-Feedback
+- Keine Mehrfachauswahl pro Reihe
+- Keine UI-Refactors der Buttons
+- Keine Änderung an Status-/Mitarbeiter-/Provider-Filter-UI
+- Keine Backend-Änderungen
 
 ## Betroffene Dateien
 
-- `src/components/ConfigurableBookingCard.tsx` — Reinigungs-Block durch Tile-Grid ersetzen, Bearbeitungs-Dialoge ergänzen
-- `src/components/StandaloneCleaningCard.tsx` — gleicher Aufbau für Standalone-Reinigungen
-
-## Design-Tokens
-
-- Tile-Hintergrund `bg-card`, Text `text-foreground`, Label `text-muted-foreground uppercase tracking-wide text-[11px]`
-- Status-Farben über bestehende Status-Tokens als `ring` und Punkt-Icon
-- Keine Hardcoded-Hex-Werte, alles über bestehende Tailwind/HSL-Tokens
+- `src/hooks/useBookings.ts` (Prädikat-Refactor im Booking-Zweig)

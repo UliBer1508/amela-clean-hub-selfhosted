@@ -267,40 +267,52 @@ export const useBookings = () => {
     const filtered = combinedEntries.filter(entry => {
       if (entry.type === 'booking') {
         const booking = entry.data;
-        
+
         // Prüfe ob Buchung eingecheckt ist - nur anzeigen wenn Checkbox aktiv
         const isCheckedIn = booking.status === 'checked_in';
         if (isCheckedIn && !includeCheckedIn) {
           return false;
         }
-        
-        const matchesSearch = !sanitizedSearch || 
+
+        const matchesSearch = !sanitizedSearch ||
           getGuestName(booking).toLowerCase().includes(sanitizedSearch) ||
           booking.houses?.name?.toLowerCase().includes(sanitizedSearch) ||
           booking.houses?.address?.toLowerCase().includes(sanitizedSearch);
 
-        // Bei eingecheckten Buchungen (wenn Checkbox aktiv) den Status-Filter ignorieren
-        const matchesStatus = statusFilter === 'all' || 
-          (isCheckedIn && includeCheckedIn) ||
-          booking.service_tasks?.some(task => task.status === statusFilter);
-        
-        const matchesStaff = !staffFilter || staffFilter === 'all' || 
-          booking.service_tasks?.some(task => task.assigned_staff_id === staffFilter);
-        
-        const matchesTime = timeFilter === 'all' || 
-          booking.service_tasks?.some(task => isWithinTimeRange(task.scheduled_date, timeFilter));
-        
         const matchesHouse = houseFilter === 'all' || booking.house_id === houseFilter;
-        
-        const matchesProvider = providerFilter === 'all' || 
-          booking.service_tasks?.some(task => {
-            if (providerFilter === 'unassigned') {
-              return !task.provider_id;
-            }
-            return task.provider_id === providerFilter;
-          });
-        
-        return matchesSearch && matchesStatus && matchesStaff && matchesTime && matchesHouse && matchesProvider;
+
+        // Alle Task-bezogenen Filter (Status, Zeit, Mitarbeiter, Provider) müssen
+        // vom GLEICHEN Task erfüllt werden, damit Kombinationen korrekt wirken.
+        const tasks = booking.service_tasks || [];
+        const taskMatches = (task: any) => {
+          const statusOk =
+            statusFilter === 'all' ||
+            (isCheckedIn && includeCheckedIn) ||
+            task.status === statusFilter;
+
+          const timeOk =
+            timeFilter === 'all' ||
+            isWithinTimeRange(task.scheduled_date, timeFilter);
+
+          const staffOk =
+            !staffFilter || staffFilter === 'all' ||
+            task.assigned_staff_id === staffFilter;
+
+          const providerOk =
+            providerFilter === 'all' ||
+            (providerFilter === 'unassigned'
+              ? !task.provider_id
+              : task.provider_id === providerFilter);
+
+          return statusOk && timeOk && staffOk && providerOk;
+        };
+
+        const hasMatchingTask = tasks.length === 0
+          ? (statusFilter === 'all' && timeFilter === 'all' &&
+             (!staffFilter || staffFilter === 'all') && providerFilter === 'all')
+          : tasks.some(taskMatches);
+
+        return matchesSearch && matchesHouse && hasMatchingTask;
       } else {
         const cleaning = entry.data;
         const matchesSearch = !sanitizedSearch || 
