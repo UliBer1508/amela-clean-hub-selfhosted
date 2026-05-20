@@ -140,7 +140,7 @@ const CleaningActionTiles: React.FC<CleaningActionTilesProps> = ({
             label="Status"
             icon={<CircleDot className="w-3.5 h-3.5" />}
             value={
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5 border-0">
                 <span className={cn('w-2.5 h-2.5 rounded-full', statusMeta.dot)} />
                 {statusMeta.label}
               </span>
