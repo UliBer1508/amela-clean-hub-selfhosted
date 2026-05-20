@@ -64,17 +64,17 @@ const Tile: React.FC<TileProps> = ({ label, icon, value, onClick, ringClass, ari
     disabled={disabled}
     aria-label={ariaLabel || label}
     className={cn(
-      'flex flex-col items-start text-left gap-1 min-h-[72px] rounded-2xl p-3 bg-card border shadow-sm',
+      'flex flex-col items-start text-left gap-1 min-h-[72px] rounded-2xl p-3 bg-card shadow-sm',
       'transition active:scale-[0.98] hover:bg-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-      'disabled:opacity-60 disabled:active:scale-100 disabled:cursor-not-allowed',
+      'disabled:opacity-60 disabled:active:scale-100 disabled:cursor-not-allowed border-2',
       ringClass && `ring-2 ${ringClass}`
     )}
   >
-    <div className="flex items-center gap-1.5 text-muted-foreground uppercase tracking-wide text-[11px] font-semibold">
+    <div className="flex items-center gap-1.5 text-muted-foreground uppercase tracking-wide text-[11px] font-bold">
       {icon}
-      <span>{label}</span>
+      <span className="font-bold">{label}</span>
     </div>
-    <div className="text-sm font-semibold text-foreground truncate w-full">{value}</div>
+    <div className="text-sm font-semibold text-foreground truncate w-full border-2">{value}</div>
   </button>
 );
 
