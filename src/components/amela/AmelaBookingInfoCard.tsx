@@ -52,14 +52,14 @@ const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking, ac
         </div>
 
         <div className="grid grid-cols-2 gap-2">
-          <div className="flex items-center gap-2 rounded-md bg-muted/30 p-2">
+          <div className="flex items-center gap-2 rounded-md bg-muted/30 p-2 border-2">
             <CalendarDays className="w-4 h-4 text-emerald-600 shrink-0" />
             <div className="flex flex-col min-w-0">
               <span className="text-[10px] uppercase tracking-wide text-muted-foreground leading-tight font-bold">Check-in</span>
               <span className="text-sm font-medium whitespace-nowrap">{formatDateTime(booking.check_in)}</span>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-md bg-muted/30 p-2">
+          <div className="flex items-center gap-2 rounded-md bg-muted/30 p-2 border-2">
             <CalendarDays className="w-4 h-4 text-rose-600 shrink-0" />
             <div className="flex flex-col min-w-0">
               <span className="text-[10px] uppercase tracking-wide text-muted-foreground leading-tight font-bold">Check-out</span>
