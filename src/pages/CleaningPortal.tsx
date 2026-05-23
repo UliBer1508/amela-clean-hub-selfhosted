@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 import Footer, { CopyrightLine } from '@/components/Footer';
 import { useNotify } from '@/hooks/useNotify';
