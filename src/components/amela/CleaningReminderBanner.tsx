@@ -52,7 +52,11 @@ const CleaningReminderBanner: React.FC<Props> = ({ entries }) => {
   const { settings } = useReminderSettings();
   const [open, setOpen] = useState(false);
 
-  const next = settings.enabled ? getNextReminder(entries) : null;
+  const force =
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('reminder') === 'force';
+
+  const next = settings.enabled || force ? getNextReminder(entries) : null;
 
   let daysUntil: number | null = null;
   let target: Date | null = null;
@@ -65,20 +69,21 @@ const CleaningReminderBanner: React.FC<Props> = ({ entries }) => {
   }
 
   const shouldShow =
-    settings.enabled && next && daysUntil !== null && daysUntil <= settings.daysBefore;
+    !!next &&
+    daysUntil !== null &&
+    (force || (settings.enabled && daysUntil <= settings.daysBefore));
 
   useEffect(() => {
     if (!shouldShow || !next) return;
-    const force = new URLSearchParams(window.location.search).get('reminder') === 'force';
     const todayKey = new Date().toISOString().slice(0, 10);
     const dismissed = sessionStorage.getItem(DISMISS_KEY);
     if (!force && dismissed === `${todayKey}:${next.checkInDate}`) return;
     setOpen(true);
-  }, [shouldShow, next?.checkInDate]);
+  }, [shouldShow, next?.checkInDate, force]);
 
   const handleClose = () => {
     setOpen(false);
-    if (next) {
+    if (next && !force) {
       const todayKey = new Date().toISOString().slice(0, 10);
       sessionStorage.setItem(DISMISS_KEY, `${todayKey}:${next.checkInDate}`);
     }
