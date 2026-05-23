@@ -1095,7 +1095,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           className="flex-1 w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground relative"
         >
           <Bell className="w-6 h-6" strokeWidth={2.25} />
-          <span className="font-medium text-sm">Hinweise</span>
+          <span className="font-medium text-sm">Benachrichtigung</span>
         </button>
         <button
           onClick={() => chatProps.setIsChatOpen(true)}
