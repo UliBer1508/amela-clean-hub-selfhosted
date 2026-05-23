@@ -90,9 +90,6 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     setShowReminderPopup(true);
   };
 
-  const {
-    filteredBookings: filteredEntriesRaw,
-  } = { filteredBookings: [] as any[] }; // placeholder, replaced below
 
 
   const {
