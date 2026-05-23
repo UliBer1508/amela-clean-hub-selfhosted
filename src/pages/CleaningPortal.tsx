@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 import Footer, { CopyrightLine } from '@/components/Footer';
 import { useNotify } from '@/hooks/useNotify';
@@ -18,7 +18,6 @@ import BookingCardSettings, { useBookingCardConfig } from "@/components/BookingC
 import AmelaEntryRow from "@/components/amela/AmelaEntryRow";
 import CleaningReminderBanner from "@/components/amela/CleaningReminderBanner";
 import ReminderSettingsPopover from "@/components/amela/ReminderSettingsPopover";
-import CleaningReminderDialog from "@/components/CleaningReminderDialog";
 import { ChatButton } from '@/components/PortalChat';
 import { usePortalMessages } from '@/hooks/usePortalMessages';
 import {
@@ -103,25 +102,8 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     forceRefresh,
   } = useBookings();
 
-  const upcomingReminders = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const all = filteredEntries('', 'all', '', 'all', 'all', AMELA_PROVIDER_ID, true);
-    const items: { houseName: string; checkinDate: string }[] = [];
-    for (const entry of all) {
-      if (entry.type !== 'booking') continue;
-      const b: any = entry.data;
-      if (!b?.check_in) continue;
-      const d = new Date(b.check_in);
-      if (d < today) continue;
-      items.push({
-        houseName: b.houses?.name ?? 'Unbekannt',
-        checkinDate: b.check_in,
-      });
-    }
-    items.sort((a, b) => new Date(a.checkinDate).getTime() - new Date(b.checkinDate).getTime());
-    return items.slice(0, 5);
-  }, [filteredEntries]);
+
+
 
   // Realtime: NUR INSERT für Bell-Badge/Toast. Datenrefresh + UPDATE-Events erledigt useBookings.
   useEffect(() => {
@@ -347,11 +329,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
 
 
       {/* Erinnerungs-Einstellungen Popup (über Glocken-Icon) */}
-      <CleaningReminderDialog
-        open={showReminderPopup}
-        onOpenChange={setShowReminderPopup}
-        bookings={upcomingReminders}
-      />
+      <ReminderSettingsPopover open={showReminderPopup} onOpenChange={setShowReminderPopup} />
 
 
 
