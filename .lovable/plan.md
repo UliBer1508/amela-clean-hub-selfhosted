@@ -1,65 +1,36 @@
-## Problem
-
-Die Buttons sind technisch unabhängige States (`houseFilter` und `timeFilter`), sollten sich also kombinieren lassen. In der Praxis erscheint die Trefferliste beim Kombinieren (z. B. *Wald Chalet* + *Diese Woche*) jedoch oft leer, weil die Prädikate **pro Buchung** statt **pro Reinigungs-Task** ausgewertet werden:
-
-```ts
-// useBookings.ts (heute)
-matchesStatus = booking.service_tasks?.some(t => t.status === statusFilter)
-matchesTime   = booking.service_tasks?.some(t => isWithinTimeRange(t.scheduled_date, timeFilter))
-```
-
-Eine Buchung erfüllt also Status *und* Zeit, **auch wenn es zwei verschiedene Tasks sind**. Umgekehrt verschwinden Buchungen, deren *einzige passende* Tasks Status/Zeit nicht gleichzeitig erfüllen. Resultat: kombinierte Filter wirken kaputt.
-
 ## Ziel
 
-Je 1 Haus + 1 Zeitraum (+ Status + Mitarbeiter + Provider) sind **vollständig kombinierbar**, und die Trefferliste zeigt genau die Buchungen/Standalone-Reinigungen, die mindestens einen Task haben, der **alle aktiven Filter gleichzeitig** erfüllt.
+Wenn im Cleaning Portal auf die Glocke „Benachrichtigung" geklickt wird, soll statt des bisherigen Reminder-Settings-Popovers ein einfaches Dialog-Popup mit folgender Nachricht erscheinen:
 
-## Änderungen
+> Hallo Amela, es steht eine Buchung für **„{hausname}"** für den **{Datum checkin}** an. Bitte Reinigung nicht vergessen. Vielen Dank.
 
-### 1. `src/hooks/useBookings.ts` – Prädikat pro Task statt pro Buchung
+## Umsetzung
 
-Im `filteredEntries`-Callback für den `booking`-Zweig:
+1. **Neue Komponente** `src/components/CleaningReminderDialog.tsx`
+   - Basiert auf shadcn `Dialog` (`@/components/ui/dialog`).
+   - Props: `open`, `onOpenChange`, `bookings: { houseName: string; checkinDate: Date }[]`.
+   - Inhalt:
+     - Titel: „Reinigungs-Erinnerung"
+     - Pro anstehender Buchung ein Absatz mit dem genannten Text. Datum als `dd.MM.yyyy` (date-fns, `de` locale — bereits im Projekt verwendet).
+     - Falls keine Buchung ansteht: „Aktuell keine anstehenden Buchungen."
+     - Schließen-Button („OK").
 
-```ts
-const tasks = booking.service_tasks || [];
-const taskMatches = (t: ServiceTask) =>
-  (statusFilter === 'all' || t.status === statusFilter || (isCheckedIn && includeCheckedIn)) &&
-  (timeFilter   === 'all' || isWithinTimeRange(t.scheduled_date, timeFilter)) &&
-  (!staffFilter || staffFilter === 'all' || t.assigned_staff_id === staffFilter) &&
-  (providerFilter === 'all'
-    || (providerFilter === 'unassigned' ? !t.provider_id : t.provider_id === providerFilter));
+2. **`src/pages/CleaningPortal.tsx` anpassen**
+   - Import: neue Komponente statt (bzw. zusätzlich zu) `ReminderSettingsPopover` für die Glocke.
+   - `handleNotificationClick` bleibt; öffnet jetzt den neuen Dialog.
+   - Aus `filteredEntries` (oder dem ungefilterten `useBookings`-Ergebnis) die anstehenden Buchungen ableiten: alle Einträge mit `check_in >= heute`, sortiert nach `check_in` aufsteigend, max. 5. Mapping: `houseName = entry.houses?.name`, `checkinDate = entry.check_in`.
+   - `<ReminderSettingsPopover .../>` an der Bell wird durch `<CleaningReminderDialog open={showReminderPopup} onOpenChange={setShowReminderPopup} bookings={...} />` ersetzt. Der bestehende `ReminderSettingsPopover` bleibt nur, falls er an anderer Stelle angesteuert wird (aktuell laut Suche nicht).
 
-const hasMatchingTask = tasks.some(taskMatches);
+3. **Keine weiteren Änderungen** an Filterlogik, Realtime-Toast, Badge-Counter, Sound oder Settings.
 
-// Haus/Suche bleiben pro Buchung
-return matchesSearch && matchesHouse && hasMatchingTask;
-```
+## Technische Details
 
-Standalone-Reinigungen ändern sich nicht (1 Task = 1 Entry, bisherige Logik bleibt).
+- Datei: `src/components/CleaningReminderDialog.tsx` (neu, ~40 Zeilen).
+- Datei: `src/pages/CleaningPortal.tsx` — 1 Import-Zeile geändert, 1 JSX-Zeile (Popover → Dialog), kleine `useMemo` für `upcomingBookings`.
+- Verwendete Tokens: `bg-background`, `text-foreground`, `text-muted-foreground` — keine Custom-Farben.
 
-Eingecheckt-Sonderfall: wenn `includeCheckedIn` & `isCheckedIn`, wird `statusFilter` im Task-Match ignoriert (wie heute).
+## Out of scope
 
-### 2. `src/pages/CleaningPortal.tsx` – Visuelles Feedback unverändert
-
-- Beide Button-Reihen bleiben Toggle-Buttons (je 1 aktiver Button pro Reihe).
-- Aktiver Zustand bleibt `border-primary bg-primary text-primary-foreground` – beide Reihen können gleichzeitig aktiv sein.
-- „Filter zurücksetzen" und Trefferanzeige bleiben.
-
-### 3. Sanity-Check
-
-Nach dem Fix mit Beispieldatensatz prüfen:
-
-- *Wald Chalet* allein → alle Wald-Einträge
-- *Diese Woche* allein → alle Einträge dieser Woche
-- *Wald Chalet* + *Diese Woche* → genau die Wald-Einträge mit Task in dieser Woche
-
-## Out of Scope
-
-- Keine Mehrfachauswahl pro Reihe
-- Keine UI-Refactors der Buttons
-- Keine Änderung an Status-/Mitarbeiter-/Provider-Filter-UI
-- Keine Backend-Änderungen
-
-## Betroffene Dateien
-
-- `src/hooks/useBookings.ts` (Prädikat-Refactor im Booking-Zweig)
+- Kein E-Mail-/Push-Versand.
+- Keine Änderungen am Settings-Popover oder an `Calendar.tsx`.
+- Keine neuen DB-Felder.
