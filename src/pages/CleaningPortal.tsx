@@ -347,11 +347,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
 
 
       {/* Erinnerungs-Einstellungen Popup (über Glocken-Icon) */}
-      <CleaningReminderDialog
-        open={showReminderPopup}
-        onOpenChange={setShowReminderPopup}
-        bookings={upcomingReminders}
-      />
+      <ReminderSettingsPopover open={showReminderPopup} onOpenChange={setShowReminderPopup} />
 
 
 
