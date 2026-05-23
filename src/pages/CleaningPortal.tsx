@@ -91,6 +91,11 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   };
 
   const {
+    filteredBookings: filteredEntriesRaw,
+  } = { filteredBookings: [] as any[] }; // placeholder, replaced below
+
+
+  const {
     filteredBookings: filteredEntries,
     loading: bookingsLoading,
     error: bookingsError,
