@@ -20,9 +20,18 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         clientsClaim: true,
         skipWaiting: true,
-        navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api/],
+        cleanupOutdatedCaches: true,
+        navigateFallbackDenylist: [/^\/api/, /^\/~oauth/],
         runtimeCaching: [
+          {
+            // HTML-Navigationen immer frisch holen, damit neue Builds nicht hängen bleiben
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'html-cache',
+              networkTimeoutSeconds: 3,
+            },
+          },
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\//,
             handler: 'NetworkFirst',
