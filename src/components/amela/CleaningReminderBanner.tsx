@@ -6,9 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button';
 import { useReminderSettings } from '@/hooks/useReminderSettings';
 
-interface NextCleaning {
-  date: string;
-  time?: string | null;
+interface NextReminder {
+  checkInDate: string;
   houseName?: string;
 }
 
@@ -16,42 +15,33 @@ interface Props {
   entries: Array<{ type: 'booking' | 'standalone'; data: any }>;
 }
 
-const getNextCleaning = (entries: Props['entries']): NextCleaning | null => {
+const getNextReminder = (entries: Props['entries']): NextReminder | null => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const candidates: NextCleaning[] = [];
+  const candidates: NextReminder[] = [];
   for (const entry of entries) {
-    if (entry.type === 'booking') {
-      const tasks = entry.data?.service_tasks || [];
-      for (const t of tasks) {
-        if (!t.scheduled_date) continue;
-        if (t.status === 'completed' || t.status === 'cancelled') continue;
-        candidates.push({
-          date: t.scheduled_date,
-          time: t.scheduled_time,
-          houseName: entry.data?.houses?.name,
-        });
-      }
-    } else {
-      const t = entry.data;
-      if (!t.scheduled_date) continue;
-      if (t.status === 'completed' || t.status === 'cancelled') continue;
-      candidates.push({
-        date: t.scheduled_date,
-        time: t.scheduled_time,
-        houseName: t.houses?.name,
-      });
-    }
+    if (entry.type !== 'booking') continue;
+    const b = entry.data;
+    if (!b?.check_in) continue;
+    const tasks = b.service_tasks || [];
+    const hasOpen = tasks.some(
+      (t: any) => t && t.status !== 'completed' && t.status !== 'cancelled'
+    );
+    if (!hasOpen) continue;
+    candidates.push({
+      checkInDate: b.check_in,
+      houseName: b.houses?.name,
+    });
   }
 
   const upcoming = candidates
     .filter((c) => {
-      const d = parseISO(c.date);
+      const d = parseISO(c.checkInDate);
       d.setHours(0, 0, 0, 0);
       return d.getTime() >= today.getTime();
     })
-    .sort((a, b) => a.date.localeCompare(b.date));
+    .sort((a, b) => a.checkInDate.localeCompare(b.checkInDate));
 
   return upcoming[0] || null;
 };
@@ -62,14 +52,14 @@ const CleaningReminderBanner: React.FC<Props> = ({ entries }) => {
   const { settings } = useReminderSettings();
   const [open, setOpen] = useState(false);
 
-  const next = settings.enabled ? getNextCleaning(entries) : null;
+  const next = settings.enabled ? getNextReminder(entries) : null;
 
   let daysUntil: number | null = null;
   let target: Date | null = null;
   if (next) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    target = parseISO(next.date);
+    target = parseISO(next.checkInDate);
     target.setHours(0, 0, 0, 0);
     daysUntil = differenceInCalendarDays(target, today);
   }
@@ -81,22 +71,22 @@ const CleaningReminderBanner: React.FC<Props> = ({ entries }) => {
     if (!shouldShow || !next) return;
     const todayKey = new Date().toISOString().slice(0, 10);
     const dismissed = sessionStorage.getItem(DISMISS_KEY);
-    if (dismissed === `${todayKey}:${next.date}`) return;
+    if (dismissed === `${todayKey}:${next.checkInDate}`) return;
     setOpen(true);
-  }, [shouldShow, next?.date]);
+  }, [shouldShow, next?.checkInDate]);
 
   const handleClose = () => {
     setOpen(false);
     if (next) {
       const todayKey = new Date().toISOString().slice(0, 10);
-      sessionStorage.setItem(DISMISS_KEY, `${todayKey}:${next.date}`);
+      sessionStorage.setItem(DISMISS_KEY, `${todayKey}:${next.checkInDate}`);
     }
   };
 
   if (!shouldShow || !next || !target || daysUntil === null) return null;
 
-  const whenText =
-    daysUntil === 0 ? 'heute' : daysUntil === 1 ? 'morgen' : `in ${daysUntil} Tagen`;
+  const houseName = next.houseName ?? 'Unbekannt';
+  const dateText = format(target, 'dd.MM.yyyy', { locale: de });
 
   return (
     <Dialog open={open} onOpenChange={(o) => (o ? setOpen(true) : handleClose())}>
@@ -104,17 +94,13 @@ const CleaningReminderBanner: React.FC<Props> = ({ entries }) => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CalendarClock className="w-5 h-5 text-amber-600" />
-            Nächste Reinigung {whenText}
+            Reinigungs-Erinnerung
           </DialogTitle>
-          <DialogDescription className="text-base text-foreground pt-2">
-            {format(target, 'EEEE, dd.MM.yyyy', { locale: de })}
-            {next.time ? ` · ${next.time.slice(0, 5)} Uhr` : ''}
-            {next.houseName ? (
-              <>
-                <br />
-                <span className="font-medium">{next.houseName}</span>
-              </>
-            ) : null}
+          <DialogDescription className="text-base text-foreground pt-2 leading-relaxed">
+            Hallo Amela, es steht eine Buchung für{' '}
+            <span className="font-semibold">„{houseName}"</span> für den{' '}
+            <span className="font-semibold">{dateText}</span> an. Bitte Reinigung nicht vergessen.
+            Vielen Dank.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
