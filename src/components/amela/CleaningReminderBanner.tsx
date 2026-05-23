@@ -69,9 +69,10 @@ const CleaningReminderBanner: React.FC<Props> = ({ entries }) => {
 
   useEffect(() => {
     if (!shouldShow || !next) return;
+    const force = new URLSearchParams(window.location.search).get('reminder') === 'force';
     const todayKey = new Date().toISOString().slice(0, 10);
     const dismissed = sessionStorage.getItem(DISMISS_KEY);
-    if (dismissed === `${todayKey}:${next.checkInDate}`) return;
+    if (!force && dismissed === `${todayKey}:${next.checkInDate}`) return;
     setOpen(true);
   }, [shouldShow, next?.checkInDate]);
 
