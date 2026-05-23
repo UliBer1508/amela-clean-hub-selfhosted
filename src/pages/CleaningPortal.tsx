@@ -18,7 +18,6 @@ import BookingCardSettings, { useBookingCardConfig } from "@/components/BookingC
 import AmelaEntryRow from "@/components/amela/AmelaEntryRow";
 import CleaningReminderBanner from "@/components/amela/CleaningReminderBanner";
 import ReminderSettingsPopover from "@/components/amela/ReminderSettingsPopover";
-import CleaningReminderDialog from "@/components/CleaningReminderDialog";
 import { ChatButton } from '@/components/PortalChat';
 import { usePortalMessages } from '@/hooks/usePortalMessages';
 import {
