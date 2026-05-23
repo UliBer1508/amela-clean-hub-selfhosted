@@ -106,8 +106,9 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   const upcomingReminders = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const all = filteredEntries('', 'all', '', 'all', 'all', AMELA_PROVIDER_ID, true);
     const items: { houseName: string; checkinDate: string }[] = [];
-    for (const entry of filteredEntries) {
+    for (const entry of all) {
       if (entry.type !== 'booking') continue;
       const b: any = entry.data;
       if (!b?.check_in) continue;
