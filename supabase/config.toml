@@ -1,4 +1,1 @@
 project_id = "usblrulkcgucxtkhugck"
-
-[functions.portal-login]
-verify_jwt = false
