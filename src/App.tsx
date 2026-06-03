@@ -11,8 +11,9 @@ import NotFound from "./pages/NotFound";
 import Offline from "./pages/Offline";
 import PWAUpdateNotification from "./components/PWAUpdateNotification";
 import PortalChat from "./components/PortalChat";
-import AutoLogin from "./components/AutoLogin";
 import { usePWAAnalytics } from "./hooks/usePWAAnalytics";
+import { usePortalAuth } from "./hooks/usePortalAuth";
+import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,11 +32,19 @@ const queryClient = new QueryClient({
 
 const AppContent = () => {
   usePWAAnalytics();
+  const ready = usePortalAuth();
   const [isChatOpen, setIsChatOpen] = useState(false);
-  
+
+  if (!ready) {
+    return (
+      <div className="flex items-center justify-center min-h-[100dvh] bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
     <>
-      <AutoLogin />
       <Toaster />
       <Sonner />
       <PWAUpdateNotification />
