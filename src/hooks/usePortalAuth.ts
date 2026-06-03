@@ -1,17 +1,12 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-const PORTAL_EMAIL = import.meta.env.VITE_PORTAL_EMAIL as string | undefined;
-const PORTAL_PASSWORD = import.meta.env.VITE_PORTAL_PASSWORD as string | undefined;
-
 /**
  * Unsichtbarer Auto-Login für das Amela-Portal.
  *
  * Prüft beim App-Start die bestehende Session und meldet sich bei Bedarf
- * still mit dem technischen Account aus VITE_PORTAL_EMAIL/VITE_PORTAL_PASSWORD an.
- *
- * Hinweis: VITE_*-Variablen sind im Client-Bundle sichtbar — bewusster
- * UX-Kompromiss, damit Putzkräfte sich nicht anmelden müssen.
+ * still über die Edge Function `portal-login` an, die serverseitig mit den
+ * Supabase-Secrets PORTAL_EMAIL/PORTAL_PASSWORD einloggt.
  */
 export function usePortalAuth() {
   const [ready, setReady] = useState(false);
@@ -21,21 +16,19 @@ export function usePortalAuth() {
 
     (async () => {
       try {
-        if (!PORTAL_EMAIL || !PORTAL_PASSWORD) {
-          console.error(
-            "Portal-Auto-Login: VITE_PORTAL_EMAIL oder VITE_PORTAL_PASSWORD ist nicht gesetzt."
-          );
-          return;
-        }
-
         const { data } = await supabase.auth.getSession();
         if (!data.session) {
-          const { error } = await supabase.auth.signInWithPassword({
-            email: PORTAL_EMAIL,
-            password: PORTAL_PASSWORD,
-          });
-          if (error) {
-            console.error("Portal-Auto-Login fehlgeschlagen:", error.message);
+          const { data: fnData, error: fnError } = await supabase.functions.invoke("portal-login");
+          if (fnError) {
+            console.error("Portal-Auto-Login fehlgeschlagen:", fnError.message);
+          } else if (fnData?.access_token && fnData?.refresh_token) {
+            const { error: setErr } = await supabase.auth.setSession({
+              access_token: fnData.access_token,
+              refresh_token: fnData.refresh_token,
+            });
+            if (setErr) console.error("Portal-Session setzen fehlgeschlagen:", setErr.message);
+          } else {
+            console.error("Portal-Auto-Login: ungültige Antwort", fnData);
           }
         }
       } catch (e) {
