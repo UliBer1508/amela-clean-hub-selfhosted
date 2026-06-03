@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import Offline from "./pages/Offline";
 import PWAUpdateNotification from "./components/PWAUpdateNotification";
 import PortalChat from "./components/PortalChat";
+import AutoLogin from "./components/AutoLogin";
 import { usePWAAnalytics } from "./hooks/usePWAAnalytics";
 
 const queryClient = new QueryClient({
@@ -34,6 +35,7 @@ const AppContent = () => {
   
   return (
     <>
+      <AutoLogin />
       <Toaster />
       <Sonner />
       <PWAUpdateNotification />
