@@ -1,5 +1,5 @@
 import React from 'react';
-import { Smartphone, Wifi, WifiOff, RefreshCw } from 'lucide-react';
+import { WifiOff, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { usePWA } from '@/hooks/usePWA';
 
