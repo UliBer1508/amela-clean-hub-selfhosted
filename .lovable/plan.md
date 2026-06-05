@@ -1,32 +1,26 @@
 ## Ziel
 
-Das bestehende automatische Erinnerungs-Popup (`CleaningReminderBanner`, getriggert durch die Tage-vorher-Einstellung) soll:
-1. den **Check-in-Termin der Buchung** als Bezugsdatum verwenden (nicht das Reinigungs-`scheduled_date`),
-2. genau den vom Nutzer gelieferten Text anzeigen:
-   > Hallo Amela, es steht eine Buchung für **„{hausname}"** für den **{Datum checkin}** an. Bitte Reinigung nicht vergessen. Vielen Dank.
+Im Cleaning-Portal unter den Filter-Kacheln „Diese Woche" / „Nächste Woche" zwei weitere Kacheln ergänzen: **„Diesen Monat"** und **„Nächsten Monat"** (Kalendermonat, nicht rollierend).
 
 ## Umsetzung
 
-**`src/components/amela/CleaningReminderBanner.tsx`**
+**`src/types/booking.ts`**
+- `TimeFilter` um `'thisMonth' | 'nextMonth'` erweitern (bestehende Keys bleiben unverändert).
 
-1. `NextCleaning`-Type umbenennen/anpassen zu `{ checkInDate: string; houseName?: string }`.
-2. `getNextCleaning`:
-   - Für `entry.type === 'booking'`: nur Buchungen mit `data.check_in` und mindestens einer offenen Reinigung (`status !== completed/cancelled`) berücksichtigen. Kandidat = `{ checkInDate: data.check_in, houseName: data.houses?.name }`.
-   - Standalone-Cleanings ignorieren (haben keinen Check-in).
-   - Sortierung & "≥ heute"-Filter unverändert, jetzt auf `checkInDate`.
-3. `daysUntil` = Differenz zu `checkInDate`. `shouldShow` bleibt wie gehabt: `daysUntil <= settings.daysBefore`.
-4. Dialog-Inhalt ersetzen:
-   - Titel: „Reinigungs-Erinnerung"
-   - Body (`DialogDescription`):
-     ```
-     Hallo Amela, es steht eine Buchung für „{houseName}" für den {dd.MM.yyyy} an.
-     Bitte Reinigung nicht vergessen. Vielen Dank.
-     ```
-   - Footer-Button „Verstanden" bleibt.
-5. Dismiss-Key bleibt analog (`${todayKey}:${checkInDate}`).
+**`src/utils/date.ts`** (`isWithinTimeRange`)
+- Neuer Case `thisMonth`: `taskDate` liegt im aktuellen Kalendermonat (`start = 1. des Monats`, `end = letzter Tag des Monats`).
+- Neuer Case `nextMonth`: `taskDate` liegt im darauffolgenden Kalendermonat (`startOfMonth(addMonths(now,1))` … `endOfMonth(...)`).
+- Nutzung von `startOfMonth`, `endOfMonth`, `addMonths` aus `date-fns`.
+
+**`src/pages/CleaningPortal.tsx`** (Zeitraum-Filter-Grid ~Zeile 370)
+- Array um zwei Einträge erweitern:
+  ```ts
+  { key: 'thisMonth', label: 'Diesen Monat' },
+  { key: 'nextMonth', label: 'Nächsten Monat' },
+  ```
+- Grid bleibt `grid-cols-2` → ergibt sauber 2×2 Layout (passt zum Screenshot-Stil).
 
 ## Out of scope
 
-- Glocke + `ReminderSettingsPopover` bleiben unverändert (Settings).
-- Keine Änderungen an `useReminderSettings`, `useBookings`, Filtern.
-- Kein Fallback-Text für Standalone-Cleanings (keine Check-ins relevant).
+- Bestehende `month` / `3months` / `6months` / `12months` Keys und `TIME_FILTERS`-Labels bleiben unverändert.
+- Keine Änderungen am Haus-Filter, an Reset-Logik (`timeFilter !== 'all'` deckt die neuen Werte automatisch ab).
