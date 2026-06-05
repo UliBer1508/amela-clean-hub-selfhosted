@@ -371,6 +371,8 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
             {([
               { key: 'thisWeek' as TimeFilter, label: 'Diese Woche' },
               { key: 'nextWeek' as TimeFilter, label: 'Nächste Woche' },
+              { key: 'thisMonth' as TimeFilter, label: 'Diesen Monat' },
+              { key: 'nextMonth' as TimeFilter, label: 'Nächsten Monat' },
             ]).map(({ key, label }) => {
               const active = timeFilter === key;
               return (

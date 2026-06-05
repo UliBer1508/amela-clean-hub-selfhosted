@@ -1,4 +1,4 @@
-import { format, startOfWeek, endOfWeek, addWeeks } from 'date-fns';
+import { format, startOfWeek, endOfWeek, addWeeks, startOfMonth, endOfMonth, addMonths } from 'date-fns';
 
 export const formatGermanDate = (dateString: string): string => {
   const date = new Date(dateString);
@@ -39,6 +39,17 @@ export const isWithinTimeRange = (date: string, filter: string): boolean => {
       const nextWeek = addWeeks(now, 1);
       const start = startOfWeek(nextWeek, { weekStartsOn: 1 });
       const end = endOfWeek(nextWeek, { weekStartsOn: 1 });
+      return taskDate >= start && taskDate <= end;
+    }
+    case 'thisMonth': {
+      const start = startOfMonth(now);
+      const end = endOfMonth(now);
+      return taskDate >= start && taskDate <= end;
+    }
+    case 'nextMonth': {
+      const next = addMonths(now, 1);
+      const start = startOfMonth(next);
+      const end = endOfMonth(next);
       return taskDate >= start && taskDate <= end;
     }
     case 'month': {
