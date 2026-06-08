@@ -49,6 +49,13 @@ export const useBookings = () => {
             service_providers!service_tasks_provider_id_fkey (
               name
             )
+          ),
+          linen_orders!linen_orders_booking_id_fkey (
+            id,
+            status,
+            delivery_date,
+            delivery_time,
+            total_items
           )
         `)
         .eq('service_tasks.service_type', 'cleaning')
