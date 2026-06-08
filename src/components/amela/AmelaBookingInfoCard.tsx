@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Home, MapPin, User, Users, CalendarDays } from 'lucide-react';
 import { getGuestName } from '@/lib/guestHelpers';
 import { formatDateTime } from '@/utils/date';
+import LaundryStatusRow from './LaundryStatusRow';
 
 interface AmelaBookingInfoCardProps {
   booking: any;
