@@ -34,6 +34,14 @@ export interface House {
   rental_type?: string;
 }
 
+export interface LinenOrder {
+  id: string;
+  status: string | null;
+  delivery_date: string | null;
+  delivery_time: string | null;
+  total_items: number;
+}
+
 export interface Booking {
   id: string;
   guest_name: string;
@@ -46,6 +54,7 @@ export interface Booking {
   houses?: House;
   guests?: Guest | null;
   service_tasks?: ServiceTask[];
+  linen_orders?: LinenOrder[];
 }
 
 export interface TaskEditingState {
