@@ -68,6 +68,8 @@ const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking, ac
             </div>
           </div>
         </div>
+
+        <LaundryStatusRow orders={booking.linen_orders} />
       </CardContent>
     </Card>
   );
