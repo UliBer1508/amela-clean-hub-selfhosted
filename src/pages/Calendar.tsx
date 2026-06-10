@@ -743,7 +743,11 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                   title={`${event.title} - ${event.house}`}
                                 >
                                   <Icon className="w-3 h-3 shrink-0" />
-                                  <span className="truncate">{abbr}</span>
+                                  <span className="truncate">
+                                    {event.type === 'cleaning' && 'Rein. '}
+                                    {(event.type === 'laundry-delivery' || event.type === 'laundry-pickup') && 'Wä. '}
+                                    {abbr}
+                                  </span>
                                 </div>
                               );
                             })}
