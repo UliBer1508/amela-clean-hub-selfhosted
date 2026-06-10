@@ -245,11 +245,12 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="max-w-md w-full">
           <CardContent className="p-6 text-center space-y-4">
-            <div className="text-5xl">⚠️</div>
+            <AlertTriangle className="w-12 h-12 mx-auto text-destructive" />
             <h2 className="text-xl font-semibold">Verbindungsfehler</h2>
             <p className="text-sm text-muted-foreground break-words">{bookingsError}</p>
             <Button onClick={() => forceRefresh()} className="hover-scale">
-              🔄 Erneut versuchen
+              <RotateCw className="w-4 h-4 mr-2" />
+              Erneut versuchen
             </Button>
           </CardContent>
         </Card>
