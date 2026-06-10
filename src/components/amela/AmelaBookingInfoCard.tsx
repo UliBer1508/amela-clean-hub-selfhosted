@@ -37,12 +37,6 @@ const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking, ac
           )}
         </div>
 
-        {booking.houses?.address && (
-          <div className="flex items-start gap-2 text-muted-foreground text-xs">
-            <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
-            <span className="break-words">{booking.houses.address}</span>
-          </div>
-        )}
 
         <div className="flex items-center gap-1.5 text-sm text-foreground">
           <User className="w-4 h-4 text-muted-foreground shrink-0 font-bold" />
