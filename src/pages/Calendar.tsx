@@ -667,32 +667,23 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                     {/* Calendar days */}
                     {calendarDays.map((day, index) => {
                       const allDayEvents = getDayEvents(day);
-                      // Priorität: Reinigung > Wäsche > Check-out > Check-in. "occupied" wird ausgeblendet.
+                      // Nur Reinigung/Wäsche in der Zelle. Check-in/out bleiben im Tap-Detail.
                       const typeOrder: Record<string, number> = {
                         cleaning: 0,
                         'laundry-delivery': 1,
                         'laundry-pickup': 1,
-                        checkout: 2,
-                        checkin: 3,
                       };
                       const dayEvents = allDayEvents
-                        .filter(e => e.type !== 'occupied')
+                        .filter(e => e.type === 'cleaning' || e.type === 'laundry-delivery' || e.type === 'laundry-pickup')
                         .sort((a, b) => (typeOrder[a.type] ?? 9) - (typeOrder[b.type] ?? 9));
                       const isCurrentMonth = viewType === 'week' ? true : isSameMonth(day, currentDate);
                       const isTodayDate = isToday(day);
                       const isSelected = selectedDate && isSameDay(day, selectedDate);
                       const occupied = isDayOccupied(day);
 
-                      const maxItems = viewType === 'week' ? 5 : 4;
-                      // Reinigung/Wäsche dürfen nie abgeschnitten werden – immer zuerst rendern.
-                      const protectedEvents = dayEvents.filter(
-                        e => e.type === 'cleaning' || e.type === 'laundry-delivery' || e.type === 'laundry-pickup'
-                      );
-                      const otherEvents = dayEvents.filter(
-                        e => e.type !== 'cleaning' && e.type !== 'laundry-delivery' && e.type !== 'laundry-pickup'
-                      );
-                      const remainingSlots = Math.max(0, maxItems - protectedEvents.length);
-                      const shownEvents = [...protectedEvents, ...otherEvents.slice(0, remainingSlots)];
+                      const maxItems = viewType === 'week' ? 5 : 3;
+                      // Reinigung/Wäsche sind die einzigen Typen – alle geschützt.
+                      const shownEvents = dayEvents.slice(0, maxItems);
                       const hiddenCount = dayEvents.length - shownEvents.length;
 
                       return (
