@@ -876,7 +876,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           </div>
 
           {/* Sidebar - nur Desktop bei month/week Ansicht */}
-          {viewType !== 'gantt' && (
+          {viewType !== 'gantt' && viewType !== 'list' && (
             <div className="hidden lg:block space-y-6">
               {/* Selected Date Events */}
               <Card>
