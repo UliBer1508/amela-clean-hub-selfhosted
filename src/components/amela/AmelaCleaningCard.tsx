@@ -79,11 +79,6 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
                   <Badge variant="outline" className="text-[10px] px-1.5 py-0">{positionLabel}</Badge>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground truncate">
-                {formatDateTime(task.scheduled_date, task.scheduled_time)}
-                {' · '}
-                {STATUS_LABELS[task.status] ?? task.status}
-              </p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
