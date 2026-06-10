@@ -439,12 +439,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
 
             {/* Header */}
             <div className="mb-6 space-y-4">
-              {/* Mobile Layout - Stack vertically */}
-              <div className="sm:hidden space-y-3">
-                <h1 className="text-2xl font-bold">{calendarTitle}</h1>
-                
-                
-                {/* Zeile 2: Ansichtswahl - 3-Spalten-Grid */}
+              {/* Mobile Layout - View switcher only (title + nav live in card) */}
+              <div className="sm:hidden">
                 <div className="grid grid-cols-3 gap-2">
                   <Button
                     variant={viewType === 'month' ? 'default' : 'outline'}
@@ -470,23 +466,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                 </div>
               </div>
 
-              {/* Desktop Layout - Single row */}
-              <div className="hidden sm:flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <h1 className="text-2xl font-bold">{calendarTitle}</h1>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm" onClick={previousPeriod}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={goToToday}>
-                      Heute
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={nextPeriod}>
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              
+              {/* Desktop Layout - View switcher only (title + nav live in card) */}
+              <div className="hidden sm:flex items-center justify-end">
                 <div className="flex items-center space-x-2">
                   <Button
                     variant={viewType === 'month' ? 'default' : 'outline'}
