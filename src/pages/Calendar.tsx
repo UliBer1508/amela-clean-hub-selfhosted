@@ -518,9 +518,9 @@ const Calendar = ({ chatProps }: CalendarProps) => {
               </div>
             </div>
 
-        <div className={cn("grid gap-6", viewType === 'gantt' ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-4")}>
-          {/* Calendar / Gantt */}
-          <div className={viewType === 'gantt' ? '' : 'lg:col-span-3'}>
+        <div className={cn("grid gap-6", (viewType === 'gantt' || viewType === 'list') ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-4")}>
+          {/* Calendar / Gantt / List */}
+          <div className={(viewType === 'gantt' || viewType === 'list') ? '' : 'lg:col-span-3'}>
             <Card>
               <CardContent className="p-4 md:p-6">
                 <h2 className="text-lg md:text-xl font-semibold mb-3">{calendarTitle}</h2>
