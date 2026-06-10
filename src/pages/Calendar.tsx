@@ -29,7 +29,7 @@ import { cn } from '@/lib/utils';
 import { getGuestName } from '@/lib/guestHelpers';
 import { supabase } from '@/integrations/supabase/client';
 
-type ViewType = 'month' | 'week' | 'gantt';
+type ViewType = 'list' | 'month' | 'week' | 'gantt';
 
 // Haus-Farben für visuelle Unterscheidung im Gantt-Chart
 const HOUSE_COLORS = [
