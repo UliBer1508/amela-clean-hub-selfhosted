@@ -355,7 +355,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
                   className={`min-h-[56px] rounded-lg border-2 px-3 py-2 text-left transition-all active:scale-95 ${
                     active
                       ? 'border-primary bg-primary text-primary-foreground shadow-md'
-                      : 'border-sky-200 dark:border-sky-900 bg-sky-50 dark:bg-sky-950/30 hover:border-primary/50'
+                      : 'border-surface-tint bg-surface-tint hover:border-primary/50'
                   }`}
                 >
                   <div className="flex items-center gap-2">
