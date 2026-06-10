@@ -18,7 +18,7 @@ const ReminderSettingsPopover: React.FC<Props> = ({ open, onOpenChange }) => {
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <CalendarClock className="w-5 h-5 text-amber-600" />
+            <CalendarClock className="w-5 h-5 text-status-delayed" />
             Erinnerung
           </DialogTitle>
           <DialogDescription>
