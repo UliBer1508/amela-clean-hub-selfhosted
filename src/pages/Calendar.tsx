@@ -563,8 +563,85 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                 )}
 
 
-                {/* Gantt Chart View */}
-                {viewType === 'gantt' ? (
+                {/* List / Gantt / Month-Week Views */}
+                {viewType === 'list' ? (
+                  <div className="space-y-5">
+                    {listGroups.length === 0 ? (
+                      <div className="py-12 text-center">
+                        <Sparkles className="w-10 h-10 mx-auto text-muted-foreground/60 mb-3" />
+                        <p className="text-sm text-muted-foreground">
+                          Keine anstehenden Reinigungen
+                        </p>
+                      </div>
+                    ) : (
+                      listGroups.map(group => {
+                        const todayFlag = isToday(group.date);
+                        return (
+                          <div key={group.date.toISOString()}>
+                            <div className={cn(
+                              "flex items-center gap-2 mb-2 pb-1 border-b",
+                              todayFlag ? "border-primary" : "border-border"
+                            )}>
+                              <h3 className={cn(
+                                "text-sm font-semibold",
+                                todayFlag ? "text-primary" : "text-foreground"
+                              )}>
+                                {format(group.date, 'EEE, d. MMMM', { locale: de })}
+                              </h3>
+                              {todayFlag && (
+                                <Badge variant="default" className="text-[10px] h-5">Heute</Badge>
+                              )}
+                            </div>
+                            <div className="space-y-2">
+                              {group.events.map(event => {
+                                const houseColor = getHouseColor(event.house_id);
+                                const isCleaning = event.type === 'cleaning';
+                                const Icon = isCleaning ? Sparkles : Shirt;
+                                const typeLabel = isCleaning ? 'Reinigung' : 'Wäsche';
+                                const time = isCleaning && event.scheduledTime
+                                  ? event.scheduledTime.slice(0, 5)
+                                  : null;
+                                return (
+                                  <div
+                                    key={event.id}
+                                    onClick={isCleaning ? () => {
+                                      setSelectedCleaningTaskId(event.taskId ?? null);
+                                      setCleaningDetailOpen(true);
+                                    } : undefined}
+                                    role={isCleaning ? 'button' : undefined}
+                                    className={cn(
+                                      "relative rounded-xl bg-card border border-border/60 pl-4 pr-3 py-3 min-h-[64px] flex items-center gap-3 overflow-hidden",
+                                      isCleaning && "cursor-pointer active:scale-[0.99] active:bg-accent/50 transition-all"
+                                    )}
+                                  >
+                                    <span
+                                      className="absolute left-0 top-0 bottom-0 w-1.5"
+                                      style={{ backgroundColor: houseColor.hex }}
+                                    />
+                                    <div
+                                      className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                                      style={{ backgroundColor: `${houseColor.hex}26` }}
+                                    >
+                                      <Icon className="w-4 h-4" style={{ color: houseColor.hex }} />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                      <div className="text-sm font-medium truncate">
+                                        {typeLabel} · {event.house}{time ? ` · ${time}` : ''}
+                                      </div>
+                                    </div>
+                                    {isCleaning && (
+                                      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                ) : viewType === 'gantt' ? (
                   <>
                     {/* Haus-Legende: Farbe + voller Name */}
                     <div className="mb-3 flex flex-wrap gap-2">
