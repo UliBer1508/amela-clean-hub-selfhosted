@@ -29,7 +29,7 @@ import { cn } from '@/lib/utils';
 import { getGuestName } from '@/lib/guestHelpers';
 import { supabase } from '@/integrations/supabase/client';
 
-type ViewType = 'month' | 'week' | 'gantt';
+type ViewType = 'list' | 'month' | 'week' | 'gantt';
 
 // Haus-Farben für visuelle Unterscheidung im Gantt-Chart
 const HOUSE_COLORS = [
@@ -76,7 +76,12 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const [dayDetailOpen, setDayDetailOpen] = useState(false);
   const [cleaningDetailOpen, setCleaningDetailOpen] = useState(false);
   const [selectedCleaningTaskId, setSelectedCleaningTaskId] = useState<string | null>(null);
-  const [viewType, setViewType] = useState<ViewType>('month');
+  const [viewType, setViewType] = useState<ViewType>(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches) {
+      return 'list';
+    }
+    return 'month';
+  });
   const [showReminderPopup, setShowReminderPopup] = useState(false);
 
   const { allBookings, loading, forceRefresh } = useAllBookings();
@@ -242,6 +247,38 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     if (!selectedDate) return [];
     return monthEvents.filter(event => isSameDay(event.date, selectedDate));
   }, [monthEvents, selectedDate]);
+
+  // Listen-Ansicht: nur Reinigung/Wäsche, ab heute, nach Tag gruppiert, max ~60 Tage
+  const listGroups = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const horizon = new Date(today);
+    horizon.setDate(horizon.getDate() + 60);
+
+    const relevant = monthEvents
+      .filter(e => e.type === 'cleaning' || e.type === 'laundry-delivery' || e.type === 'laundry-pickup')
+      .filter(e => {
+        const d = new Date(e.date);
+        d.setHours(0, 0, 0, 0);
+        return d >= today && d <= horizon;
+      })
+      .sort((a, b) => {
+        const da = a.date.getTime() - b.date.getTime();
+        if (da !== 0) return da;
+        // Reinigung zuerst, dann Wäsche
+        const order = (t: string) => (t === 'cleaning' ? 0 : 1);
+        return order(a.type) - order(b.type);
+      });
+
+    const groups = new Map<string, { date: Date; events: typeof relevant }>();
+    relevant.forEach(e => {
+      const key = format(e.date, 'yyyy-MM-dd');
+      if (!groups.has(key)) groups.set(key, { date: e.date, events: [] });
+      groups.get(key)!.events.push(e);
+    });
+    return Array.from(groups.values());
+  }, [monthEvents]);
+
 
 
   const getDayEvents = (day: Date) => {
@@ -430,18 +467,18 @@ const Calendar = ({ chatProps }: CalendarProps) => {
               <div className="sm:hidden">
                 <div className="grid grid-cols-3 gap-2">
                   <Button
+                    variant={viewType === 'list' ? 'default' : 'outline'}
+                    onClick={() => setViewType('list')}
+                    className="min-h-[44px] active:scale-95"
+                  >
+                    Liste
+                  </Button>
+                  <Button
                     variant={viewType === 'month' ? 'default' : 'outline'}
                     onClick={() => setViewType('month')}
                     className="min-h-[44px] active:scale-95"
                   >
                     Monat
-                  </Button>
-                  <Button
-                    variant={viewType === 'week' ? 'default' : 'outline'}
-                    onClick={() => setViewType('week')}
-                    className="min-h-[44px] active:scale-95"
-                  >
-                    Woche
                   </Button>
                   <Button
                     variant={viewType === 'gantt' ? 'default' : 'outline'}
@@ -481,49 +518,130 @@ const Calendar = ({ chatProps }: CalendarProps) => {
               </div>
             </div>
 
-        <div className={cn("grid gap-6", viewType === 'gantt' ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-4")}>
-          {/* Calendar / Gantt */}
-          <div className={viewType === 'gantt' ? '' : 'lg:col-span-3'}>
+        <div className={cn("grid gap-6", (viewType === 'gantt' || viewType === 'list') ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-4")}>
+          {/* Calendar / Gantt / List */}
+          <div className={(viewType === 'gantt' || viewType === 'list') ? '' : 'lg:col-span-3'}>
             <Card>
               <CardContent className="p-4 md:p-6">
-                <h2 className="text-lg md:text-xl font-semibold mb-3">{calendarTitle}</h2>
-                <div className="mb-4 flex items-center gap-2">
-                  {/* Haus-Farb-Legende */}
-                  <div className="flex gap-1.5 overflow-x-auto flex-1 min-w-0 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
-                    {houses.map((house) => {
-                      const color = getHouseColor(house.id);
-                      const abbr = getHouseAbbreviation(house.name);
-                      return (
-                        <div
-                          key={house.id}
-                          title={house.name}
-                          className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/40 shrink-0"
-                        >
-                          <span
-                            className="w-2.5 h-2.5 rounded-full shrink-0"
-                            style={{ backgroundColor: color.hex }}
-                          />
-                          <span className="text-[11px] font-medium whitespace-nowrap">{abbr}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Button variant="outline" onClick={previousPeriod} className="h-11 w-11 p-0 rounded-full shadow-sm active:scale-95">
-                      <ChevronLeft className="h-6 w-6" />
-                    </Button>
-                    <Button variant="outline" onClick={goToToday} className="h-11 px-4 rounded-full shadow-sm active:scale-95">
-                      Heute
-                    </Button>
-                    <Button variant="outline" onClick={nextPeriod} className="h-11 w-11 p-0 rounded-full shadow-sm active:scale-95">
-                      <ChevronRight className="h-6 w-6" />
-                    </Button>
-                  </div>
-                </div>
+                {viewType !== 'list' && (
+                  <>
+                    <h2 className="text-lg md:text-xl font-semibold mb-3">{calendarTitle}</h2>
+                    <div className="mb-4 flex items-center gap-2">
+                      {/* Haus-Farb-Legende */}
+                      <div className="flex gap-1.5 overflow-x-auto flex-1 min-w-0 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
+                        {houses.map((house) => {
+                          const color = getHouseColor(house.id);
+                          const abbr = getHouseAbbreviation(house.name);
+                          return (
+                            <div
+                              key={house.id}
+                              title={house.name}
+                              className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/40 shrink-0"
+                            >
+                              <span
+                                className="w-2.5 h-2.5 rounded-full shrink-0"
+                                style={{ backgroundColor: color.hex }}
+                              />
+                              <span className="text-[11px] font-medium whitespace-nowrap">{abbr}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Button variant="outline" onClick={previousPeriod} className="h-11 w-11 p-0 rounded-full shadow-sm active:scale-95">
+                          <ChevronLeft className="h-6 w-6" />
+                        </Button>
+                        <Button variant="outline" onClick={goToToday} className="h-11 px-4 rounded-full shadow-sm active:scale-95">
+                          Heute
+                        </Button>
+                        <Button variant="outline" onClick={nextPeriod} className="h-11 w-11 p-0 rounded-full shadow-sm active:scale-95">
+                          <ChevronRight className="h-6 w-6" />
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
 
 
-                {/* Gantt Chart View */}
-                {viewType === 'gantt' ? (
+                {/* List / Gantt / Month-Week Views */}
+                {viewType === 'list' ? (
+                  <div className="space-y-5">
+                    {listGroups.length === 0 ? (
+                      <div className="py-12 text-center">
+                        <Sparkles className="w-10 h-10 mx-auto text-muted-foreground/60 mb-3" />
+                        <p className="text-sm text-muted-foreground">
+                          Keine anstehenden Reinigungen
+                        </p>
+                      </div>
+                    ) : (
+                      listGroups.map(group => {
+                        const todayFlag = isToday(group.date);
+                        return (
+                          <div key={group.date.toISOString()}>
+                            <div className={cn(
+                              "flex items-center gap-2 mb-2 pb-1 border-b",
+                              todayFlag ? "border-primary" : "border-border"
+                            )}>
+                              <h3 className={cn(
+                                "text-sm font-semibold",
+                                todayFlag ? "text-primary" : "text-foreground"
+                              )}>
+                                {format(group.date, 'EEE, d. MMMM', { locale: de })}
+                              </h3>
+                              {todayFlag && (
+                                <Badge variant="default" className="text-[10px] h-5">Heute</Badge>
+                              )}
+                            </div>
+                            <div className="space-y-2">
+                              {group.events.map(event => {
+                                const houseColor = getHouseColor(event.house_id);
+                                const isCleaning = event.type === 'cleaning';
+                                const Icon = isCleaning ? Sparkles : Shirt;
+                                const typeLabel = isCleaning ? 'Reinigung' : 'Wäsche';
+                                const time = isCleaning && event.scheduledTime
+                                  ? event.scheduledTime.slice(0, 5)
+                                  : null;
+                                return (
+                                  <div
+                                    key={event.id}
+                                    onClick={isCleaning ? () => {
+                                      setSelectedCleaningTaskId(event.taskId ?? null);
+                                      setCleaningDetailOpen(true);
+                                    } : undefined}
+                                    role={isCleaning ? 'button' : undefined}
+                                    className={cn(
+                                      "relative rounded-xl bg-card border border-border/60 pl-4 pr-3 py-3 min-h-[64px] flex items-center gap-3 overflow-hidden",
+                                      isCleaning && "cursor-pointer active:scale-[0.99] active:bg-accent/50 transition-all"
+                                    )}
+                                  >
+                                    <span
+                                      className="absolute left-0 top-0 bottom-0 w-1.5"
+                                      style={{ backgroundColor: houseColor.hex }}
+                                    />
+                                    <div
+                                      className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                                      style={{ backgroundColor: `${houseColor.hex}26` }}
+                                    >
+                                      <Icon className="w-4 h-4" style={{ color: houseColor.hex }} />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                      <div className="text-sm font-medium truncate">
+                                        {typeLabel} · {event.house}{time ? ` · ${time}` : ''}
+                                      </div>
+                                    </div>
+                                    {isCleaning && (
+                                      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                ) : viewType === 'gantt' ? (
                   <>
                     {/* Haus-Legende: Farbe + voller Name */}
                     <div className="mb-3 flex flex-wrap gap-2">
@@ -758,7 +876,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           </div>
 
           {/* Sidebar - nur Desktop bei month/week Ansicht */}
-          {viewType !== 'gantt' && (
+          {viewType !== 'gantt' && viewType !== 'list' && (
             <div className="hidden lg:block space-y-6">
               {/* Selected Date Events */}
               <Card>
