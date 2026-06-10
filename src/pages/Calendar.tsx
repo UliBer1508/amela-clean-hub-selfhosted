@@ -76,7 +76,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const [dayDetailOpen, setDayDetailOpen] = useState(false);
   const [cleaningDetailOpen, setCleaningDetailOpen] = useState(false);
   const [selectedCleaningTaskId, setSelectedCleaningTaskId] = useState<string | null>(null);
-  const [viewType, setViewType] = useState<ViewType>('gantt');
+  const [viewType, setViewType] = useState<ViewType>('month');
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [showReminderPopup, setShowReminderPopup] = useState(false);
