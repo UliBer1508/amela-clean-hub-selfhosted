@@ -619,10 +619,14 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                       style={{ backgroundColor: houseColor.hex }}
                                     />
                                     <div
-                                      className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-                                      style={{ backgroundColor: `${houseColor.hex}26` }}
+                                      className={cn(
+                                        "w-9 h-9 rounded-full flex items-center justify-center shrink-0",
+                                        isCleaning
+                                          ? "bg-primary/15 text-primary"
+                                          : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                                      )}
                                     >
-                                      <Icon className="w-4 h-4" style={{ color: houseColor.hex }} />
+                                      <Icon className="w-4 h-4" />
                                     </div>
                                     <div className="min-w-0 flex-1">
                                       <div className="text-sm font-medium truncate">
