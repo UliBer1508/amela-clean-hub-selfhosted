@@ -499,7 +499,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           <div className={viewType === 'gantt' ? '' : 'lg:col-span-3'}>
             <Card>
               <CardContent className="p-4 md:p-6">
-                <h2 className="hidden sm:block text-lg md:text-xl font-semibold mb-3">{calendarTitle}</h2>
+                <h2 className="text-lg md:text-xl font-semibold mb-3">{calendarTitle}</h2>
                 <div className="mb-4 flex items-center gap-2">
                   {/* Haus-Farb-Legende */}
                   <div className="flex gap-1.5 overflow-x-auto flex-1 min-w-0 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
