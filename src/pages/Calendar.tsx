@@ -806,29 +806,9 @@ const Calendar = ({ chatProps }: CalendarProps) => {
               <Card>
                 <CardContent className="p-4">
                   <h3 className="font-semibold mb-3">Legende</h3>
-                  
-                  {/* Event-Typen */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500 shrink-0" />
-                      <span className="text-sm">Check-in</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-red-500 shrink-0" />
-                      <span className="text-sm">Check-out</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-blue-500 shrink-0" />
-                      <span className="text-sm">Reinigung</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-violet-500 shrink-0" />
-                      <span className="text-sm">Wäsche</span>
-                    </div>
-                  </div>
 
                   <h4 className="text-xs font-medium text-muted-foreground mb-2">Unterkünfte</h4>
-                  <div className="space-y-2">
+                  <div className="space-y-2 mb-4">
                     {houses.map(house => {
                       const houseColor = getHouseColor(house.id);
                       return (
@@ -838,6 +818,18 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                         </div>
                       );
                     })}
+                  </div>
+
+                  <h4 className="text-xs font-medium text-muted-foreground mb-2">Symbole</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <Sparkles className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <span className="text-sm">Reinigung</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Shirt className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <span className="text-sm">Wäsche</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
