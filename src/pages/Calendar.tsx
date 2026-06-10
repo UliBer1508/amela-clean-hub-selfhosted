@@ -76,7 +76,12 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const [dayDetailOpen, setDayDetailOpen] = useState(false);
   const [cleaningDetailOpen, setCleaningDetailOpen] = useState(false);
   const [selectedCleaningTaskId, setSelectedCleaningTaskId] = useState<string | null>(null);
-  const [viewType, setViewType] = useState<ViewType>('month');
+  const [viewType, setViewType] = useState<ViewType>(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches) {
+      return 'list';
+    }
+    return 'month';
+  });
   const [showReminderPopup, setShowReminderPopup] = useState(false);
 
   const { allBookings, loading, forceRefresh } = useAllBookings();
