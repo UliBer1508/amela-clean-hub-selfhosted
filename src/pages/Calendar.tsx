@@ -690,7 +690,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                         <div
                           key={index}
                           className={cn(
-                            viewType === 'week' ? 'min-h-[120px]' : 'min-h-[88px] sm:min-h-[100px]',
+                            viewType === 'week' ? 'min-h-[120px]' : 'min-h-[72px] sm:min-h-[88px]',
                             'p-1.5 sm:p-2 border border-border cursor-pointer transition-colors rounded-sm',
                             isCurrentMonth
                               ? occupied
