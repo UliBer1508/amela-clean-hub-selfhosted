@@ -435,18 +435,18 @@ const Calendar = ({ chatProps }: CalendarProps) => {
               <div className="sm:hidden">
                 <div className="grid grid-cols-3 gap-2">
                   <Button
+                    variant={viewType === 'list' ? 'default' : 'outline'}
+                    onClick={() => setViewType('list')}
+                    className="min-h-[44px] active:scale-95"
+                  >
+                    Liste
+                  </Button>
+                  <Button
                     variant={viewType === 'month' ? 'default' : 'outline'}
                     onClick={() => setViewType('month')}
                     className="min-h-[44px] active:scale-95"
                   >
                     Monat
-                  </Button>
-                  <Button
-                    variant={viewType === 'week' ? 'default' : 'outline'}
-                    onClick={() => setViewType('week')}
-                    className="min-h-[44px] active:scale-95"
-                  >
-                    Woche
                   </Button>
                   <Button
                     variant={viewType === 'gantt' ? 'default' : 'outline'}
