@@ -1163,7 +1163,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
 
                 <div className="pt-2">
                   <SheetClose asChild>
-                    <Button variant="outline" className="w-full min-h-[44px]">
+                    <Button className="w-full min-h-[44px] bg-primary text-primary-foreground hover:bg-primary/90">
                       Schliessen
                     </Button>
                   </SheetClose>
