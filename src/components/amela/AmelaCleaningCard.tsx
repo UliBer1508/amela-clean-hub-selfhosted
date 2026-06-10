@@ -82,12 +82,6 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Badge
-              variant="outline"
-              className={cn('text-[10px]', STATUS_BADGE_CLASS[task.status])}
-            >
-              {STATUS_LABELS[task.status] ?? task.status}
-            </Badge>
             {paymentBadge && (
               <Badge variant={paymentBadge.variant} className={cn('text-[10px] gap-1', paymentBadge.className)}>
                 <paymentBadge.Icon className="w-3 h-3" />
