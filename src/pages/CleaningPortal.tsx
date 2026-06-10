@@ -316,10 +316,10 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
               className={`my-2 hover-scale relative min-h-[44px] ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
               onClick={handleNotificationClick}
             >
-              <Bell className={`w-4 h-4 mr-2 ${hasUnreadNotifications ? 'text-orange-500' : ''}`} />
+              <Bell className={`w-4 h-4 mr-2 ${hasUnreadNotifications ? 'text-status-delayed' : ''}`} />
               Benachrichtigungen
               {newTaskCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
                   {newTaskCount}
                 </span>
               )}
@@ -355,7 +355,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
                   className={`min-h-[56px] rounded-lg border-2 px-3 py-2 text-left transition-all active:scale-95 ${
                     active
                       ? 'border-primary bg-primary text-primary-foreground shadow-md'
-                      : 'border-sky-200 dark:border-sky-900 bg-sky-50 dark:bg-sky-950/30 hover:border-primary/50'
+                      : 'border-surface-tint bg-surface-tint hover:border-primary/50'
                   }`}
                 >
                   <div className="flex items-center gap-2">
@@ -383,7 +383,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
                   className={`min-h-[56px] rounded-lg border-2 px-3 py-2 text-left transition-all active:scale-95 ${
                     active
                       ? 'border-primary bg-primary text-primary-foreground shadow-md'
-                      : 'border-sky-200 dark:border-sky-900 bg-sky-50 dark:bg-sky-950/30 hover:border-primary/50'
+                      : 'border-surface-tint bg-surface-tint hover:border-primary/50'
                   }`}
                 >
                   <div className="flex items-center gap-2">
@@ -476,8 +476,8 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     </PullToRefresh>
 
     {/* Mobile Bottom Navigation */}
-    <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-sky-50 dark:bg-sky-950/30 border-t border-sky-200 dark:border-sky-900 pb-[env(safe-area-inset-bottom)] shadow-lg">
-      <CopyrightLine className="py-1 border-b border-sky-200/50 dark:border-sky-900/50" />
+    <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-surface-tint border-t border-surface-tint pb-[env(safe-area-inset-bottom)] shadow-lg">
+      <CopyrightLine className="py-1 border-b border-surface-tint" />
       <div className="flex justify-around items-center h-16">
         <Link to="/" className="flex-1">
           <button className="relative w-full h-16 flex flex-col items-center justify-center gap-1 text-primary">
@@ -503,7 +503,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           <Bell className="w-6 h-6" strokeWidth={2.25} />
           <span className="font-medium text-sm">Benachrichtigung</span>
           {newTaskCount > 0 && (
-            <span className="absolute top-1 right-1/4 bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center animate-pulse">
+            <span className="absolute top-1 right-1/4 bg-destructive text-destructive-foreground text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center animate-pulse">
               {newTaskCount}
             </span>
           )}
@@ -515,7 +515,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           <MessageCircle className="w-6 h-6" strokeWidth={2.25} />
           <span className="font-medium text-sm">Chat</span>
           {unreadCount > 0 && (
-            <span className="absolute top-1 right-1/4 bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
+            <span className="absolute top-1 right-1/4 bg-destructive text-destructive-foreground text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
               {unreadCount}
             </span>
           )}

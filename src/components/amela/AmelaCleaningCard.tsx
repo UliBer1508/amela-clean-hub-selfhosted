@@ -51,7 +51,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
 
   return (
     <Card
-      className="bg-sky-50 dark:bg-sky-950/30 border-l-4 hover:shadow-md transition-shadow"
+      className="bg-surface-tint border-l-4 hover:shadow-md transition-shadow"
       style={accentColor ? { borderLeftColor: accentColor } : undefined}
     >
       <CardContent className="p-3 space-y-2.5">
@@ -61,7 +61,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           className="w-full flex items-center justify-between gap-2 text-left"
         >
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-9 h-9 rounded-lg bg-sky-500/15 text-sky-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
               <Sparkles className="w-5 h-5" />
             </div>
             <div className="min-w-0">
