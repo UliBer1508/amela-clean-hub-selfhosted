@@ -51,7 +51,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
 
   return (
     <Card
-      className="bg-sky-50 dark:bg-sky-950/30 border-l-4 hover:shadow-md transition-shadow"
+      className="bg-surface-tint border-l-4 hover:shadow-md transition-shadow"
       style={accentColor ? { borderLeftColor: accentColor } : undefined}
     >
       <CardContent className="p-3 space-y-2.5">
