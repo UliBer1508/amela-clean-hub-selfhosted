@@ -666,6 +666,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                     </div>
                     <ScrollBar orientation="horizontal" />
                   </ScrollArea>
+                  </>
                 ) : (
                   /* Month/Week Calendar Grid */
                   <div className={`grid gap-1 ${viewType === 'week' ? 'grid-cols-7' : 'grid-cols-7'}`}>
