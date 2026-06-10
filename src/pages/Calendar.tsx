@@ -248,6 +248,38 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     return monthEvents.filter(event => isSameDay(event.date, selectedDate));
   }, [monthEvents, selectedDate]);
 
+  // Listen-Ansicht: nur Reinigung/Wäsche, ab heute, nach Tag gruppiert, max ~60 Tage
+  const listGroups = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const horizon = new Date(today);
+    horizon.setDate(horizon.getDate() + 60);
+
+    const relevant = monthEvents
+      .filter(e => e.type === 'cleaning' || e.type === 'laundry-delivery' || e.type === 'laundry-pickup')
+      .filter(e => {
+        const d = new Date(e.date);
+        d.setHours(0, 0, 0, 0);
+        return d >= today && d <= horizon;
+      })
+      .sort((a, b) => {
+        const da = a.date.getTime() - b.date.getTime();
+        if (da !== 0) return da;
+        // Reinigung zuerst, dann Wäsche
+        const order = (t: string) => (t === 'cleaning' ? 0 : 1);
+        return order(a.type) - order(b.type);
+      });
+
+    const groups = new Map<string, { date: Date; events: typeof relevant }>();
+    relevant.forEach(e => {
+      const key = format(e.date, 'yyyy-MM-dd');
+      if (!groups.has(key)) groups.set(key, { date: e.date, events: [] });
+      groups.get(key)!.events.push(e);
+    });
+    return Array.from(groups.values());
+  }, [monthEvents]);
+
+
 
   const getDayEvents = (day: Date) => {
     return monthEvents.filter(event => isSameDay(event.date, day));
