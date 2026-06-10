@@ -597,8 +597,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                       className={cn(
                                         "border-r last:border-r-0 h-full",
                                         houseOccupied
-                                          ? "bg-sky-200 dark:bg-sky-800/50"
-                                          : "bg-sky-50 dark:bg-sky-950/30",
+                                          ? "bg-primary/15"
+                                          : "bg-surface-tint",
                                         isToday(day) && "ring-1 ring-primary/40 ring-inset"
                                       )}
                                     />
