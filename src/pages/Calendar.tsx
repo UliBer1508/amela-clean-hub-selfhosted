@@ -76,7 +76,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const [dayDetailOpen, setDayDetailOpen] = useState(false);
   const [cleaningDetailOpen, setCleaningDetailOpen] = useState(false);
   const [selectedCleaningTaskId, setSelectedCleaningTaskId] = useState<string | null>(null);
-  const [viewType, setViewType] = useState<ViewType>('gantt');
+  const [viewType, setViewType] = useState<ViewType>('month');
   const [selectedHouse, setSelectedHouse] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [showReminderPopup, setShowReminderPopup] = useState(false);
@@ -439,12 +439,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
 
             {/* Header */}
             <div className="mb-6 space-y-4">
-              {/* Mobile Layout - Stack vertically */}
-              <div className="sm:hidden space-y-3">
-                <h1 className="text-2xl font-bold">{calendarTitle}</h1>
-                
-                
-                {/* Zeile 2: Ansichtswahl - 3-Spalten-Grid */}
+              {/* Mobile Layout - View switcher only (title + nav live in card) */}
+              <div className="sm:hidden">
                 <div className="grid grid-cols-3 gap-2">
                   <Button
                     variant={viewType === 'month' ? 'default' : 'outline'}
@@ -470,23 +466,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                 </div>
               </div>
 
-              {/* Desktop Layout - Single row */}
-              <div className="hidden sm:flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <h1 className="text-2xl font-bold">{calendarTitle}</h1>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm" onClick={previousPeriod}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={goToToday}>
-                      Heute
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={nextPeriod}>
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              
+              {/* Desktop Layout - View switcher only (title + nav live in card) */}
+              <div className="hidden sm:flex items-center justify-end">
                 <div className="flex items-center space-x-2">
                   <Button
                     variant={viewType === 'month' ? 'default' : 'outline'}
@@ -518,7 +499,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           <div className={viewType === 'gantt' ? '' : 'lg:col-span-3'}>
             <Card>
               <CardContent className="p-4 md:p-6">
-                <h2 className="hidden sm:block text-lg md:text-xl font-semibold mb-3">{calendarTitle}</h2>
+                <h2 className="text-lg md:text-xl font-semibold mb-3">{calendarTitle}</h2>
                 <div className="mb-4 flex items-center gap-2">
                   {/* Haus-Farb-Legende */}
                   <div className="flex gap-1.5 overflow-x-auto flex-1 min-w-0 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
@@ -571,7 +552,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                             <div
                               key={day.toISOString()}
                               className={cn(
-                                "p-1 text-center text-xs border-r last:border-r-0 bg-sky-50 dark:bg-sky-950/30",
+                                "p-1 text-center text-xs border-r last:border-r-0 bg-surface-tint",
                                 isToday(day) && "ring-2 ring-primary/60 ring-inset font-bold"
                               )}
                             >
@@ -616,8 +597,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                       className={cn(
                                         "border-r last:border-r-0 h-full",
                                         houseOccupied
-                                          ? "bg-sky-200 dark:bg-sky-800/50"
-                                          : "bg-sky-50 dark:bg-sky-950/30",
+                                          ? "bg-primary/15"
+                                          : "bg-surface-tint",
                                         isToday(day) && "ring-1 ring-primary/40 ring-inset"
                                       )}
                                     />
@@ -678,11 +659,34 @@ const Calendar = ({ chatProps }: CalendarProps) => {
 
                     {/* Calendar days */}
                     {calendarDays.map((day, index) => {
-                      const dayEvents = getDayEvents(day);
+                      const allDayEvents = getDayEvents(day);
+                      // Priorität: Reinigung > Wäsche > Check-out > Check-in. "occupied" wird ausgeblendet.
+                      const typeOrder: Record<string, number> = {
+                        cleaning: 0,
+                        'laundry-delivery': 1,
+                        'laundry-pickup': 1,
+                        checkout: 2,
+                        checkin: 3,
+                      };
+                      const dayEvents = allDayEvents
+                        .filter(e => e.type !== 'occupied')
+                        .sort((a, b) => (typeOrder[a.type] ?? 9) - (typeOrder[b.type] ?? 9));
                       const isCurrentMonth = viewType === 'week' ? true : isSameMonth(day, currentDate);
                       const isTodayDate = isToday(day);
                       const isSelected = selectedDate && isSameDay(day, selectedDate);
                       const occupied = isDayOccupied(day);
+
+                      const maxItems = viewType === 'week' ? 5 : 4;
+                      // Reinigung/Wäsche dürfen nie abgeschnitten werden – immer zuerst rendern.
+                      const protectedEvents = dayEvents.filter(
+                        e => e.type === 'cleaning' || e.type === 'laundry-delivery' || e.type === 'laundry-pickup'
+                      );
+                      const otherEvents = dayEvents.filter(
+                        e => e.type !== 'cleaning' && e.type !== 'laundry-delivery' && e.type !== 'laundry-pickup'
+                      );
+                      const remainingSlots = Math.max(0, maxItems - protectedEvents.length);
+                      const shownEvents = [...protectedEvents, ...otherEvents.slice(0, remainingSlots)];
+                      const hiddenCount = dayEvents.length - shownEvents.length;
 
                       return (
                         <div
@@ -692,8 +696,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                             'p-1.5 sm:p-2 border border-border cursor-pointer transition-colors rounded-sm',
                             isCurrentMonth
                               ? occupied
-                                ? 'bg-sky-200 dark:bg-sky-800/50'
-                                : 'bg-sky-50 dark:bg-sky-950/30'
+                                ? 'bg-primary/15'
+                                : 'bg-surface-tint'
                               : 'bg-muted/50 text-muted-foreground',
                             isTodayDate && !isSelected && 'ring-2 ring-primary/60 ring-inset',
                             isSelected && 'ring-2 ring-primary ring-inset',
@@ -713,30 +717,32 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                           
                           {/* Events */}
                           <div className="space-y-1">
-                            {dayEvents.slice(0, viewType === 'week' ? 4 : 3).map((event) => {
+                            {shownEvents.map((event) => {
                               const houseColor = getHouseColor(event.house_id);
                               const abbr = getHouseAbbreviation(event.house);
+                              const Icon =
+                                event.type === 'cleaning' ? Sparkles
+                                : event.type === 'laundry-delivery' || event.type === 'laundry-pickup' ? Shirt
+                                : event.type === 'checkin' ? LogIn
+                                : event.type === 'checkout' ? LogOut
+                                : Bed;
                               return (
                                 <div
                                   key={event.id}
                                   className={cn(
-                                    "text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded truncate",
+                                    "text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded truncate flex items-center gap-1",
                                     houseColor.bg, houseColor.text
                                   )}
                                   title={`${event.title} - ${event.house}`}
                                 >
-                                  {event.type === 'checkin' && `Check-in • ${abbr}`}
-                                  {event.type === 'checkout' && `Check-out • ${abbr}`}
-                                  {event.type === 'cleaning' && `Reinigung • ${abbr}`}
-                                  {event.type === 'laundry-pickup' && `Wäsche • ${abbr}`}
-                                  {event.type === 'laundry-delivery' && `Wäsche • ${abbr}`}
-                                  {event.type === 'occupied' && event.house}
+                                  <Icon className="w-3 h-3 shrink-0" />
+                                  <span className="truncate">{abbr}</span>
                                 </div>
                               );
                             })}
-                            {dayEvents.length > (viewType === 'week' ? 4 : 3) && (
+                            {hiddenCount > 0 && (
                               <div className="text-[10px] sm:text-xs text-muted-foreground">
-                                +{dayEvents.length - (viewType === 'week' ? 4 : 3)} weitere
+                                +{hiddenCount} weitere
                               </div>
                             )}
                           </div>
@@ -800,29 +806,9 @@ const Calendar = ({ chatProps }: CalendarProps) => {
               <Card>
                 <CardContent className="p-4">
                   <h3 className="font-semibold mb-3">Legende</h3>
-                  
-                  {/* Event-Typen */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500 shrink-0" />
-                      <span className="text-sm">Check-in</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-red-500 shrink-0" />
-                      <span className="text-sm">Check-out</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-blue-500 shrink-0" />
-                      <span className="text-sm">Reinigung</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-violet-500 shrink-0" />
-                      <span className="text-sm">Wäsche</span>
-                    </div>
-                  </div>
 
                   <h4 className="text-xs font-medium text-muted-foreground mb-2">Unterkünfte</h4>
-                  <div className="space-y-2">
+                  <div className="space-y-2 mb-4">
                     {houses.map(house => {
                       const houseColor = getHouseColor(house.id);
                       return (
@@ -832,6 +818,18 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                         </div>
                       );
                     })}
+                  </div>
+
+                  <h4 className="text-xs font-medium text-muted-foreground mb-2">Symbole</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <Sparkles className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <span className="text-sm">Reinigung</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Shirt className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <span className="text-sm">Wäsche</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -1070,8 +1068,8 @@ const Calendar = ({ chatProps }: CalendarProps) => {
 
 
     {/* Mobile Bottom Navigation */}
-    <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-sky-50 dark:bg-sky-950/30 border-t border-sky-200 dark:border-sky-900 pb-[env(safe-area-inset-bottom)] shadow-lg">
-      <CopyrightLine className="py-1 border-b border-sky-200/50 dark:border-sky-900/50" />
+    <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-surface-tint border-t border-primary/20 pb-[env(safe-area-inset-bottom)] shadow-lg">
+      <CopyrightLine className="py-1 border-b border-primary/20" />
       <div className="flex justify-around items-center h-16">
         <Link to="/" className="flex-1">
           <button className="relative w-full h-16 flex flex-col items-center justify-center gap-1 text-muted-foreground">
@@ -1104,7 +1102,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           <MessageCircle className="w-6 h-6" strokeWidth={2.25} />
           <span className="font-medium text-sm">Chat</span>
           {unreadCount > 0 && (
-            <span className="absolute top-1 right-1/4 bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
+            <span className="absolute top-1 right-1/4 bg-destructive text-destructive-foreground text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center">
               {unreadCount}
             </span>
           )}
