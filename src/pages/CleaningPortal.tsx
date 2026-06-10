@@ -30,6 +30,8 @@ import {
   XCircle,
   AlertTriangle,
   MessageCircle,
+  RotateCw,
+  SearchX,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
