@@ -33,9 +33,10 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import type { TimeFilter } from '@/types/booking';
+
 type StatusFilter = 'all' | 'scheduled' | 'in_progress' | 'completed' | 'delayed' | 'cancelled';
 type HouseFilter = 'all' | string;
-type TimeFilter = 'all' | 'week' | 'thisWeek' | 'nextWeek' | 'month' | '3months';
 type ProviderFilter = 'all' | 'unassigned' | string;
 
 const STATUS_FILTERS = {
