@@ -33,7 +33,7 @@ const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking, ac
             </div>
           </div>
           {isCheckedIn && (
-            <Badge variant="destructive" className="text-[10px] shrink-0">⚠️ Eingecheckt</Badge>
+            <Badge variant="destructive" className="text-[10px] shrink-0 gap-1"><AlertTriangle className="w-3 h-3" /> Eingecheckt</Badge>
           )}
         </div>
 
