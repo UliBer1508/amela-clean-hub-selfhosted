@@ -476,8 +476,8 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
     </PullToRefresh>
 
     {/* Mobile Bottom Navigation */}
-    <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-sky-50 dark:bg-sky-950/30 border-t border-sky-200 dark:border-sky-900 pb-[env(safe-area-inset-bottom)] shadow-lg">
-      <CopyrightLine className="py-1 border-b border-sky-200/50 dark:border-sky-900/50" />
+    <nav className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-surface-tint border-t border-surface-tint pb-[env(safe-area-inset-bottom)] shadow-lg">
+      <CopyrightLine className="py-1 border-b border-surface-tint" />
       <div className="flex justify-around items-center h-16">
         <Link to="/" className="flex-1">
           <button className="relative w-full h-16 flex flex-col items-center justify-center gap-1 text-primary">
