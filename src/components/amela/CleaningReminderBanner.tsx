@@ -99,7 +99,7 @@ const CleaningReminderBanner: React.FC<Props> = ({ entries }) => {
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <CalendarClock className="w-5 h-5 text-amber-600" />
+            <CalendarClock className="w-5 h-5 text-status-delayed" />
             Reinigungs-Erinnerung
           </DialogTitle>
           <DialogDescription className="text-base text-foreground pt-2 leading-relaxed">
