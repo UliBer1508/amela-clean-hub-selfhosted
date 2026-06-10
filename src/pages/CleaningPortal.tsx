@@ -432,7 +432,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
             ) : currentFilteredEntries.length === 0 ? (
               <Card>
                 <CardContent className="p-8 md:p-12 text-center space-y-3">
-                  <div className="text-5xl">🔍</div>
+                  <SearchX className="w-12 h-12 mx-auto text-muted-foreground" />
                   <h3 className="text-lg font-semibold">Keine Reinigungsaufträge gefunden</h3>
                   <p className="text-sm text-muted-foreground">
                     {debouncedSearchTerm
