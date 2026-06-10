@@ -523,40 +523,44 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           <div className={(viewType === 'gantt' || viewType === 'list') ? '' : 'lg:col-span-3'}>
             <Card>
               <CardContent className="p-4 md:p-6">
-                <h2 className="text-lg md:text-xl font-semibold mb-3">{calendarTitle}</h2>
-                <div className="mb-4 flex items-center gap-2">
-                  {/* Haus-Farb-Legende */}
-                  <div className="flex gap-1.5 overflow-x-auto flex-1 min-w-0 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
-                    {houses.map((house) => {
-                      const color = getHouseColor(house.id);
-                      const abbr = getHouseAbbreviation(house.name);
-                      return (
-                        <div
-                          key={house.id}
-                          title={house.name}
-                          className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/40 shrink-0"
-                        >
-                          <span
-                            className="w-2.5 h-2.5 rounded-full shrink-0"
-                            style={{ backgroundColor: color.hex }}
-                          />
-                          <span className="text-[11px] font-medium whitespace-nowrap">{abbr}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Button variant="outline" onClick={previousPeriod} className="h-11 w-11 p-0 rounded-full shadow-sm active:scale-95">
-                      <ChevronLeft className="h-6 w-6" />
-                    </Button>
-                    <Button variant="outline" onClick={goToToday} className="h-11 px-4 rounded-full shadow-sm active:scale-95">
-                      Heute
-                    </Button>
-                    <Button variant="outline" onClick={nextPeriod} className="h-11 w-11 p-0 rounded-full shadow-sm active:scale-95">
-                      <ChevronRight className="h-6 w-6" />
-                    </Button>
-                  </div>
-                </div>
+                {viewType !== 'list' && (
+                  <>
+                    <h2 className="text-lg md:text-xl font-semibold mb-3">{calendarTitle}</h2>
+                    <div className="mb-4 flex items-center gap-2">
+                      {/* Haus-Farb-Legende */}
+                      <div className="flex gap-1.5 overflow-x-auto flex-1 min-w-0 [&::-webkit-scrollbar]:hidden [scrollbar-width:none]">
+                        {houses.map((house) => {
+                          const color = getHouseColor(house.id);
+                          const abbr = getHouseAbbreviation(house.name);
+                          return (
+                            <div
+                              key={house.id}
+                              title={house.name}
+                              className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/40 shrink-0"
+                            >
+                              <span
+                                className="w-2.5 h-2.5 rounded-full shrink-0"
+                                style={{ backgroundColor: color.hex }}
+                              />
+                              <span className="text-[11px] font-medium whitespace-nowrap">{abbr}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Button variant="outline" onClick={previousPeriod} className="h-11 w-11 p-0 rounded-full shadow-sm active:scale-95">
+                          <ChevronLeft className="h-6 w-6" />
+                        </Button>
+                        <Button variant="outline" onClick={goToToday} className="h-11 px-4 rounded-full shadow-sm active:scale-95">
+                          Heute
+                        </Button>
+                        <Button variant="outline" onClick={nextPeriod} className="h-11 w-11 p-0 rounded-full shadow-sm active:scale-95">
+                          <ChevronRight className="h-6 w-6" />
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
 
 
                 {/* Gantt Chart View */}
