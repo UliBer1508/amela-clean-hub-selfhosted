@@ -623,7 +623,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                         "w-9 h-9 rounded-full flex items-center justify-center shrink-0",
                                         isCleaning
                                           ? "bg-primary/15 text-primary"
-                                          : "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                                          : "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
                                       )}
                                     >
                                       <Icon className="w-4 h-4" />
