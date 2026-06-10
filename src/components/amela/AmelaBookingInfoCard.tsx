@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Home, MapPin, User, Users, CalendarDays } from 'lucide-react';
+import { Home, MapPin, User, Users, CalendarDays, AlertTriangle } from 'lucide-react';
 import { getGuestName } from '@/lib/guestHelpers';
 import { formatDateTime } from '@/utils/date';
 import LaundryStatusRow from './LaundryStatusRow';
@@ -33,7 +33,7 @@ const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking, ac
             </div>
           </div>
           {isCheckedIn && (
-            <Badge variant="destructive" className="text-[10px] shrink-0">⚠️ Eingecheckt</Badge>
+            <Badge variant="destructive" className="text-[10px] shrink-0 gap-1"><AlertTriangle className="w-3 h-3" /> Eingecheckt</Badge>
           )}
         </div>
 
