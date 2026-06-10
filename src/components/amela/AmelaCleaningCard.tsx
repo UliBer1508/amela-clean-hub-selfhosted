@@ -29,6 +29,14 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: 'Storniert',
 };
 
+const STATUS_BADGE_CLASS: Record<string, string> = {
+  scheduled: 'bg-status-scheduled/15 text-status-scheduled border-status-scheduled/30',
+  in_progress: 'bg-status-progress/15 text-status-progress border-status-progress/30',
+  completed: 'bg-status-completed/15 text-status-completed border-status-completed/30',
+  delayed: 'bg-status-delayed/15 text-status-delayed border-status-delayed/30',
+  cancelled: 'bg-status-cancelled/15 text-status-cancelled border-status-cancelled/30',
+};
+
 const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
   task,
   onStatusUpdate,
@@ -79,6 +87,12 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <Badge
+              variant="outline"
+              className={cn('text-[10px]', STATUS_BADGE_CLASS[task.status])}
+            >
+              {STATUS_LABELS[task.status] ?? task.status}
+            </Badge>
             {paymentBadge && (
               <Badge variant={paymentBadge.variant} className={cn('text-[10px] gap-1', paymentBadge.className)}>
                 <paymentBadge.Icon className="w-3 h-3" />
