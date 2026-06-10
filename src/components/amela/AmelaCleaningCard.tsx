@@ -29,6 +29,14 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: 'Storniert',
 };
 
+const STATUS_BADGE_CLASS: Record<string, string> = {
+  scheduled: 'bg-status-scheduled/15 text-status-scheduled border-status-scheduled/30',
+  in_progress: 'bg-status-progress/15 text-status-progress border-status-progress/30',
+  completed: 'bg-status-completed/15 text-status-completed border-status-completed/30',
+  delayed: 'bg-status-delayed/15 text-status-delayed border-status-delayed/30',
+  cancelled: 'bg-status-cancelled/15 text-status-cancelled border-status-cancelled/30',
+};
+
 const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
   task,
   onStatusUpdate,
