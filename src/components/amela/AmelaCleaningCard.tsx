@@ -89,9 +89,8 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
           <div className="flex items-center gap-2 shrink-0">
             <Badge
               variant="outline"
-              className={cn('text-[10px] gap-1', STATUS_BADGE_CLASS[task.status])}
+              className={cn('text-[10px]', STATUS_BADGE_CLASS[task.status])}
             >
-              <span className={cn('w-1.5 h-1.5 rounded-full', `bg-status-${task.status === 'in_progress' ? 'progress' : task.status}`)} />
               {STATUS_LABELS[task.status] ?? task.status}
             </Badge>
             {paymentBadge && (
