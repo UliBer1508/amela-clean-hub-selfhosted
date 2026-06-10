@@ -503,7 +503,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
           <Bell className="w-6 h-6" strokeWidth={2.25} />
           <span className="font-medium text-sm">Benachrichtigung</span>
           {newTaskCount > 0 && (
-            <span className="absolute top-1 right-1/4 bg-red-500 text-white text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center animate-pulse">
+            <span className="absolute top-1 right-1/4 bg-destructive text-destructive-foreground text-[10px] rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center animate-pulse">
               {newTaskCount}
             </span>
           )}
