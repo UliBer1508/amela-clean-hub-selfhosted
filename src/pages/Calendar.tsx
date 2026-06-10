@@ -245,17 +245,6 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     return monthEvents.filter(event => isSameDay(event.date, selectedDate));
   }, [monthEvents, selectedDate]);
 
-  const getEventColor = (type: string) => {
-    switch (type) {
-      case 'checkin': return 'bg-green-500';
-      case 'checkout': return 'bg-red-500';
-      case 'occupied': return 'bg-orange-500';
-      case 'cleaning': return 'bg-blue-500';
-      case 'laundry-pickup': return 'bg-violet-400';
-      case 'laundry-delivery': return 'bg-violet-600';
-      default: return 'bg-gray-500';
-    }
-  };
 
   const getDayEvents = (day: Date) => {
     return monthEvents.filter(event => isSameDay(event.date, day));
