@@ -46,7 +46,7 @@ const AmelaCleaningCard: React.FC<AmelaCleaningCardProps> = ({
       : paymentStatus === 'pending'
       ? { variant: 'secondary' as const, label: 'Ausstehend', Icon: Clock, className: '' }
       : paymentStatus === 'unpaid'
-      ? { variant: 'outline' as const, label: 'Unbezahlt', Icon: XCircle, className: 'bg-green-100 text-green-800 border-green-300 dark:bg-green-950/40 dark:text-green-300 dark:border-green-800' }
+      ? { variant: 'outline' as const, label: 'Unbezahlt', Icon: XCircle, className: 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800' }
       : null;
 
   return (
