@@ -903,11 +903,11 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                 : 'Belegt';
 
               const statusMap: Record<string, { label: string; dot: string }> = {
-                scheduled: { label: 'Geplant', dot: 'bg-blue-500' },
-                in_progress: { label: 'In Arbeit', dot: 'bg-amber-500' },
-                completed: { label: 'Erledigt', dot: 'bg-emerald-500' },
-                delivered: { label: 'Geliefert', dot: 'bg-emerald-500' },
-                cancelled: { label: 'Abgebrochen', dot: 'bg-rose-500' },
+                scheduled: { label: 'Geplant', dot: 'bg-status-scheduled' },
+                in_progress: { label: 'In Arbeit', dot: 'bg-status-progress' },
+                completed: { label: 'Erledigt', dot: 'bg-status-completed' },
+                delivered: { label: 'Geliefert', dot: 'bg-status-completed' },
+                cancelled: { label: 'Abgebrochen', dot: 'bg-status-cancelled' },
               };
               const statusInfo = event.status ? statusMap[event.status] : null;
 
