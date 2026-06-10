@@ -1,9 +1,10 @@
-## Datum/Uhrzeit unter "Reinigungsauftrag" entfernen
+## Status-Badge im Karten-Header entfernen
 
-In `src/components/amela/AmelaCleaningCard.tsx` (Header der Karte, ca. Z. 82–86) wird unter dem Titel "Reinigungsauftrag" eine Zeile mit `formatDateTime(...)` und Status-Label angezeigt. Datum/Uhrzeit sind redundant, weil die "Reinigungstermin"-Kachel darunter dieselbe Information zeigt.
+Der farbige "Geplant"-Badge rechts neben dem Titel "Reinigungsauftrag" zeigt dieselbe Information wie die "STATUS"-Kachel darunter. Doppelung entfernen.
 
-### Änderung
+### Änderung in `src/components/amela/AmelaCleaningCard.tsx`
 
-- Die komplette Zeile `<p className="text-xs text-muted-foreground truncate">{formatDateTime(...)} · {STATUS_LABELS...}</p>` entfernen.
-- Status wird bereits durch den neuen farbigen Status-Badge rechts angezeigt — keine Doppelung nötig.
-- Keine weitere Logik, kein Import, kein anderes Element betroffen.
+- Den `<Badge>` mit `STATUS_BADGE_CLASS[task.status]` (im Header rechts) entfernen.
+- `STATUS_BADGE_CLASS` und ggf. `STATUS_LABELS` bleiben, werden aber im Header nicht mehr verwendet.
+- Der "Unbezahlt"-Payment-Badge und der Chevron bleiben unverändert.
+- Keine Logik geändert.
