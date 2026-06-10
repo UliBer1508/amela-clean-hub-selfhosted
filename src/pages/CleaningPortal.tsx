@@ -316,10 +316,10 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
               className={`my-2 hover-scale relative min-h-[44px] ${hasUnreadNotifications ? 'animate-bell-ring' : ''}`}
               onClick={handleNotificationClick}
             >
-              <Bell className={`w-4 h-4 mr-2 ${hasUnreadNotifications ? 'text-orange-500' : ''}`} />
+              <Bell className={`w-4 h-4 mr-2 ${hasUnreadNotifications ? 'text-status-delayed' : ''}`} />
               Benachrichtigungen
               {newTaskCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
                   {newTaskCount}
                 </span>
               )}
