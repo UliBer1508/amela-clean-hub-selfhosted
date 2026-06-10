@@ -77,8 +77,6 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const [cleaningDetailOpen, setCleaningDetailOpen] = useState(false);
   const [selectedCleaningTaskId, setSelectedCleaningTaskId] = useState<string | null>(null);
   const [viewType, setViewType] = useState<ViewType>('month');
-  const [selectedHouse, setSelectedHouse] = useState<string>('all');
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [showReminderPopup, setShowReminderPopup] = useState(false);
 
   const { allBookings, loading, forceRefresh } = useAllBookings();
@@ -245,17 +243,6 @@ const Calendar = ({ chatProps }: CalendarProps) => {
     return monthEvents.filter(event => isSameDay(event.date, selectedDate));
   }, [monthEvents, selectedDate]);
 
-  const getEventColor = (type: string) => {
-    switch (type) {
-      case 'checkin': return 'bg-green-500';
-      case 'checkout': return 'bg-red-500';
-      case 'occupied': return 'bg-orange-500';
-      case 'cleaning': return 'bg-blue-500';
-      case 'laundry-pickup': return 'bg-violet-400';
-      case 'laundry-delivery': return 'bg-violet-600';
-      default: return 'bg-gray-500';
-    }
-  };
 
   const getDayEvents = (day: Date) => {
     return monthEvents.filter(event => isSameDay(event.date, day));
@@ -756,7 +743,11 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                   title={`${event.title} - ${event.house}`}
                                 >
                                   <Icon className="w-3 h-3 shrink-0" />
-                                  <span className="truncate">{abbr}</span>
+                                  <span className="truncate">
+                                    {event.type === 'cleaning' && 'Rein. '}
+                                    {(event.type === 'laundry-delivery' || event.type === 'laundry-pickup') && 'Wä. '}
+                                    {abbr}
+                                  </span>
                                 </div>
                               );
                             })}
@@ -912,11 +903,11 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                 : 'Belegt';
 
               const statusMap: Record<string, { label: string; dot: string }> = {
-                scheduled: { label: 'Geplant', dot: 'bg-blue-500' },
-                in_progress: { label: 'In Arbeit', dot: 'bg-amber-500' },
-                completed: { label: 'Erledigt', dot: 'bg-emerald-500' },
-                delivered: { label: 'Geliefert', dot: 'bg-emerald-500' },
-                cancelled: { label: 'Abgebrochen', dot: 'bg-rose-500' },
+                scheduled: { label: 'Geplant', dot: 'bg-status-scheduled' },
+                in_progress: { label: 'In Arbeit', dot: 'bg-status-progress' },
+                completed: { label: 'Erledigt', dot: 'bg-status-completed' },
+                delivered: { label: 'Geliefert', dot: 'bg-status-completed' },
+                cancelled: { label: 'Abgebrochen', dot: 'bg-status-cancelled' },
               };
               const statusInfo = event.status ? statusMap[event.status] : null;
 
