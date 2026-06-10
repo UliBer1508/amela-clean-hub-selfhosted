@@ -1161,12 +1161,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                   </div>
                 )}
 
-                <div className="flex flex-col gap-2 pt-2">
-                  <Link to="/cleaning-portal" className="w-full">
-                    <Button className="w-full min-h-[44px]">
-                      Im Reinigungsportal öffnen
-                    </Button>
-                  </Link>
+                <div className="pt-2">
                   <SheetClose asChild>
                     <Button variant="outline" className="w-full min-h-[44px]">
                       Schliessen
