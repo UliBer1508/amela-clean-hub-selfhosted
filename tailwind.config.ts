@@ -59,6 +59,13 @@ export default {
         },
         "service-card": "hsl(var(--service-card))",
         "service-card-hover": "hsl(var(--service-card-hover))",
+        "surface-tint": "hsl(var(--surface-tint))",
+        "status-scheduled": "hsl(var(--status-scheduled))",
+        "status-progress": "hsl(var(--status-progress))",
+        "status-completed": "hsl(var(--status-completed))",
+        "status-delayed": "hsl(var(--status-delayed))",
+        "status-cancelled": "hsl(var(--status-cancelled))",
+        "status-unpaid": "hsl(var(--status-unpaid))",
       },
       backgroundImage: {
         "hero-gradient": "var(--hero-gradient)",
