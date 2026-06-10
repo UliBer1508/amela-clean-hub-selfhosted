@@ -537,6 +537,25 @@ const Calendar = ({ chatProps }: CalendarProps) => {
 
                 {/* Gantt Chart View */}
                 {viewType === 'gantt' ? (
+                  <>
+                    {/* Haus-Legende: Farbe + voller Name */}
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      {houses.map((house) => {
+                        const color = getHouseColor(house.id);
+                        return (
+                          <div
+                            key={house.id}
+                            className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/40"
+                          >
+                            <span
+                              className="w-2.5 h-2.5 rounded-full shrink-0"
+                              style={{ backgroundColor: color.hex }}
+                            />
+                            <span className="text-xs font-medium">{house.name}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   <ScrollArea className="w-full">
                     <div className="w-full">
                       {/* Header mit Tagen */}
