@@ -622,7 +622,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
                                       className={cn(
                                         "w-9 h-9 rounded-full flex items-center justify-center shrink-0",
                                         isCleaning
-                                          ? "bg-primary/15 text-primary"
+                                          ? "bg-surface-tint text-primary"
                                           : "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300"
                                       )}
                                     >
