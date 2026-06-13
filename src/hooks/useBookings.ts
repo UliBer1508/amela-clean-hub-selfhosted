@@ -55,7 +55,9 @@ export const useBookings = () => {
             status,
             delivery_date,
             delivery_time,
-            total_items
+            total_items,
+            status_changed_at,
+            status_changed_by
           )
         `)
         .eq('service_tasks.service_type', 'cleaning')
