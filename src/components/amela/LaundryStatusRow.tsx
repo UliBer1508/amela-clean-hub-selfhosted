@@ -30,8 +30,13 @@ const getDisplayState = (orders?: LinenOrder[] | null): DisplayState => {
 
   const delivered = active.find(o => o.status === 'delivered');
   if (delivered) {
-    const d = formatDate(delivered.delivery_date);
-    return { variant: 'delivered', text: d ? `Geliefert · ${d}` : 'Geliefert' };
+    const iso = delivered.status_changed_at || delivered.delivery_date;
+    const d = formatDate(iso);
+    const by = delivered.status_changed_by?.trim();
+    const parts = ['Geliefert'];
+    if (d) parts.push(d);
+    if (by) parts.push(by);
+    return { variant: 'delivered', text: parts.join(' · ') };
   }
 
   const upcoming = active
