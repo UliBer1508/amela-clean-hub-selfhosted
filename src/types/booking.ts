@@ -40,6 +40,8 @@ export interface LinenOrder {
   delivery_date: string | null;
   delivery_time: string | null;
   total_items: number;
+  status_changed_at?: string | null;
+  status_changed_by?: string | null;
 }
 
 export interface Booking {
