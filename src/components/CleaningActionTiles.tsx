@@ -116,7 +116,7 @@ const CleaningActionTiles: React.FC<CleaningActionTilesProps> = ({
 
   const handleDateSave = () => {
     if (selectedDate) {
-      onDateTimeUpdate(taskId, selectedDate.toISOString().split('T')[0], selectedTime);
+      onDateTimeUpdate(taskId, format(selectedDate, 'yyyy-MM-dd'), selectedTime);
       setDateOpen(false);
     }
   };
