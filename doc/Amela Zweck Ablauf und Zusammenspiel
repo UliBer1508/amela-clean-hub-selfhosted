@@ -1,0 +1,152 @@
+# Amela Reinigungsportal — Zweck, Ablauf & Zusammenspiel
+
+> Stand: 26.06.2026
+> Repo: `amela-clean-hub-selfhosted` · gehostet auf `amela.steinbockchalets-charge.com`
+> Diese Datei beschreibt, **wofür** das Portal da ist und **wie** es im Alltag
+> genutzt wird — nicht den technischen Aufbau, sondern den Arbeitsablauf.
+> Sie ist die maßgebliche Beschreibung des Portal-Zwecks.
+
+---
+
+## 1. Wofür ist dieses Portal?
+
+Das Amela-Portal ist die App für **Amela, die Reinigungskraft**. Damit sieht sie:
+
+- **wann welche Buchung ansteht** (Gast, Anzahl Gäste, Check-in / Check-out, Haus)
+- **wann sie reinigen muss** (der Reinigungstermin pro Buchung)
+- **wann die Wäsche geliefert wird** (aus dem Teuni-/Wäsche-System)
+
+Es ist ein reines **Arbeitswerkzeug für eine Person** — keine Verwaltung, keine
+Buchungserstellung. Amela meldet sich nicht selbst an; das Portal loggt sich
+automatisch im Hintergrund ein (Portal-Konto `amela@portal.local`).
+
+---
+
+## 2. Wie entsteht eine Reinigung? (wichtig)
+
+**Reinigungen werden NICHT im Amela-Portal angelegt.** Sie entstehen in der
+**Hausverwaltung**:
+
+- Die Hausverwaltung legt **für jede Buchung automatisch eine Reinigung an**.
+- Der Reinigungstermin ist **standardmäßig der Check-in-Tag** der Buchung.
+
+> **Hintergrund Saison:** In der Hauptsaison gibt es in **beiden Häusern**
+> (Chalet Wald, Venedigersiedlung) **Gästewechsel am Samstag**. Deshalb fällt die
+> Reinigung praktisch immer auf den Check-in-Tag — gereinigt wird für den
+> ankommenden Gast.
+
+### Folge für die Bedienung im Portal
+- Amela **erstellt** keine Reinigungen und legt keine Standalone-Reinigungen an.
+  (Falls im Code ein Dialog dafür existiert, ist er für den Amela-Alltag **nicht**
+  der vorgesehene Weg — Standalone-Reinigungen kommen aus der Hausverwaltung.)
+- Amela **passt** bestehende Reinigungstermine **an**, wenn nötig (siehe 3).
+
+---
+
+## 3. Wann passt Amela den Reinigungstag an?
+
+Wenn Buchungen **nicht** direkt aufeinanderfolgen (kein Samstag-Wechsel, sondern
+eine Lücke zwischen Check-out und nächstem Check-in), muss nicht zwingend am
+Check-in-Tag gereinigt werden. Dann kann **Amela den Reinigungstag im Portal
+verschieben** — z. B. einen Tag früher, wenn es besser in ihren Ablauf passt.
+
+Technisch: In der Reinigungskarte tippt sie auf den Reinigungstermin, wählt ein
+neues Datum/Uhrzeit und speichert. Das aktualisiert `scheduled_date` der Reinigung
+in der gemeinsamen Datenbank.
+
+> **Wichtig (Bugfix 26.06.2026):** Das Speichern des Datums verschob früher den Tag
+> um eins zurück (UTC-Umrechnung über `toISOString`). Das ist behoben — überall wird
+> jetzt `format(date, 'yyyy-MM-dd')` verwendet, sodass der gewählte Tag erhalten
+> bleibt.
+
+---
+
+## 4. Das Zusammenspiel der drei Systeme
+
+Der Reinigungstag ist der **Dreh- und Angelpunkt** zwischen den Portalen:
+
+```
+        Hausverwaltung
+   (legt Buchung + Reinigung an,
+    Reinigung am Check-in-Tag)
+                │
+                ▼
+   ┌─────────────────────────┐        ┌─────────────────────────┐
+   │   AMELA-Portal          │        │   TEUNI-Portal (Wäsche) │
+   │                         │        │                         │
+   │ • sieht Buchung         │        │ • sieht den             │
+   │ • sieht Reinigungstag   │───────▶│   Reinigungstag         │
+   │ • passt ihn ggf. an     │        │   → weiß, wann Wäsche   │
+   │                         │        │     gebracht werden muss│
+   │ • sieht Wäsche-         │◀───────│ • trägt Lieferdatum ein │
+   │   Lieferdatum           │        │                         │
+   └─────────────────────────┘        └─────────────────────────┘
+```
+
+Konkret:
+
+- **Amela → Teuni:** Der von Amela festgelegte/angepasste **Reinigungstag** wird im
+  Teuni-Portal angezeigt. So weiß Teuni, **wann die Wäsche da sein muss**
+  (passend zur Reinigung).
+- **Teuni → Amela:** Das **Lieferdatum der Wäsche** (aus `linen_orders.delivery_date`)
+  wird im Amela-Portal angezeigt. So sieht Amela, **wann die Wäsche kommt** — sie
+  kann nicht reinigen, bevor die frische Wäsche da ist.
+
+Beide Portale greifen auf **dieselbe Datenbank** zu (`usblrulkcgucxtkhugck`).
+Es gibt keine separate Schnittstelle — die Abstimmung läuft über die gemeinsamen
+Tabellen `service_tasks` (Reinigung) und `linen_orders` (Wäsche), beide an die
+Buchung gekoppelt.
+
+---
+
+## 5. Was Amela im Portal sieht (Kartenaufbau)
+
+Pro Buchung zeigt das Portal:
+
+1. **Buchungskarte** — Gast, Anzahl Gäste, Check-in, Check-out, Haus, und der
+   **Wäsche-Lieferstatus** (wann kommt die Wäsche).
+2. **Reinigungskarte** — der Reinigungstermin (anpassbar), Status (geplant / in
+   Arbeit / abgeschlossen), Notizen, Checkliste.
+
+---
+
+## 6. Was Amela NICHT tut (Abgrenzung)
+
+- Keine Buchungen anlegen oder ändern
+- Keine Reinigungen erstellen (kommen aus der Hausverwaltung)
+- Keine Wäschebestellungen (macht Teuni / die Hausverwaltung)
+- Nur: **bestehende Reinigungstermine einsehen, anpassen, Status setzen**
+
+---
+
+## 7. Im Portal vorhanden, aber im Alltag NICHT genutzt
+
+Wichtig für Wartung und für künftige Änderungen: Es gibt Funktionen, die im Code
+**vorhanden und teils erreichbar** sind, aber im heutigen Arbeitsablauf **nicht
+verwendet** werden. Sie sind kein „toter Code", funktionieren also — werden aber
+schlicht nicht gebraucht.
+
+| Funktion | Status | Warum ungenutzt |
+|---|---|---|
+| **Putzkräfte zuweisen / verwalten** | aktiv verdrahtet (Route `/putzkraefte`, Staff-Filter, `updateTaskStaff`) | Amela stellt **keine** Putzkräfte ein — sie ist selbst die Reinigungskraft |
+| **Standalone-Reinigung anlegen** | Dialog im Code vorhanden | Standalone-Reinigungen werden **nur in der Hausverwaltung** angelegt, nicht hier |
+
+> **Für Claude / Entwickler:** Bei Analysen NICHT annehmen, dass diese Funktionen
+> Teil des Amela-Alltags sind, nur weil der Code sie enthält. Die Existenz einer
+> Komponente sagt nichts über ihre tatsächliche Nutzung. Im Zweifel nachfragen.
+
+> **Mögliches Aufräumen (später, optional):** Ungenutzte Funktionen könnten entfernt
+> werden — das macht das Portal für Amela übersichtlicher und den Code wartbarer.
+> Kein akuter Handlungsbedarf; nur eine Option, wenn ohnehin am Portal gearbeitet wird.
+
+---
+
+## 8. Was Amela tatsächlich tut (Zusammenfassung)
+
+Die real genutzten Funktionen im Überblick:
+
+- Buchungen mit Reinigungsterminen **ansehen**
+- **Reinigungstag anpassen**, wenn Buchungen auseinanderliegen
+- **Reinigungsstatus** setzen (geplant → in Arbeit → abgeschlossen)
+- sehen, **wann die Wäsche geliefert** wird (aus dem Teuni-/Wäsche-System)
+- Notizen / Checkliste zur Reinigung
