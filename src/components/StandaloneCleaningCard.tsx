@@ -61,7 +61,7 @@ const StandaloneCleaningCard: React.FC<StandaloneCleaningCardProps> = ({
 
   const handleDateTimeUpdateInternal = () => {
     if (selectedDate) {
-      const dateStr = selectedDate.toISOString().split('T')[0];
+      const dateStr = format(selectedDate, 'yyyy-MM-dd');
       onDateTimeUpdate(cleaning.id, dateStr, selectedTime);
       setIsEditingDateTime(false);
     }

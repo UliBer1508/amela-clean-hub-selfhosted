@@ -47,7 +47,7 @@ const AddStandaloneCleaningDialog: React.FC<AddStandaloneCleaningDialogProps> = 
 
     setLoading(true);
     try {
-      const dateStr = selectedDate.toISOString().split('T')[0];
+      const dateStr = format(selectedDate, 'yyyy-MM-dd');
       
       const { error } = await supabase
         .from('service_tasks')

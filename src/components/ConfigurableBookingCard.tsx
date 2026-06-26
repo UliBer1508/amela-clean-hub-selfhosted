@@ -81,7 +81,7 @@ const ConfigurableBookingCard: React.FC<ConfigurableBookingCardProps> = ({
 
   const handleDateTimeUpdateInternal = () => {
     if (editingTask && selectedDate) {
-      const dateStr = selectedDate.toISOString().split('T')[0];
+      const dateStr = format(selectedDate, 'yyyy-MM-dd');
       onDateTimeUpdate(editingTask.id, dateStr, selectedTime);
       setEditingTask(null);
       setIsDateDialogOpen(false);
