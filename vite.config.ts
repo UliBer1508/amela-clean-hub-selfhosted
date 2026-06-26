@@ -90,8 +90,8 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       manifest: {
-        name: 'Amela Reinigungsportal',
-        short_name: 'Amela Clean',
+        name: 'Steinbockchalets-Reinigungsportal',
+        short_name: 'Reinigung',
         description: 'Professioneller Reinigungsservice für Ferienhäuser - Buchungen, Aufgaben und Kalender verwalten',
         theme_color: '#1e3a8a',
         background_color: '#ffffff',
