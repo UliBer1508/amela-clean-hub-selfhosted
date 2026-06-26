@@ -5,6 +5,7 @@ import { APP_CONFIG } from '@/constants/app';
 import { isWithinTimeRange } from '@/utils/date';
 import { sanitizeSearchTerm } from '@/utils/validation';
 import { getGuestName } from '@/lib/guestHelpers';
+import { format } from 'date-fns';
 
 export const useBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -225,7 +226,7 @@ export const useBookings = () => {
       const { error } = await supabase
         .from('service_tasks')
         .update({
-          scheduled_date: newDate.toISOString().split('T')[0],
+          scheduled_date: format(newDate, 'yyyy-MM-dd'),
           scheduled_time: newTime
         })
         .eq('id', taskId);
