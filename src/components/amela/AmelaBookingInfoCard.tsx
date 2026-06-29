@@ -22,7 +22,7 @@ const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking, ac
       <CardContent className="p-3 space-y-2.5">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-          <div className="w-9 h-9 rounded-md bg-primary text-primary-foreground flex items-center justify-center shrink-0 p-0.5">
+          <div className="w-10 h-10 rounded-md bg-primary text-primary-foreground flex items-center justify-center shrink-0 p-0.5">
               <img src="/steinbock-logo.png" alt="Steinbock Chalets" className="w-full h-full object-contain" />
             </div>
             <div className="min-w-0">
