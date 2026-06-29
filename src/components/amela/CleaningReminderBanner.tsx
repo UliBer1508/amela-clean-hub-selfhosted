@@ -75,20 +75,19 @@ const CleaningReminderBanner: React.FC<Props> = ({ entries }) => {
 
   useEffect(() => {
     if (!shouldShow || !next) return;
-    const todayKey = new Date().toISOString().slice(0, 10);
-    const dismissed = sessionStorage.getItem(DISMISS_KEY);
-    if (!force && dismissed === `${todayKey}:${next.checkInDate}`) return;
+    const bookingKey = `${next.checkInDate}:${next.houseName ?? ''}`;
+    const dismissed = localStorage.getItem(DISMISS_KEY);
+    if (!force && dismissed === bookingKey) return;
     setOpen(true);
   }, [shouldShow, next?.checkInDate, force]);
 
-  const handleClose = () => {
+ const handleClose = () => {
     setOpen(false);
     if (next && !force) {
-      const todayKey = new Date().toISOString().slice(0, 10);
-      sessionStorage.setItem(DISMISS_KEY, `${todayKey}:${next.checkInDate}`);
+      const bookingKey = `${next.checkInDate}:${next.houseName ?? ''}`;
+      localStorage.setItem(DISMISS_KEY, bookingKey);
     }
   };
-
   if (!shouldShow || !next || !target || daysUntil === null) return null;
 
   const houseName = next.houseName ?? 'Unbekannt';
