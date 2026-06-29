@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Home, MapPin, User, Users, CalendarDays, AlertTriangle } from 'lucide-react';
+import { MapPin, User, Users, CalendarDays, AlertTriangle } from 'lucide-react';
 import { getGuestName } from '@/lib/guestHelpers';
 import { formatDateTime } from '@/utils/date';
 import LaundryStatusRow from './LaundryStatusRow';
@@ -22,8 +22,8 @@ const AmelaBookingInfoCard: React.FC<AmelaBookingInfoCardProps> = ({ booking, ac
       <CardContent className="p-3 space-y-2.5">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-md bg-primary text-primary-foreground flex items-center justify-center shrink-0">
-              <Home className="w-4 h-4" />
+          <div className="w-9 h-9 rounded-md bg-primary text-primary-foreground flex items-center justify-center shrink-0 p-0.5">
+              <img src="/steinbock-logo.png" alt="Steinbock Chalets" className="w-full h-full object-contain" />
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-foreground text-sm truncate">
