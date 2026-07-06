@@ -7,7 +7,7 @@ import { AMELA_PROVIDER_ID } from '@/constants/app';
 export interface PortalMessage {
   id: string;
   provider_id: string;
-  sender_type: 'admin' | 'provider';
+  sender_type: 'admin' | 'provider' | 'assistant';
   message: string;
   is_read: boolean;
   related_task_id?: string | null;
@@ -42,7 +42,7 @@ export const usePortalMessages = () => {
         .from('provider_messages')
         .select('*', { count: 'exact', head: true })
         .eq('provider_id', AMELA_PROVIDER_ID)
-        .eq('sender_type', 'admin')
+        .neq('sender_type', 'provider')
         .eq('is_read', false);
 
       if (error) throw error;
@@ -86,7 +86,7 @@ export const usePortalMessages = () => {
         .from('provider_messages')
         .update({ is_read: true })
         .eq('provider_id', AMELA_PROVIDER_ID)
-        .eq('sender_type', 'admin')
+        .neq('sender_type', 'provider')
         .eq('is_read', false);
 
       if (error) throw error;
