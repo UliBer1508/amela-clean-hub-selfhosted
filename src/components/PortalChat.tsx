@@ -118,13 +118,22 @@ const PortalChat = ({ isOpen, onClose }: PortalChatProps) => {
                       className={`max-w-[80%] rounded-lg px-3 py-2 ${
                         msg.sender_type === 'provider'
                           ? 'bg-primary text-primary-foreground'
+                          : msg.sender_type === 'assistant'
+                          ? 'bg-purple-100 border border-purple-300'
                           : 'bg-muted'
                       }`}
                     >
+                      {msg.sender_type === 'assistant' && (
+                        <p className="text-xs font-semibold mb-1 text-purple-700">
+                          Max (Assistent)
+                        </p>
+                      )}
                       <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
                       <p className={`text-xs mt-1 ${
                         msg.sender_type === 'provider' 
                           ? 'text-primary-foreground/70' 
+                          : msg.sender_type === 'assistant'
+                          ? 'text-purple-600'
                           : 'text-muted-foreground'
                       }`}>
                         {format(new Date(msg.created_at), 'dd.MM. HH:mm', { locale: de })}
