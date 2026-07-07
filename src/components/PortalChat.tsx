@@ -136,7 +136,9 @@ const PortalChat = ({ isOpen, onClose }: PortalChatProps) => {
                           ? 'text-purple-600'
                           : 'text-muted-foreground'
                       }`}>
-                        {format(new Date(msg.created_at), 'dd.MM. HH:mm', { locale: de })}
+                        {msg.sender_type === 'assistant'
+                          ? `Gesendet: ${format(new Date(msg.created_at), 'dd.MM.yyyy, HH:mm', { locale: de })}`
+                          : format(new Date(msg.created_at), 'dd.MM. HH:mm', { locale: de })}
                       </p>
                     </div>
                   </div>
