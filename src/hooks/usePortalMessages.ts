@@ -53,12 +53,21 @@ export const usePortalMessages = () => {
   // Nachricht senden (als Provider)
   const sendMessageMutation = useMutation({
     mutationFn: async (message: string) => {
+      // Kette nicht reißen lassen: die Antwort bezieht sich auf die letzte
+      // Terminfrage von Max (assistant). Deren related_task_id (Reinigungs-ID)
+      // wird mitgeschickt, damit Max die Antwort eindeutig zuordnen kann.
+      const lastAssistantMsg = [...messages]
+        .reverse()
+        .find((m) => m.sender_type === 'assistant' && m.related_task_id);
+      const relatedTaskId = lastAssistantMsg?.related_task_id ?? null;
+
       const { data, error } = await supabase
         .from('provider_messages')
         .insert({
           provider_id: AMELA_PROVIDER_ID,
           sender_type: 'provider',
           message,
+          related_task_id: relatedTaskId,
         })
         .select()
         .single();
