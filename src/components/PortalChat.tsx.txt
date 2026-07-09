@@ -1,0 +1,235 @@
+import { useState, useRef, useEffect } from 'react';
+import { Send, X, MessageCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { usePortalMessages } from '@/hooks/usePortalMessages';
+import { format } from 'date-fns';
+import { de } from 'date-fns/locale';
+import chatIcon from '@/assets/chat-icon.png';
+
+interface ChatButtonProps {
+  onClick: () => void;
+  unreadCount: number;
+}
+
+export const ChatButton = ({ onClick, unreadCount }: ChatButtonProps) => (
+  <button
+    onClick={onClick}
+    className="relative w-16 h-16 md:w-18 md:h-18 flex-shrink-0 bg-primary rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 flex items-center justify-center"
+  >
+    <MessageCircle className="w-8 h-8 md:w-9 md:h-9 text-primary-foreground" />
+    {unreadCount > 0 && (
+      <Badge
+        variant="destructive"
+        className="absolute -top-1 -right-1 h-6 w-6 flex items-center justify-center p-0 text-sm font-bold"
+      >
+        {unreadCount}
+      </Badge>
+    )}
+  </button>
+);
+
+interface PortalChatProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const PortalChat = ({ isOpen, onClose }: PortalChatProps) => {
+  const [input, setInput] = useState('');
+  const [newDate, setNewDate] = useState('');
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { messages, isLoading, unreadCount, sendMessage, markAsRead } = usePortalMessages();
+
+  // Auto-scroll bei neuen Nachrichten
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // Nachrichten als gelesen markieren wenn Chat geöffnet wird
+  useEffect(() => {
+    if (isOpen && unreadCount > 0) {
+      markAsRead();
+    }
+  }, [isOpen, unreadCount, markAsRead]);
+
+  const handleSend = () => {
+    const trimmedInput = input.trim();
+    if (!trimmedInput) return;
+
+    sendMessage(trimmedInput);
+    setInput('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const handleFocus = () => {
+    // Scroll to bottom when keyboard appears
+    setTimeout(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    }, 300);
+  };
+
+  // Offene Terminfrage von Max? -> Schnellantworten "Ja" / "Neuer Termin" anzeigen.
+  // Erkennbar daran, dass die NEUESTE Nachricht von Max (assistant) kommt und
+  // sich auf eine Reinigung bezieht (related_task_id) — Amela hat also noch nicht
+  // geantwortet.
+  const lastMsg = messages.length > 0 ? messages[messages.length - 1] : null;
+  const showQuickReply = !!lastMsg && lastMsg.sender_type === 'assistant' && !!lastMsg.related_task_id;
+
+  const handleTerminOk = () => {
+    sendMessage('Ja, der Termin passt.');
+  };
+
+  const handleTerminChange = () => {
+    if (!newDate) return;
+    // newDate kommt als YYYY-MM-DD -> in festes Format TT.MM.JJJJ umwandeln.
+    const parts = newDate.split('-');
+    const formatted = parts.length === 3 ? `${parts[2]}.${parts[1]}.${parts[0]}` : newDate;
+    sendMessage(`Neuer Termin: ${formatted}`);
+    setNewDate('');
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 md:top-20 md:right-6 md:inset-auto md:w-96 h-[100dvh] md:h-[500px] bg-background border-0 md:border md:rounded-lg shadow-xl z-[100] flex flex-col">
+          {/* Header */}
+        <div className="flex items-center justify-between p-4 pt-[calc(1rem+env(safe-area-inset-top))] md:pt-4 border-b bg-primary text-primary-foreground md:rounded-t-lg">
+          <div className="flex items-center gap-2">
+            <img src={chatIcon} alt="Chat" className="h-5 w-5" />
+            <span className="font-semibold">Nachrichten</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="text-primary-foreground hover:bg-primary/80"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+          {/* Messages Area */}
+          <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+            {isLoading ? (
+              <div className="text-center text-muted-foreground">Laden...</div>
+            ) : messages.length === 0 ? (
+              <div className="text-center text-muted-foreground text-sm">
+                Noch keine Nachrichten. Schreibe eine Nachricht an den Admin!
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.sender_type === 'provider' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[80%] rounded-lg px-3 py-2 ${
+                        msg.sender_type === 'provider'
+                          ? 'bg-primary text-primary-foreground'
+                          : msg.sender_type === 'assistant'
+                          ? 'bg-purple-100 border border-purple-300'
+                          : 'bg-muted'
+                      }`}
+                    >
+                      {msg.sender_type === 'assistant' && (
+                        <p className="text-xs font-semibold mb-1 text-purple-700">
+                          Max (Assistent)
+                        </p>
+                      )}
+                      <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
+                      <p className={`text-xs mt-1 ${
+                        msg.sender_type === 'provider'
+                          ? 'text-primary-foreground/70'
+                          : msg.sender_type === 'assistant'
+                          ? 'text-purple-600'
+                          : 'text-muted-foreground'
+                      }`}>
+                        {msg.sender_type === 'assistant'
+                          ? `Gesendet: ${format(new Date(msg.created_at), 'dd.MM.yyyy, HH:mm', { locale: de })}`
+                          : format(new Date(msg.created_at), 'dd.MM. HH:mm', { locale: de })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+
+          {/* Schnellantwort auf Max' Terminfrage */}
+          {showQuickReply && (
+            <div className="px-4 pt-3 border-t bg-purple-50">
+              <p className="text-xs font-semibold text-purple-700 mb-2">
+                Antwort auf die Terminfrage von Max:
+              </p>
+              <div className="flex flex-col gap-2">
+                <Button
+                  onClick={handleTerminOk}
+                  size="sm"
+                  className="w-full"
+                >
+                  ✅ Ja, Termin passt
+                </Button>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="date"
+                    value={newDate}
+                    onChange={(e) => setNewDate(e.target.value)}
+                    className="flex-1 h-9 rounded-md border border-input bg-background px-2 text-sm"
+                  />
+                  <Button
+                    onClick={handleTerminChange}
+                    disabled={!newDate}
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0"
+                  >
+                    Neuer Termin
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Input Area */}
+          <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t">
+            <div className="flex gap-2">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onFocus={handleFocus}
+                placeholder="Nachricht eingeben..."
+                className="min-h-[44px] max-h-[100px] resize-none"
+                rows={1}
+              />
+              <Button
+                onClick={handleSend}
+                disabled={!input.trim()}
+                size="icon"
+                className="shrink-0 h-[44px] w-[44px]"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Enter zum Senden, Shift+Enter für neue Zeile
+            </p>
+          </div>
+        </div>
+  );
+};
+
+export default PortalChat;
