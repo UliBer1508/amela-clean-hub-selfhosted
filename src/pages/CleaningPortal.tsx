@@ -213,8 +213,30 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
   const handleNotesUpdate = useCallback(
     async (taskId: string, notes: string) => {
       try {
-        const { error } = await supabase.from('service_tasks').update({ notes }).eq('id', taskId);
+        // .select() ist zwingend: ohne das meldet Supabase auch dann error === null,
+        // wenn 0 Zeilen betroffen waren (z.B. durch RLS oder falsche ID) — der
+        // Nutzer bekaeme eine Erfolgsmeldung fuer einen stillen Fehlschlag.
+        const { data, error } = await supabase
+          .from('service_tasks')
+          .update({ notes })
+          .eq('id', taskId)
+          .select('id, notes');
+
         if (error) throw error;
+
+        if (!data || data.length === 0) {
+          throw new Error(
+            `Update betraf 0 Zeilen (task ${taskId}) — Datensatz nicht gefunden oder keine Schreibrechte.`
+          );
+        }
+
+        // Ohne diesen Refresh bleibt der lokale State (combinedEntries) auf dem
+        // alten Wert stehen. CleaningActionTiles initialisiert notesValue aus dem
+        // Prop, weshalb beim erneuten Oeffnen wieder der alte Text erschien und es
+        // so aussah, als sei nicht gespeichert worden. Status/Termin machen das
+        // ueber useBookings bereits — nur die Notiz umging den Hook.
+        await forceRefresh();
+
         notify({
           title: 'Notizen aktualisiert',
           description: 'Die Notizen wurden erfolgreich gespeichert.',
@@ -225,7 +247,7 @@ const CleaningPortal = ({ chatProps }: CleaningPortalProps) => {
         showError('Notizen konnten nicht aktualisiert werden.');
       }
     },
-    [notify]
+    [notify, forceRefresh]
   );
 
 
