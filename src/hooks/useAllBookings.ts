@@ -21,8 +21,6 @@ export const useAllBookings = () => {
         .from('bookings')
         .select(`
           id,
-          guest_name,
-          guest_email,
           check_in,
           check_out,
           number_of_guests,
