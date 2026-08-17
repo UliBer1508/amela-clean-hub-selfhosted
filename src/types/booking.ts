@@ -46,8 +46,15 @@ export interface LinenOrder {
 
 export interface Booking {
   id: string;
-  guest_name: string;
-  guest_email: string;
+  /**
+   * Etappe 4/6 der Gastdaten-Entdopplung: Die Kopiespalten in `bookings`
+   * werden nicht mehr abgefragt — Gastdaten kommen aus der `guests`-Relation.
+   * Die Felder bleiben optional deklariert, solange die Spalten in der
+   * Datenbank noch existieren; gelesen wird ausschliesslich ueber
+   * `getGuestName()` / `getGuestEmail()` aus `@/lib/guestHelpers`.
+   */
+  guest_name?: string;
+  guest_email?: string;
   check_in: string;
   check_out: string;
   number_of_guests: number;
