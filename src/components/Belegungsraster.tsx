@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { format, startOfWeek, addDays, isToday } from 'date-fns';
+import { format, startOfWeek, addDays, isToday, isSameMonth } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import {
@@ -58,6 +58,18 @@ interface BelegungsrasterProps {
   startDatum: Date;
   /** Wie viele Wochen untereinander gezeigt werden */
   wochen?: number;
+  /**
+   * Aufgabenliste unter jeder Woche anzeigen.
+   * `false` in der Monatsansicht: dort geht es um den Überblick, und fünf bis
+   * sechs Wochenblöcke MIT Auftragszeilen wären auf dem Handy nur noch Scrollen.
+   */
+  zeigeAufgabenliste?: boolean;
+  /**
+   * Wenn gesetzt, werden Tage ausserhalb DIESES Monats blass dargestellt.
+   * Das Raster zeigt immer volle Wochen (Mo–So), im Monatsmodus ragen also
+   * Nachbartage herein — ohne Abblendung verliert man die Monatsgrenze.
+   */
+  monatFokus?: Date;
   /** Symbol der eigenen Aufgabe */
   meinSymbol?: string;
   /** Beschriftung in der Legende, z. B. "Reinigung" / "Wäsche" */
@@ -78,6 +90,8 @@ const Belegungsraster = ({
   infoAufgaben = [],
   startDatum,
   wochen = 4,
+  zeigeAufgabenliste = true,
+  monatFokus,
   meinSymbol = '🧹',
   meinName = 'Reinigung',
   infoName = 'Wäsche',
@@ -146,15 +160,23 @@ const Belegungsraster = ({
 
     return (
       <div key={wochenStart.toISOString()} className="mb-5 last:mb-0">
-        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1.5">
-          {format(wochenStart, 'd. MMM', { locale: de })} – {format(addDays(wochenStart, 6), 'd. MMM yyyy', { locale: de })}
-        </div>
+        {!monatFokus && (
+          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1.5">
+            {format(wochenStart, 'd. MMM', { locale: de })} – {format(addDays(wochenStart, 6), 'd. MMM yyyy', { locale: de })}
+          </div>
+        )}
 
         {/* Tageskopf */}
         <div className="grid gap-1 mb-1 grid-cols-[repeat(7,minmax(0,1fr))] sm:grid-cols-[96px_repeat(7,minmax(0,1fr))]">
           <div className="hidden sm:block" />
           {tage.map(tag => (
-            <div key={tag.toISOString()} className="text-center leading-tight">
+            <div
+              key={tag.toISOString()}
+              className={cn(
+                'text-center leading-tight',
+                monatFokus && !isSameMonth(tag, monatFokus) && 'opacity-40'
+              )}
+            >
               <div className={cn('text-xs font-semibold', isToday(tag) ? 'text-primary' : 'text-foreground')}>
                 {format(tag, 'EEEEEE', { locale: de })}
               </div>
@@ -222,6 +244,7 @@ const Belegungsraster = ({
                       onClick={meine && onAufgabeClick ? () => onAufgabeClick(meine.id) : undefined}
                       className={cn(
                         'relative h-11 rounded overflow-hidden',
+                        monatFokus && !isSameMonth(tag, monatFokus) && 'opacity-40',
                         info.status === 'free' && 'border border-border',
                         meine && 'cursor-pointer active:scale-[0.97] transition-transform',
                         meine && !gefaehrdet && 'ring-2 ring-inset ring-primary',
@@ -232,20 +255,24 @@ const Belegungsraster = ({
                       {beschriftung && (
                         <span
                           className={cn(
-                            'absolute inset-0 flex items-center justify-center text-[10px] font-semibold truncate',
-                            meine ? 'pl-0.5 pr-6' : 'px-0.5'
+                            'absolute inset-y-0 left-0 flex items-center',
+                            meine ? 'right-[24px]' : 'right-0'
                           )}
-                          style={{ color: hc.text }}
                         >
-                          {beschriftung.split(' ')[0]}
+                          <span
+                            className="w-full px-1 text-[10px] font-semibold text-center truncate"
+                            style={{ color: hc.text }}
+                          >
+                            {beschriftung.split(' ')[0]}
+                          </span>
                         </span>
                       )}
 
                       {meine && (
                         <span
                           className={cn(
-                            'absolute top-0.5 right-0.5 w-5 h-5 rounded-full border-2 bg-card',
-                            'flex items-center justify-center text-[10px] leading-none shadow-sm z-10',
+                            'absolute top-0.5 right-0.5 w-[22px] h-[22px] rounded-full border-2 bg-card',
+                            'flex items-center justify-center text-[13px] leading-none shadow-sm z-10',
                             istErledigt(meine.status) ? 'border-green-600' : gefaehrdet ? 'border-destructive' : 'border-primary'
                           )}
                         >
@@ -274,6 +301,7 @@ const Belegungsraster = ({
         })}
 
         {/* Aufgaben im Klartext — was im 44-px-Feld keinen Platz hat */}
+        {zeigeAufgabenliste && (
         <div className="mt-2 space-y-1.5">
           {aufgabenDerWoche.length === 0 ? (
             <div className="px-3 py-2 text-xs text-muted-foreground border border-dashed border-border rounded-lg">
@@ -327,6 +355,7 @@ const Belegungsraster = ({
             })
           )}
         </div>
+        )}
       </div>
     );
   };
@@ -352,11 +381,31 @@ const Belegungsraster = ({
           Wechseltag
         </span>
         <span className="flex items-center gap-1.5">
+          <span
+            className="w-6 h-3.5 rounded-sm border"
+            style={{
+              background: 'linear-gradient(135deg,#ffffff 0%,#ffffff 42%,#9ca3af 42%,#9ca3af 58%,#fbbf24 58%,#fbbf24 100%)',
+              borderColor: '#d97706',
+            }}
+          />
+          Anreise
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span
+            className="w-6 h-3.5 rounded-sm border"
+            style={{
+              background: 'linear-gradient(135deg,#fbbf24 0%,#fbbf24 42%,#9ca3af 42%,#9ca3af 58%,#ffffff 58%,#ffffff 100%)',
+              borderColor: '#d97706',
+            }}
+          />
+          Abreise
+        </span>
+        <span className="flex items-center gap-1.5">
           <span className="w-6 h-3.5 rounded-sm border border-border bg-card" />
           frei
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-5 h-5 rounded-full border-2 border-primary bg-card flex items-center justify-center text-[10px] leading-none">
+          <span className="w-[22px] h-[22px] rounded-full border-2 border-primary bg-card flex items-center justify-center text-[13px] leading-none">
             {meinSymbol}
           </span>
           {meinName}
