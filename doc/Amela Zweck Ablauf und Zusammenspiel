@@ -133,7 +133,26 @@ Dazu vier Markierungen:
 
 Unter jeder Woche stehen die Aufträge im Klartext (Uhrzeit, Gastnamen,
 „Wechsel: X reist ab, Y kommt an"). Antippen öffnet die Detailansicht wie
-bisher. Die Monatsansicht bleibt unverändert erhalten.
+bisher.
+
+### Zwei Zeiträume, ein Bild
+
+| Schaltfläche | Zeitraum | Wofür |
+|---|---|---|
+| **Belegung** | vier Wochen ab heute, mit Auftragszeilen | das Arbeitsfenster |
+| **Monat** | ein ganzer Monat, ohne Auftragszeilen | Überblick und Vorausplanung |
+
+Beide zeigen dasselbe Raster. In der Monatsansicht fehlen die Auftragszeilen
+bewusst: fünf bis sechs Wochenblöcke mit je einer Liste darunter wären auf dem
+Handy nur noch Scrollen. Die Symbole in den Zellen bleiben antippbar.
+
+Tage aus dem Vor- oder Folgemonat werden blass dargestellt — das Raster zeigt
+immer volle Wochen von Montag bis Sonntag, sonst wäre die Monatsgrenze nicht
+erkennbar.
+
+Bis zum 18.08.2026 zeigte die Monatsansicht ein Gitter mit einem Chip je
+Reinigung: nur Termine, keine Belegung — dieselbe Schwäche wie die alte
+Wochenliste.
 
 **Hausfarben:** Venediger amber, Wald cyan — identisch zu Hausverwaltung und
 Website. Vorher hatte dieses Portal eine eigene Tabelle mit Grün/Violett;
