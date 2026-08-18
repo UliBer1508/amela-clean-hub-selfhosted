@@ -1,6 +1,6 @@
 # Amela Reinigungsportal — Zweck, Ablauf & Zusammenspiel
 
-> Stand: 26.06.2026
+> Stand: 18.08.2026 (Erstfassung 26.06.2026)
 > Repo: `amela-clean-hub-selfhosted` · gehostet auf `amela.steinbockchalets-charge.com`
 > Diese Datei beschreibt, **wofür** das Portal da ist und **wie** es im Alltag
 > genutzt wird — nicht den technischen Aufbau, sondern den Arbeitsablauf.
@@ -99,6 +99,71 @@ Buchung gekoppelt.
 
 ---
 
+## 4a. Der Kalender — Belegungsraster (NEU 18.08.2026)
+
+Der Kalender (`/calendar`) hatte bis heute eine reine Terminliste: „am 16.08.
+Wald Chalet, 11:00". Damit war nicht erkennbar, **warum** an dem Tag gearbeitet
+wird und ob der Termin Spielraum hat.
+
+Er zeigt jetzt dasselbe Raster wie die Hausverwaltung: **Zeile = Haus,
+Spalte = Tag**, vier Wochen untereinander.
+
+| Feld | Bedeutung |
+|---|---|
+| Vollton in der Hausfarbe | belegt |
+| diagonal geteilt, weiß → Farbe | Anreise |
+| diagonal geteilt, Farbe → weiß | Abreise |
+| diagonal geteilt, Farbe → Farbe | **Wechseltag** — abreisen und anreisen am selben Tag, Termin nicht verschiebbar |
+| weiß | frei — nach einer Abreise ist hier Luft |
+
+Das beantwortet genau die Frage aus Abschnitt 3 („wann passt Amela den
+Reinigungstag an?") auf einen Blick, statt durch Vergleichen einzelner
+Buchungskarten.
+
+Dazu vier Markierungen:
+
+- **🧹 im Feld** = Amelas Reinigung. Grüner Rand = erledigt.
+- **Streifen am unteren Zellenrand** = Wäsche. Grün = geliefert, grau = offen.
+  Reine Information, kein Auftrag — ohne frische Wäsche kann nicht gereinigt
+  werden.
+- **Roter Rahmen** = Reinigung steht an, Wäsche ist noch nicht da. Genau die
+  Lage, wegen der Max heute Erinnerungen an Teuni schickt.
+- **Amberfarbener Punkt** = beide Häuser haben am selben Tag eine Reinigung.
+  Amela kann nicht an zwei Orten gleichzeitig sein.
+
+Unter jeder Woche stehen die Aufträge im Klartext (Uhrzeit, Gastnamen,
+„Wechsel: X reist ab, Y kommt an"). Antippen öffnet die Detailansicht wie
+bisher. Die Monatsansicht bleibt unverändert erhalten.
+
+**Hausfarben:** Venediger amber, Wald cyan — identisch zu Hausverwaltung und
+Website. Vorher hatte dieses Portal eine eigene Tabelle mit Grün/Violett;
+dasselbe Haus sah in jedem System anders aus.
+
+**Reinigungen ohne Buchung** (General-/Saisonreinigung) erscheinen jetzt
+ebenfalls im Kalender. Sie haben keinen Anreisetag und sitzen deshalb auf ihrem
+echten `scheduled_date`. Angelegt werden sie weiterhin nur in der
+Hausverwaltung (Abschnitt 7).
+
+### Wo die Logik liegt
+
+| Datei | Inhalt |
+|---|---|
+| `src/lib/belegung.ts` | Belegungslogik (`getDayInfo`, `getCellStyle`) und Hausfarben (`getHouseColors`) |
+| `src/components/Belegungsraster.tsx` | Darstellung, portalneutral — kennt weder Provider noch Rolle |
+| `src/pages/Calendar.tsx` | verknüpft beides mit den Daten dieses Portals |
+| `src/hooks/useAllBookings.ts` | lädt Buchungen, Reinigungen **und** Wäschebestellungen |
+
+Die ersten drei Dateien sind **byte-identisch mit dem Boris-Portal** (nachgewiesen
+per SHA-1). Wer sie hier ändert, muss sie dort mitziehen — sonst bedeutet
+„Wechseltag" je nach Portal etwas anderes.
+
+**Provider-Filter:** Der Kalender zeigt ausschließlich Reinigungen mit
+`provider_id = AMELA_PROVIDER_ID`. Bis zum 18.08.2026 stand dieser Filter **nur**
+auf der Startseite (`CleaningPortal.tsx:79`), nicht im Kalender — dort war er nie
+geprüft worden. Jetzt steht er auch dort explizit im Code.
+
+---
+
 ## 5. Was Amela im Portal sieht (Kartenaufbau)
 
 Pro Buchung zeigt das Portal:
@@ -129,7 +194,7 @@ schlicht nicht gebraucht.
 | Funktion | Status | Warum ungenutzt |
 |---|---|---|
 | **Putzkräfte zuweisen / verwalten** | aktiv verdrahtet (Route `/putzkraefte`, Staff-Filter, `updateTaskStaff`) | Amela stellt **keine** Putzkräfte ein — sie ist selbst die Reinigungskraft |
-| **Standalone-Reinigung anlegen** | Dialog im Code vorhanden | Standalone-Reinigungen werden **nur in der Hausverwaltung** angelegt, nicht hier |
+| **Standalone-Reinigung anlegen** | Dialog im Code vorhanden | Standalone-Reinigungen werden **nur in der Hausverwaltung** angelegt, nicht hier. Seit 18.08.2026 werden sie im Kalender aber **angezeigt** (Abschnitt 4a) — anlegen und anzeigen sind zweierlei. |
 
 > **Für Claude / Entwickler:** Bei Analysen NICHT annehmen, dass diese Funktionen
 > Teil des Amela-Alltags sind, nur weil der Code sie enthält. Die Existenz einer
@@ -150,3 +215,23 @@ Die real genutzten Funktionen im Überblick:
 - **Reinigungsstatus** setzen (geplant → in Arbeit → abgeschlossen)
 - sehen, **wann die Wäsche geliefert** wird (aus dem Teuni-/Wäsche-System)
 - Notizen / Checkliste zur Reinigung
+- im **Belegungsraster** sehen, ob ein Termin an einem Gästewechsel hängt und
+  ob die Wäsche rechtzeitig da ist (Abschnitt 4a)
+
+---
+
+## 9. Ablage in diesem Repo (aufgenommen 18.08.2026)
+
+Beim Nachziehen der Doku sind vier Stellen aufgefallen, die jemanden auf einen
+falschen Stand führen können. Keine davon stört den Betrieb.
+
+| Datei | Befund | Vorschlag |
+|---|---|---|
+| `CHANGELOG.md` (Repo-Root) | Stand 30.09.2025, Version 1.0.0. Seither ist ein Jahr Arbeit dazugekommen, die nirgends im Repo festgehalten ist. Das Boris-Portal führt seinen Changelog unter `doc/CHANGELOG.md` weiter. | fortführen oder auf `doc/CHANGELOG.md` umziehen wie bei Boris |
+| `public/amela-CHANGELOG.md` | Zweiter, abweichender Changelog — liegt in `public/`, wird also mit ausgeliefert. | zusammenführen oder entfernen |
+| `README.md` (Repo-Root) | Verweist auf ein Lovable-Projekt. Lovable wird seit 13.07.2026 nicht mehr genutzt. | Verweis entfernen |
+| `src/hooks/docs/Amela-Portal-Zweck-und-Ablauf.md` | **Leer** (1 Byte) und im Quellcode-Verzeichnis. Dieselbe leere Datei liegt auch im Boris-Repo — sie wurde beim Kopieren mitgenommen. | löschen (Ordner `src/hooks/docs/` entfällt damit) |
+
+Zusätzlich: Diese Datei hier hat **keine Dateiendung**. Mit `.md` wäre sie auf
+GitHub lesbar formatiert statt als Rohtext. Der Ordner heißt `doc/`, in der
+Hausverwaltung `docs/`.
