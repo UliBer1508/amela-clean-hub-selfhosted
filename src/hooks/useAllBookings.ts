@@ -5,6 +5,16 @@ import { Booking } from '@/types/booking';
 /**
  * Hook zum Laden ALLER Buchungen (für Kalenderansicht).
  * Separat vom CleaningPortal-Hook (useBookings), um doppeltes Fetching zu vermeiden.
+ *
+ * Änderungen 18.08.2026 (Belegungsraster):
+ * - `houses` als `!inner` mit Filter `rental_type = 'tourist'`. Ohne den Filter
+ *   kämen die Dauermietobjekte als eigene Zeilen ins Raster; `useHouses`
+ *   filtert bereits so, die Buchungsabfrage tat es bisher nicht.
+ * - `linen_orders` mitgeladen. Das Raster zeigt am unteren Rand der Zelle, ob
+ *   die Wäsche für diesen Wechsel schon da ist — dafür braucht der Kalender
+ *   die Bestellung. Bisher lud nur `useBookings` sie.
+ * - Realtime-Kanal für `linen_orders` ergänzt, sonst bliebe eine gerade als
+ *   geliefert gemeldete Bestellung im Kalender offen stehen.
  */
 export const useAllBookings = () => {
   const [allBookings, setAllBookings] = useState<Booking[]>([]);
@@ -26,9 +36,10 @@ export const useAllBookings = () => {
           number_of_guests,
           status,
           house_id,
-          houses!bookings_house_id_fkey (
+          houses!bookings_house_id_fkey!inner (
             name,
-            address
+            address,
+            rental_type
           ),
           guests (*),
           service_tasks!service_tasks_booking_id_fkey (
@@ -45,8 +56,16 @@ export const useAllBookings = () => {
             service_providers!service_tasks_provider_id_fkey (
               name
             )
+          ),
+          linen_orders!linen_orders_booking_id_fkey (
+            id,
+            status,
+            delivery_date,
+            delivery_time,
+            total_items
           )
         `)
+        .eq('houses.rental_type', 'tourist')
         .order('check_in', { ascending: true });
 
       if (fetchError) throw fetchError;
@@ -76,11 +95,16 @@ export const useAllBookings = () => {
       .channel('all-tasks-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'service_tasks' }, () => debouncedFetch())
       .subscribe();
+    const linenChannel = supabase
+      .channel('all-linen-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'linen_orders' }, () => debouncedFetch())
+      .subscribe();
 
     return () => {
       if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
       supabase.removeChannel(bookingsChannel);
       supabase.removeChannel(tasksChannel);
+      supabase.removeChannel(linenChannel);
     };
   }, [fetchAllBookings, debouncedFetch]);
 
