@@ -17,41 +17,31 @@ import ReminderSettingsPopover from '@/components/amela/ReminderSettingsPopover'
 import PullToRefresh from '@/components/PullToRefresh';
 import {
   format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay,
-  addMonths, subMonths, startOfWeek, endOfWeek, addWeeks, subWeeks, isWithinInterval,
+  addMonths, subMonths, startOfWeek, endOfWeek, addWeeks, subWeeks,
 } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { ChatButton } from '@/components/PortalChat';
 import { usePortalMessages } from '@/hooks/usePortalMessages';
 import { cn } from '@/lib/utils';
 import { getGuestName } from '@/lib/guestHelpers';
+// In diesem Repo heisst die Konstante noch AMELA_PROVIDER_ID (im Boris-Repo
+// wurde sie am 21.07.2026 auf PROVIDER_ID umbenannt). Alias wie in
+// useBookings.ts:11, damit der uebrige Code in beiden Portalen gleich bleibt.
+import { AMELA_PROVIDER_ID as PROVIDER_ID } from '@/constants/app';
+import Belegungsraster, { type RasterAufgabe, type RasterHaus } from '@/components/Belegungsraster';
+import { getHouseColors, type RasterBuchung } from '@/lib/belegung';
 
 type ViewType = 'week' | 'month';
 
 // Statuswerte, die eine Reinigung als "nicht mehr aktiv" markieren -> ausblenden.
 const CANCELLED_STATUSES = new Set(['cancelled', 'storniert', 'abgebrochen']);
 
-// Haus-Farben für visuelle Unterscheidung
-const HOUSE_COLORS = [
-  { hex: '#3b82f6' }, { hex: '#a855f7' }, { hex: '#10b981' }, { hex: '#f59e0b' },
-  { hex: '#f43f5e' }, { hex: '#06b6d4' }, { hex: '#6366f1' }, { hex: '#ec4899' },
-];
-
-// Feste, sprechende Farben je nach Hausname (überschreibt Hash-Farbe)
-const HOUSE_NAME_COLOR_OVERRIDES: Array<{ match: string; hex: string }> = [
-  { match: 'wald', hex: '#22c55e' },
-  { match: 'venediger', hex: '#a855f7' },
-];
-
-const getHouseColor = (houseId: string, houseName?: string) => {
-  if (houseName) {
-    const lower = houseName.toLowerCase();
-    const override = HOUSE_NAME_COLOR_OVERRIDES.find(o => lower.includes(o.match));
-    if (override) return override.hex;
-  }
-  if (!houseId) return HOUSE_COLORS[0].hex;
-  const hash = houseId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return HOUSE_COLORS[hash % HOUSE_COLORS.length].hex;
-};
+// Hausfarbe aus der gemeinsamen Quelle (@/lib/belegung). Vorher stand hier eine
+// eigene Tabelle mit Grün/Violett — dasselbe Haus hatte damit in Hausverwaltung,
+// Amela- und Teuni-Portal drei verschiedene Farben. Der zweite Parameter bleibt
+// aus Aufrufer-Sicht erhalten; die houseId wird nicht mehr gebraucht.
+const getHouseColor = (_houseId: string, houseName?: string) =>
+  getHouseColors(houseName || '').base;
 
 interface CleaningEvent {
   id: string;
@@ -59,6 +49,8 @@ interface CleaningEvent {
   date: Date;
   house: string;
   house_id: string;
+  /** null bei Reinigungen ohne Buchung (Fenster-/Generalreinigung) */
+  bookingId?: string | null;
   status?: string;
   scheduledTime?: string | null;
   notes?: string | null;
@@ -97,20 +89,31 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   const { allBookings, loading, forceRefresh } = useAllBookings();
-  const { totalCleaningTasks } = useBookings();
+  const { totalCleaningTasks, standaloneCleanings } = useBookings();
   const { houses } = useHouses();
   const { staff: cleaningStaff } = useCleaningStaff();
 
-  // Nur Reinigungen aus den Buchungen ziehen; stornierte Buchungen und
-  // stornierte Reinigungen werden ausgefiltert (verhindert Doppel-/Geistereinträge).
+  // Reinigungen dieses Portals. ZWEI Quellen, beide mit Provider-Filter:
+  //
+  // 1. Reinigungen AN EINER BUCHUNG (Regelfall, Termin = Check-in-Tag).
+  // 2. Reinigungen OHNE BUCHUNG (`booking_id is null`) — Fensterreinigung,
+  //    General-/Saisonreinigung. Sie fehlten hier bisher vollständig — im
+  //    Reinigungs-Tab der Hausverwaltung gibt es sie seit dem 21.07.2026
+  //    (CODE-INDEX Abschnitt 9, "Reinigung OHNE Buchung").
+  //
+  // Der Filter `provider_id === PROVIDER_ID` setzt die dokumentierte Regel um
+  // ("Das Portal zeigt ausschließlich Reinigungen mit provider_id = …").
+  // Die Startseite filtert seit jeher so (CleaningPortal.tsx), der Kalender
+  // nicht — er verließ sich unausgesprochen auf die Datenbank.
   const cleaningEvents = useMemo<CleaningEvent[]>(() => {
-    if (!allBookings) return [];
     const events: CleaningEvent[] = [];
-    allBookings.forEach(booking => {
+
+    (allBookings || []).forEach(booking => {
       if (booking.status === 'cancelled') return;
       const guestName = getGuestName(booking);
       booking.service_tasks?.forEach(task => {
         if (task.service_type !== 'cleaning') return;
+        if (task.provider_id !== PROVIDER_ID) return;
         if (CANCELLED_STATUSES.has(String(task.status || '').toLowerCase())) return;
         if (!task.scheduled_date) return;
         events.push({
@@ -119,6 +122,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
           date: new Date(task.scheduled_date),
           house: booking.houses?.name || 'Unbekannt',
           house_id: booking.house_id,
+          bookingId: booking.id,
           status: task.status,
           scheduledTime: task.scheduled_time ?? null,
           notes: task.notes ?? null,
@@ -128,34 +132,124 @@ const Calendar = ({ chatProps }: CalendarProps) => {
         });
       });
     });
+
+    (standaloneCleanings || []).forEach(task => {
+      if (task.provider_id !== PROVIDER_ID) return;
+      if (CANCELLED_STATUSES.has(String(task.status || '').toLowerCase())) return;
+      if (!task.scheduled_date) return;
+      events.push({
+        id: `cleaning-${task.id}`,
+        taskId: task.id,
+        date: new Date(task.scheduled_date),
+        house: task.houses?.name || 'Unbekannt',
+        house_id: task.house_id,
+        bookingId: null,
+        status: task.status,
+        scheduledTime: task.scheduled_time ?? null,
+        notes: task.notes ?? null,
+        assignedStaffId: task.assigned_staff_id ?? null,
+        houseAddress: task.houses?.address ?? null,
+        guestName: undefined,
+      });
+    });
+
     return events;
-  }, [allBookings]);
+  }, [allBookings, standaloneCleanings]);
 
   const eventsForDay = (day: Date) =>
     cleaningEvents
       .filter(e => isSameDay(e.date, day))
       .sort((a, b) => (a.scheduledTime || '').localeCompare(b.scheduledTime || ''));
 
-  // Woche: 7 Tage der aktuellen Woche
-  const weekDays = useMemo(() => {
-    const start = startOfWeek(currentDate, { weekStartsOn: 1 });
-    const end = endOfWeek(currentDate, { weekStartsOn: 1 });
-    return eachDayOfInterval({ start, end });
-  }, [currentDate]);
+  // ---------------------------------------------------------------------
+  // Daten für das Belegungsraster
+  // ---------------------------------------------------------------------
+  // Das Raster zeigt Belegung UND Auftrag im selben Bild. Es ersetzt die
+  // frühere Tagesliste plus "Kommende Wochen": vier Wochen untereinander,
+  // darunter je Woche die Aufträge im Klartext.
 
-  // Vorschau: die nächsten 4 Wochen nach der aktuellen Woche, jeweils zusammengefasst
-  const upcomingWeeks = useMemo(() => {
-    const result: Array<{ start: Date; end: Date; events: CleaningEvent[] }> = [];
-    for (let i = 1; i <= 4; i++) {
-      const start = startOfWeek(addWeeks(currentDate, i), { weekStartsOn: 1 });
-      const end = endOfWeek(addWeeks(currentDate, i), { weekStartsOn: 1 });
-      const events = cleaningEvents
-        .filter(e => isWithinInterval(e.date, { start, end }))
-        .sort((a, b) => a.date.getTime() - b.date.getTime());
-      if (events.length > 0) result.push({ start, end, events });
-    }
-    return result;
-  }, [cleaningEvents, currentDate]);
+  const rasterHaeuser = useMemo<RasterHaus[]>(
+    () => houses.map(h => ({ id: h.id, name: h.name })),
+    [houses]
+  );
+
+  const rasterBuchungen = useMemo<RasterBuchung[]>(
+    () =>
+      (allBookings || []).map(b => ({
+        id: b.id,
+        house_id: b.house_id,
+        check_in: b.check_in,
+        check_out: b.check_out,
+        gastName: getGuestName(b),
+        status: b.status,
+      })),
+    [allBookings]
+  );
+
+  // Wäschelieferungen: KEIN Auftrag für dieses Portal, nur Information —
+  // ohne frische Wäsche kann nicht gereinigt werden. Sie erscheinen deshalb
+  // nur als schmaler Streifen in der Zelle, nicht als Symbol.
+  const rasterWaesche = useMemo<RasterAufgabe[]>(() => {
+    const out: RasterAufgabe[] = [];
+    (allBookings || []).forEach(booking => {
+      if (booking.status === 'cancelled') return;
+      booking.linen_orders?.forEach(order => {
+        if (CANCELLED_STATUSES.has(String(order.status || '').toLowerCase())) return;
+        if (!order.delivery_date) return;
+        out.push({
+          id: `linen-${order.id}`,
+          house_id: booking.house_id,
+          datum: order.delivery_date.substring(0, 10),
+          uhrzeit: order.delivery_time ?? null,
+          status: order.status ?? null,
+          booking_id: booking.id,
+          titel: 'Wäschelieferung',
+        });
+      });
+    });
+    return out;
+  }, [allBookings]);
+
+  const rasterAufgaben = useMemo<RasterAufgabe[]>(() => {
+    const bekannteHaeuser = new Set(houses.map(h => h.id));
+    return cleaningEvents
+      .filter(e => bekannteHaeuser.has(e.house_id))
+      .map(e => {
+        const buchung = e.bookingId
+          ? (allBookings || []).find(b => b.id === e.bookingId)
+          : undefined;
+        const anreise = buchung
+          ? (allBookings || []).find(
+              b => b.house_id === e.house_id && b.check_in.substring(0, 10) === buchung.check_in.substring(0, 10)
+            )
+          : undefined;
+        const abreise = buchung
+          ? (allBookings || []).find(
+              b =>
+                b.house_id === e.house_id &&
+                b.id !== buchung.id &&
+                b.check_out.substring(0, 10) === buchung.check_in.substring(0, 10)
+            )
+          : undefined;
+
+        const hinweis = !buchung
+          ? (e.notes ? e.notes.slice(0, 60) : 'Reinigung ohne Buchung')
+          : abreise
+            ? `Wechsel: ${getGuestName(abreise) || 'Gast'} reist ab, ${getGuestName(anreise ?? buchung) || 'Gast'} kommt an`
+            : `Anreise ${getGuestName(buchung) || 'Gast'}`;
+
+        return {
+          id: e.taskId,
+          house_id: e.house_id,
+          datum: format(e.date, 'yyyy-MM-dd'),
+          uhrzeit: e.scheduledTime,
+          status: e.status ?? null,
+          booking_id: e.bookingId ?? null,
+          titel: `${e.house} reinigen`,
+          hinweis,
+        };
+      });
+  }, [cleaningEvents, houses, allBookings]);
 
   // Monat: volles Kalendergitter (Mo–So)
   const monthGridDays = useMemo(() => {
@@ -173,9 +267,11 @@ const Calendar = ({ chatProps }: CalendarProps) => {
   const nextPeriod = () =>
     setCurrentDate(prev => (viewType === 'week' ? addWeeks(prev, 1) : addMonths(prev, 1)));
 
+  // Die Belegungsansicht zeigt VIER Wochen; der Titel muss denselben Zeitraum
+  // nennen, sonst steht über dem Raster eine Woche, die es gar nicht abgrenzt.
   const periodTitle =
     viewType === 'week'
-      ? `${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} – ${format(endOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
+      ? `${format(startOfWeek(currentDate, { weekStartsOn: 1 }), 'd. MMM', { locale: de })} – ${format(endOfWeek(addWeeks(currentDate, 3), { weekStartsOn: 1 }), 'd. MMM yyyy', { locale: de })}`
       : format(currentDate, 'MMMM yyyy', { locale: de });
 
   const weekdayHeader = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
@@ -259,7 +355,7 @@ const Calendar = ({ chatProps }: CalendarProps) => {
             onClick={() => setViewType('week')}
             className="min-h-[44px] active:scale-95"
           >
-            Woche
+            Belegung
           </Button>
           <Button
             variant={viewType === 'month' ? 'default' : 'outline'}
@@ -297,94 +393,23 @@ const Calendar = ({ chatProps }: CalendarProps) => {
         </div>
 
         {viewType === 'week' ? (
-          /* ---------- WOCHENANSICHT ---------- */
-          <div className="space-y-5">
-            <Card>
-              <CardContent className="p-3 md:p-4 space-y-2">
-                {weekDays.map(day => {
-                  const dayEvents = eventsForDay(day);
-                  const todayFlag = isToday(day);
-                  const hasWork = dayEvents.length > 0;
-                  return (
-                    <div
-                      key={day.toISOString()}
-                      className={cn(
-                        'flex items-start gap-3 rounded-lg p-2.5',
-                        hasWork ? 'bg-surface-tint' : 'bg-muted/20',
-                        todayFlag && 'ring-2 ring-primary ring-inset'
-                      )}
-                    >
-                      <div className={cn('w-14 shrink-0 text-sm', !hasWork && 'opacity-60')}>
-                        <div className={cn('font-semibold', todayFlag && 'text-primary')}>
-                          {format(day, 'EEE', { locale: de })}
-                        </div>
-                        <div className="text-xs text-muted-foreground">{format(day, 'd.', { locale: de })}</div>
-                      </div>
-                      {hasWork ? (
-                        <div className="flex-1 flex flex-col gap-1.5 min-w-0">
-                          {dayEvents.map(event => {
-                            const color = getHouseColor(event.house_id, event.house);
-                            return (
-                              <button
-                                key={event.id}
-                                type="button"
-                                onClick={() => openDetail(event.taskId)}
-                                style={{ borderLeftColor: color, borderLeftWidth: 4 }}
-                                className="w-full flex items-center gap-2 px-3 py-2 bg-card border border-border/60 rounded-r-lg text-left active:scale-[0.99] transition-transform"
-                              >
-                                <Sparkles className="w-4 h-4 shrink-0" style={{ color }} />
-                                <span className="font-medium text-sm truncate">{event.house}</span>
-                                <span className="ml-auto text-sm text-muted-foreground shrink-0">
-                                  {event.scheduledTime ? event.scheduledTime.slice(0, 5) : ''}
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <div className="flex-1 flex items-center text-sm text-muted-foreground opacity-60">frei</div>
-                      )}
-                    </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-
-            {/* Vorschau kommende Wochen */}
-            {upcomingWeeks.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-muted-foreground mb-2">Kommende Wochen</h3>
-                <Card>
-                  <CardContent className="p-3 md:p-4 space-y-2">
-                    {upcomingWeeks.map(week => (
-                      <div key={week.start.toISOString()} className="flex items-start gap-3">
-                        <div className="w-28 shrink-0 text-xs text-muted-foreground pt-0.5">
-                          {format(week.start, 'd. MMM', { locale: de })} – {format(week.end, 'd. MMM', { locale: de })}
-                        </div>
-                        <div className="flex-1 flex flex-wrap gap-x-3 gap-y-1">
-                          {week.events.map(event => {
-                            const color = getHouseColor(event.house_id, event.house);
-                            return (
-                              <button
-                                key={event.id}
-                                type="button"
-                                onClick={() => openDetail(event.taskId)}
-                                className="flex items-center gap-1.5 text-sm active:opacity-70"
-                              >
-                                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
-                                <span className="font-medium">{format(event.date, 'EEE', { locale: de })}</span>
-                                <span className="text-muted-foreground">· {event.house}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-          </div>
+          /* ---------- BELEGUNGSRASTER (vier Wochen) ---------- */
+          <Card>
+            <CardContent className="p-3 md:p-4">
+              <Belegungsraster
+                haeuser={rasterHaeuser}
+                buchungen={rasterBuchungen}
+                meineAufgaben={rasterAufgaben}
+                infoAufgaben={rasterWaesche}
+                startDatum={currentDate}
+                wochen={4}
+                meinSymbol="🧹"
+                meinName="Reinigung"
+                infoName="Wäsche"
+                onAufgabeClick={openDetail}
+              />
+            </CardContent>
+          </Card>
         ) : (
           /* ---------- MONATSANSICHT ---------- */
           <Card>
