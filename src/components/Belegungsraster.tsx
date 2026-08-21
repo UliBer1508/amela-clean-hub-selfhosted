@@ -18,12 +18,21 @@ import {
  * anreisen am selben Tag) — dann ist der Termin nicht verschiebbar. Steht nach
  * der Abreise ein weißes Feld, ist Luft.
  *
- * Aufteilung eigene / fremde Aufgabe:
- * - `meineAufgaben` bekommen ein Symbol IM Feld (das ist der Auftrag)
- * - `infoAufgaben` erscheinen nur als schmaler Streifen am unteren Rand
- *   (Reinigung braucht die Wäsche, Wäsche braucht den Reinigungstermin)
- * Grund für die Ungleichbehandlung: auf dem Handy sind sieben Spalten ~48 px
- * breit — zwei gleich große Symbole passen nicht nebeneinander.
+ * Aufteilung eigene / fremde Aufgabe (überarbeitet 21.08.2026):
+ * - `meineAufgaben` bekommen ein Symbol OBEN RECHTS, Rand durchgezogen
+ * - `infoAufgaben` bekommen ein Symbol UNTEN RECHTS, Rand gestrichelt
+ * Beide stehen an IHREM EIGENEN Tag: der Wäschekorb am Liefertag, der Besen
+ * am Reinigungstag.
+ *
+ * Vorher war die fremde Aufgabe ein schmaler grauer Streifen, der bevorzugt
+ * am Tag der EIGENEN Aufgabe gezeichnet wurde (über die gemeinsame
+ * booking_id). Da Wäsche und Reinigung an verschiedenen Tagen stattfinden,
+ * erschien derselbe Termin zweimal — einmal am falschen Tag — und der
+ * Streifen sagte nicht, wofür er stand.
+ *
+ * Zwei Kreise à 20 px passen übereinander in die 44 px Zellenhöhe. Auf dem
+ * Handy entfällt bei eigener Aufgabe der Gastname; er steht in der
+ * Aufgabenliste und im Tooltip.
  *
  * Die Komponente ist portalneutral: sie kennt weder Provider noch Rolle.
  * Wer welche Aufgaben sieht, entscheidet die aufrufende Seite.
@@ -33,6 +42,43 @@ export interface RasterHaus {
   id: string;
   name: string;
 }
+
+/**
+ * Beschriftungen. Vorgabe ist Deutsch — die Reinigungsportale (Amela, Boris)
+ * uebergeben nichts. Das Teuni-Portal ist dreisprachig (de/en/nl) und reicht
+ * uebersetzte Texte durch. So bleibt DIESE DATEI in allen Portalen identisch.
+ */
+export interface RasterTexte {
+  nichtsZuTun: string;
+  belegt: string;
+  anreise: string;
+  abreise: string;
+  wechseltag: string;
+  frei: string;
+  erledigt: string;
+  offen: string;
+  fehltTerminSteht: string;
+  beideHaeuser: string;
+  vorhanden: string;
+  fehlt: string;
+  pruefen: string;
+}
+
+export const RASTER_TEXTE_DE: RasterTexte = {
+  nichtsZuTun: 'Diese Woche nichts zu tun.',
+  belegt: 'belegt',
+  anreise: 'Anreise',
+  abreise: 'Abreise',
+  wechseltag: 'Wechseltag',
+  frei: 'frei',
+  erledigt: 'erledigt',
+  offen: 'offen',
+  fehltTerminSteht: 'fehlt, Termin steht an',
+  beideHaeuser: 'beide Häuser am selben Tag',
+  vorhanden: 'da',
+  fehlt: 'fehlt',
+  pruefen: 'prüfen',
+};
 
 export interface RasterAufgabe {
   id: string;
@@ -72,9 +118,12 @@ interface BelegungsrasterProps {
   monatFokus?: Date;
   /** Symbol der eigenen Aufgabe */
   meinSymbol?: string;
+  /** Symbol der fremden Aufgabe — steht an IHREM Tag, nicht am eigenen. */
+  infoSymbol?: string;
   /** Beschriftung in der Legende, z. B. "Reinigung" / "Wäsche" */
   meinName?: string;
   infoName?: string;
+  texte?: RasterTexte;
   onAufgabeClick?: (aufgabeId: string) => void;
 }
 
@@ -93,8 +142,10 @@ const Belegungsraster = ({
   zeigeAufgabenliste = true,
   monatFokus,
   meinSymbol = '🧹',
+  infoSymbol = '🧺',
   meinName = 'Reinigung',
   infoName = 'Wäsche',
+  texte = RASTER_TEXTE_DE,
   onAufgabeClick,
 }: BelegungsrasterProps) => {
   const wochenStarts = useMemo(() => {
@@ -216,11 +267,15 @@ const Belegungsraster = ({
                   const info = getDayInfo(buchungen, haus.id, tag);
                   const stil = getCellStyle(info.status, hc.base, hc.border);
                   const meine = meineNachTag.get(`${haus.id}|${key}`);
+                  // Die fremde Aufgabe steht an IHREM Tag.
+                  //
+                  // Bis 21.08.2026 wurde stattdessen ein grauer Streifen
+                  // gezeichnet, und zwar bevorzugt am Tag der EIGENEN Aufgabe
+                  // (`fremdeZurAufgabe` über die gemeinsame booking_id). Da
+                  // Wäsche und Reinigung an verschiedenen Tagen stattfinden,
+                  // erschien derselbe Termin zweimal — einmal am falschen Tag,
+                  // beide Male ohne erkennbare Bedeutung.
                   const fremdeAmTag = infoNachTag.get(`${haus.id}|${key}`);
-                  const fremdeZurAufgabe = meine?.booking_id
-                    ? infoNachBuchung.get(meine.booking_id)
-                    : undefined;
-                  const streifen = fremdeZurAufgabe ?? fremdeAmTag;
                   const gefaehrdet = meine ? istGefaehrdet(meine) : false;
 
                   const beschriftung =
@@ -231,11 +286,11 @@ const Belegungsraster = ({
 
                   const titel =
                     info.status === 'changeover'
-                      ? `Wechseltag — ${info.departing.gastName ?? 'Abreise'} ab, ${info.arriving.gastName ?? 'Anreise'} an`
-                      : info.status === 'checkin' ? `Anreise ${info.arriving.gastName ?? ''}`
-                      : info.status === 'checkout' ? `Abreise ${info.departing.gastName ?? ''}`
-                      : info.status === 'occupied' ? `Belegt — ${info.occupying.gastName ?? ''}`
-                      : 'Frei';
+                      ? `${texte.wechseltag} — ${info.departing.gastName ?? ''} / ${info.arriving.gastName ?? ''}`
+                      : info.status === 'checkin' ? `${texte.anreise} ${info.arriving.gastName ?? ''}`
+                      : info.status === 'checkout' ? `${texte.abreise} ${info.departing.gastName ?? ''}`
+                      : info.status === 'occupied' ? `${texte.belegt} — ${info.occupying.gastName ?? ''}`
+                      : texte.frei;
 
                   return (
                     <div
@@ -252,15 +307,26 @@ const Belegungsraster = ({
                       )}
                       style={stil}
                     >
+                      {/* Gastname.
+                          Auf dem Handy ist eine Zelle rund 57 px breit. Symbol UND
+                          Name passen dort nicht nebeneinander: das Symbol braucht
+                          24 px, der Rest reicht fuer zwei Buchstaben ("Ch..."). In
+                          Zellen MIT eigener Aufgabe entfaellt der Name deshalb auf
+                          schmalen Schirmen — Diagonale plus Symbol sagt bereits
+                          "Wechseltag, hier arbeite ich". Der Name steht in der
+                          Aufgabenliste, im Tooltip und im Detailfenster.
+                          Ab `sm` (640 px) ist Platz fuer beides. */}
                       {beschriftung && (
                         <span
                           className={cn(
-                            'absolute inset-y-0 left-0 flex items-center',
-                            meine ? 'right-[24px]' : 'right-0'
+                            'absolute inset-0 items-center pl-1',
+                            meine ? 'hidden sm:flex sm:pr-7'
+                              : fremdeAmTag ? 'flex pr-7'
+                              : 'flex pr-1'
                           )}
                         >
                           <span
-                            className="w-full px-1 text-[10px] font-semibold text-center truncate"
+                            className="w-full text-[10px] font-semibold text-center truncate"
                             style={{ color: hc.text }}
                           >
                             {beschriftung.split(' ')[0]}
@@ -271,8 +337,8 @@ const Belegungsraster = ({
                       {meine && (
                         <span
                           className={cn(
-                            'absolute top-0.5 right-0.5 w-[22px] h-[22px] rounded-full border-2 bg-card',
-                            'flex items-center justify-center text-[13px] leading-none shadow-sm z-10',
+                            'absolute top-0.5 right-0.5 w-5 h-5 rounded-full border-2 bg-card',
+                            'flex items-center justify-center text-[12px] leading-none shadow-sm z-10',
                             istErledigt(meine.status) ? 'border-green-600' : gefaehrdet ? 'border-destructive' : 'border-primary'
                           )}
                         >
@@ -280,13 +346,21 @@ const Belegungsraster = ({
                         </span>
                       )}
 
-                      {streifen && (
+                      {/* Fremde Aufgabe: gestrichelter Rand, damit ohne Legende
+                          erkennbar ist, dass es nicht die eigene ist. Unten
+                          rechts, das eigene Symbol sitzt oben rechts — zwei
+                          Kreise à 20 px passen in die 44 px Zellenhöhe. */}
+                      {fremdeAmTag && (
                         <span
+                          title={fremdeAmTag.titel}
                           className={cn(
-                            'absolute left-0.5 right-0.5 bottom-0.5 h-1 rounded-full z-10',
-                            istErledigt(streifen.status) ? 'bg-green-600' : 'bg-muted-foreground/40'
+                            'absolute bottom-0.5 right-0.5 w-5 h-5 rounded-full border-2 border-dashed bg-card',
+                            'flex items-center justify-center text-[12px] leading-none shadow-sm z-10',
+                            istErledigt(fremdeAmTag.status) ? 'border-green-600' : 'border-muted-foreground/60'
                           )}
-                        />
+                        >
+                          {infoSymbol}
+                        </span>
                       )}
 
                       {kollisionsTage.has(key) && meine && (
@@ -305,7 +379,7 @@ const Belegungsraster = ({
         <div className="mt-2 space-y-1.5">
           {aufgabenDerWoche.length === 0 ? (
             <div className="px-3 py-2 text-xs text-muted-foreground border border-dashed border-border rounded-lg">
-              Diese Woche nichts zu tun.
+              {texte.nichtsZuTun}
             </div>
           ) : (
             aufgabenDerWoche.map(a => {
@@ -342,12 +416,12 @@ const Belegungsraster = ({
                           : 'bg-destructive/10 text-destructive'
                       )}
                     >
-                      {istErledigt(gegenstueck.status) ? `${infoName} da` : `${infoName} fehlt`}
+                      {istErledigt(gegenstueck.status) ? `${infoName} ${texte.vorhanden}` : `${infoName} ${texte.fehlt}`}
                     </span>
                   )}
                   {!gegenstueck && gefaehrdet && (
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 mt-0.5 bg-destructive/10 text-destructive">
-                      prüfen
+                      {texte.pruefen}
                     </span>
                   )}
                 </button>
@@ -368,7 +442,7 @@ const Belegungsraster = ({
       <div className="flex flex-wrap gap-x-4 gap-y-2 p-3 border border-border rounded-lg bg-card text-xs mt-2">
         <span className="flex items-center gap-1.5">
           <span className="w-6 h-3.5 rounded-sm border" style={{ background: '#fbbf24', borderColor: '#d97706' }} />
-          belegt
+          {texte.belegt}
         </span>
         <span className="flex items-center gap-1.5">
           <span
@@ -378,7 +452,7 @@ const Belegungsraster = ({
               borderColor: '#d97706',
             }}
           />
-          Wechseltag
+          {texte.wechseltag}
         </span>
         <span className="flex items-center gap-1.5">
           <span
@@ -388,7 +462,7 @@ const Belegungsraster = ({
               borderColor: '#d97706',
             }}
           />
-          Anreise
+          {texte.anreise}
         </span>
         <span className="flex items-center gap-1.5">
           <span
@@ -398,33 +472,43 @@ const Belegungsraster = ({
               borderColor: '#d97706',
             }}
           />
-          Abreise
+          {texte.abreise}
         </span>
         <span className="flex items-center gap-1.5">
           <span className="w-6 h-3.5 rounded-sm border border-border bg-card" />
-          frei
+          {texte.frei}
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-[22px] h-[22px] rounded-full border-2 border-primary bg-card flex items-center justify-center text-[13px] leading-none">
+          <span className="w-5 h-5 rounded-full border-2 border-primary bg-card flex items-center justify-center text-[12px] leading-none">
             {meinSymbol}
           </span>
           {meinName}
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-6 h-1 rounded-full bg-green-600" />
-          {infoName} erledigt
+          <span className="w-5 h-5 rounded-full border-2 border-green-600 bg-card flex items-center justify-center text-[12px] leading-none">
+            {meinSymbol}
+          </span>
+          {meinName} {texte.erledigt}
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-6 h-1 rounded-full bg-muted-foreground/40" />
-          {infoName} offen
+          <span className="w-5 h-5 rounded-full border-2 border-dashed border-muted-foreground/60 bg-card flex items-center justify-center text-[12px] leading-none">
+            {infoSymbol}
+          </span>
+          {infoName}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-5 h-5 rounded-full border-2 border-dashed border-green-600 bg-card flex items-center justify-center text-[12px] leading-none">
+            {infoSymbol}
+          </span>
+          {infoName} {texte.erledigt}
         </span>
         <span className="flex items-center gap-1.5">
           <span className="w-5 h-5 rounded-sm ring-2 ring-inset ring-destructive bg-card" />
-          {infoName} fehlt, Termin steht an
+          {infoName} {texte.fehltTerminSteht}
         </span>
         <span className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-amber-500" />
-          beide Häuser am selben Tag
+          {texte.beideHaeuser}
         </span>
       </div>
     </div>
